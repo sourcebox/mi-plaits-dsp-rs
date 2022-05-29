@@ -48,11 +48,11 @@ fn dust() {
 
 #[test]
 fn particle() {
-    let frequency = 220.0;
+    let frequency = 50.0;
     let density = 0.1;
-    let gain = 0.5;
-    let spread = 0.1;
-    let q = 0.1;
+    let gain = 1.0;
+    let spread = 0.5;
+    let q = 0.9;
     let duration = 1.0;
 
     let mut noise = particle::Particle::new();
@@ -65,8 +65,11 @@ fn particle() {
     let blocks = (duration * SAMPLE_RATE / (BLOCK_SIZE as f32)) as usize;
     let f = frequency / SAMPLE_RATE;
 
-    for _ in 0..blocks {
-        noise.render(false, density, gain, f, spread, q, &mut out, &mut aux);
+    for n in 0..blocks {
+        out.fill(0.0);
+        aux.fill(0.0);
+        let sync = n % (blocks / 5) == 0;
+        noise.render(sync, density, gain, f, spread, q, &mut out, &mut aux);
         wav_data.extend_from_slice(&out);
         wav_data_aux.extend_from_slice(&aux);
     }
