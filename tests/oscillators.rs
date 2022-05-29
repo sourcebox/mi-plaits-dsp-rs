@@ -359,8 +359,8 @@ fn fast_sine_oscillator() {
 
 #[test]
 fn string_synth_oscillator() {
-    let frequency = 127.5;
-    let registration: [f32; 7] = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0];
+    let frequency = 55.0;
+    let registration: [f32; 7] = [1.0, 0.0, 0.5, 0.0, 0.2, 0.0, 0.5];
     let duration = 1.0;
 
     let mut osc = string_synth_oscillator::StringSynthOscillator::new();
@@ -372,6 +372,7 @@ fn string_synth_oscillator() {
     let f = frequency / SAMPLE_RATE;
 
     for _ in 0..blocks {
+        out.fill(0.0);
         osc.render(f, &registration, 1.0, &mut out);
         wav_data.extend_from_slice(&out);
     }
