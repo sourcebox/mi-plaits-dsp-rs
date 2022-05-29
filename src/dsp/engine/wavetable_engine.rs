@@ -4,8 +4,6 @@
 
 use core::alloc::GlobalAlloc;
 
-use num_traits::float::Float;
-
 use super::{note_to_frequency, Engine, EngineParameters};
 use crate::dsp::oscillator::wavetable_oscillator::{interpolate_wave_hermite, Differentiator};
 use crate::dsp::resources::WAV_INTEGRATED_WAVES;
