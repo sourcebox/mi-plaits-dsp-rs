@@ -1,0 +1,88 @@
+//! 808-style HH with two noise sources - one faithful to the original, the other
+//! more metallic.
+
+// Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
+
+use core::alloc::GlobalAlloc;
+
+use super::{note_to_frequency, Engine, EngineParameters, TriggerState};
+use crate::dsp::allocate_buffer;
+use crate::dsp::drums::hihat::{Hihat, NoiseType, VcaType};
+
+#[derive(Debug)]
+pub struct HihatEngine<'a> {
+    hi_hat_1: Hihat,
+    hi_hat_2: Hihat,
+
+    temp_buffer_1: &'a mut [f32],
+    temp_buffer_2: &'a mut [f32],
+}
+
+impl<'a> Engine for HihatEngine<'a> {
+    fn new<T: GlobalAlloc>(buffer_allocator: &T, block_size: usize) -> Self {
+        Self {
+            hi_hat_1: Hihat::default(),
+            hi_hat_2: Hihat::default(),
+            temp_buffer_1: allocate_buffer(buffer_allocator, block_size),
+            temp_buffer_2: allocate_buffer(buffer_allocator, block_size),
+        }
+    }
+
+    fn init(&mut self) {
+        self.hi_hat_1.init();
+        self.hi_hat_2.init();
+    }
+
+    #[inline]
+    fn render(
+        &mut self,
+        parameters: &EngineParameters,
+        out: &mut [f32],
+        aux: &mut [f32],
+        _already_enveloped: &mut bool,
+    ) {
+        let f0 = note_to_frequency(parameters.note);
+
+        let sustain = matches!(
+            parameters.trigger,
+            TriggerState::Unpatched | TriggerState::UnpatchedAutotriggered
+        );
+
+        let trigger = matches!(
+            parameters.trigger,
+            TriggerState::RisingEdge | TriggerState::UnpatchedAutotriggered
+        );
+
+        self.hi_hat_1.render(
+            sustain,
+            trigger,
+            parameters.accent,
+            f0,
+            parameters.timbre,
+            parameters.morph,
+            parameters.harmonics,
+            self.temp_buffer_1,
+            self.temp_buffer_2,
+            out,
+            NoiseType::Square,
+            VcaType::Swing,
+            true,
+        );
+
+        self.hi_hat_2.render(
+            sustain,
+            trigger,
+            parameters.accent,
+            f0,
+            parameters.timbre,
+            parameters.morph,
+            parameters.harmonics,
+            self.temp_buffer_1,
+            self.temp_buffer_2,
+            aux,
+            NoiseType::RingMod,
+            VcaType::Linear,
+            false,
+        );
+    }
+}
