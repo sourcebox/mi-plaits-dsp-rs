@@ -180,12 +180,15 @@ impl LpcSpeechSynth {
 
     #[inline]
     pub fn play_frame(&mut self, frames: &[LpcSpeechSynthFrame], frame: f32, interpolate: bool) {
-        let frame_integral = frame as usize;
+        let mut frame_integral = frame as usize;
         let mut frame_fractional = frame - (frame_integral as f32);
 
         if !interpolate {
             frame_fractional = 0.0;
         }
+
+        frame_integral = frame_integral.clamp(0, frames.len() - 2);
+
         self.play_frame_blend(
             &frames[frame_integral],
             &frames[frame_integral + 1],
