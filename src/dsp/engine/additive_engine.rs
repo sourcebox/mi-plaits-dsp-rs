@@ -2,8 +2,6 @@
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-use core::alloc::GlobalAlloc;
-
 use num_traits::float::Float;
 
 use super::{note_to_frequency, Engine, EngineParameters};
@@ -34,11 +32,12 @@ impl Default for AdditiveEngine {
     }
 }
 
-impl Engine for AdditiveEngine {
-    fn new<T: GlobalAlloc>(_buffer_allocator: &T, _block_size: usize) -> Self {
+impl AdditiveEngine {
+    pub fn new() -> Self {
         Self::default()
     }
-
+}
+impl Engine for AdditiveEngine {
     fn init(&mut self) {
         self.amplitudes = [0.0; NUM_HARMONICS];
         for osc in self.harmonic_oscillator.iter_mut() {

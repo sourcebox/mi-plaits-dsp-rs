@@ -2,8 +2,6 @@
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-use core::alloc::GlobalAlloc;
-
 use super::{note_to_frequency, Engine, EngineParameters, TriggerState};
 use crate::dsp::oscillator::sine_oscillator::FastSineOscillator;
 use crate::dsp::resources::LUT_SINE;
@@ -21,8 +19,8 @@ pub struct SwarmEngine {
     swarm_voice: [SwarmVoice; NUM_SWARM_VOICES],
 }
 
-impl Engine for SwarmEngine {
-    fn new<T: GlobalAlloc>(_buffer_allocator: &T, _block_size: usize) -> Self {
+impl SwarmEngine {
+    pub fn new() -> Self {
         Self {
             swarm_voice: [
                 SwarmVoice::default(),
@@ -36,7 +34,9 @@ impl Engine for SwarmEngine {
             ],
         }
     }
+}
 
+impl Engine for SwarmEngine {
     fn init(&mut self) {
         let n = (NUM_SWARM_VOICES as i32 - 1) / 2;
 

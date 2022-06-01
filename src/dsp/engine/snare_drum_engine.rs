@@ -2,8 +2,6 @@
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-use core::alloc::GlobalAlloc;
-
 use super::{note_to_frequency, Engine, EngineParameters, TriggerState};
 use crate::dsp::drums::analog_snare_drum::AnalogSnareDrum;
 use crate::dsp::drums::synthetic_snare_drum::SyntheticSnareDrum;
@@ -14,11 +12,13 @@ pub struct SnareDrumEngine {
     synthetic_snare_drum: SyntheticSnareDrum,
 }
 
-impl Engine for SnareDrumEngine {
-    fn new<T: GlobalAlloc>(_buffer_allocator: &T, _block_size: usize) -> Self {
+impl SnareDrumEngine {
+    fn new() -> Self {
         Self::default()
     }
+}
 
+impl Engine for SnareDrumEngine {
     fn init(&mut self) {
         self.analog_snare_drum.init();
         self.synthetic_snare_drum.init();

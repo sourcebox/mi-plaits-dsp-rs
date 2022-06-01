@@ -2,8 +2,6 @@
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-use core::alloc::GlobalAlloc;
-
 use super::{note_to_frequency, Engine, EngineParameters};
 use crate::dsp::oscillator::grainlet_oscillator::GrainletOscillator;
 use crate::dsp::oscillator::z_oscillator::ZOscillator;
@@ -19,11 +17,13 @@ pub struct GrainEngine {
     grain_balance: f32,
 }
 
-impl Engine for GrainEngine {
-    fn new<T: GlobalAlloc>(_buffer_allocator: &T, _block_size: usize) -> Self {
+impl GrainEngine {
+    pub fn new() -> Self {
         Self::default()
     }
+}
 
+impl Engine for GrainEngine {
     fn init(&mut self) {
         self.grainlet[0].init();
         self.grainlet[1].init();

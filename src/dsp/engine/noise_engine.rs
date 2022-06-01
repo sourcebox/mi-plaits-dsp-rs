@@ -26,8 +26,8 @@ pub struct NoiseEngine<'a> {
     temp_buffer: &'a mut [f32],
 }
 
-impl<'a> Engine for NoiseEngine<'a> {
-    fn new<T: GlobalAlloc>(buffer_allocator: &T, block_size: usize) -> Self {
+impl<'a> NoiseEngine<'a> {
+    pub fn new<T: GlobalAlloc>(buffer_allocator: &T, block_size: usize) -> Self {
         Self {
             clocked_noise: [ClockedNoise::default(), ClockedNoise::default()],
             lp_hp_filter: Svf::default(),
@@ -39,7 +39,9 @@ impl<'a> Engine for NoiseEngine<'a> {
             temp_buffer: allocate_buffer(buffer_allocator, block_size),
         }
     }
+}
 
+impl<'a> Engine for NoiseEngine<'a> {
     fn init(&mut self) {
         self.clocked_noise[0].init();
         self.clocked_noise[1].init();

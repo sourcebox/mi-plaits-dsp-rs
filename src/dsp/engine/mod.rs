@@ -19,14 +19,10 @@ pub mod virtual_analog_engine;
 pub mod waveshaping_engine;
 pub mod wavetable_engine;
 
-use core::alloc::GlobalAlloc;
-
 use crate::dsp::A0;
 use crate::stmlib::dsp::units::semitones_to_ratio;
 
 pub trait Engine {
-    fn new<T: GlobalAlloc>(buffer_allocator: &T, block_size: usize) -> Self;
-
     fn init(&mut self);
 
     fn reset(&mut self) {}

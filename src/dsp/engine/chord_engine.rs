@@ -2,8 +2,6 @@
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-use core::alloc::GlobalAlloc;
-
 use super::{note_to_frequency, Engine, EngineParameters};
 use crate::dsp::oscillator::string_synth_oscillator::StringSynthOscillator;
 use crate::dsp::oscillator::wavetable_oscillator::WavetableOscillator;
@@ -30,6 +28,12 @@ pub struct ChordEngine<'a> {
     ratios: [f32; CHORD_NUM_CHORDS * CHORD_NUM_NOTES],
 
     wavetable: [&'a [i16]; 15],
+}
+
+impl<'a> ChordEngine<'a> {
+    pub fn new() -> Self {
+        Self::default()
+    }
 }
 
 impl<'a> Default for ChordEngine<'a> {
@@ -76,10 +80,6 @@ impl<'a> Default for ChordEngine<'a> {
 }
 
 impl<'a> Engine for ChordEngine<'a> {
-    fn new<T: GlobalAlloc>(_buffer_allocator: &T, _block_size: usize) -> Self {
-        Self::default()
-    }
-
     fn init(&mut self) {
         for i in 0..CHORD_NUM_VOICES {
             self.divide_down_voice[i].init();

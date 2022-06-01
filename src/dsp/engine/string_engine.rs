@@ -22,8 +22,8 @@ pub struct StringEngine<'a> {
     temp_buffer_2: &'a mut [f32],
 }
 
-impl<'a> Engine for StringEngine<'a> {
-    fn new<T: GlobalAlloc>(buffer_allocator: &T, block_size: usize) -> Self {
+impl<'a> StringEngine<'a> {
+    pub fn new<T: GlobalAlloc>(buffer_allocator: &T, block_size: usize) -> Self {
         Self {
             voice: [
                 StringVoice::new(buffer_allocator),
@@ -39,7 +39,9 @@ impl<'a> Engine for StringEngine<'a> {
             temp_buffer_2: allocate_buffer(buffer_allocator, block_size),
         }
     }
+}
 
+impl<'a> Engine for StringEngine<'a> {
     fn init(&mut self) {
         for voice in &mut self.voice {
             voice.init();

@@ -2,8 +2,6 @@
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-use core::alloc::GlobalAlloc;
-
 use super::{note_to_frequency, Engine, EngineParameters, TriggerState};
 use crate::dsp::drums::analog_bass_drum::AnalogBassDrum;
 use crate::dsp::drums::synthetic_bass_drum::SyntheticBassDrum;
@@ -17,11 +15,13 @@ pub struct BassDrumEngine {
     overdrive: Overdrive,
 }
 
-impl Engine for BassDrumEngine {
-    fn new<T: GlobalAlloc>(_buffer_allocator: &T, _block_size: usize) -> Self {
+impl BassDrumEngine {
+    pub fn new() -> Self {
         Self::default()
     }
+}
 
+impl Engine for BassDrumEngine {
     fn init(&mut self) {
         self.analog_bass_drum.init();
         self.synthetic_bass_drum.init();

@@ -2,8 +2,6 @@
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-use core::alloc::GlobalAlloc;
-
 use super::{note_to_frequency, Engine, EngineParameters};
 use crate::dsp::resources::{LUT_FM_FREQUENCY_QUANTIZER, LUT_SINE};
 use crate::dsp::A0;
@@ -29,11 +27,13 @@ pub struct FmEngine {
     carrier_fir: f32,
 }
 
-impl Engine for FmEngine {
-    fn new<T: GlobalAlloc>(_buffer_allocator: &T, _block_size: usize) -> Self {
+impl FmEngine {
+    pub fn new() -> Self {
         Self::default()
     }
+}
 
+impl Engine for FmEngine {
     fn init(&mut self) {
         self.carrier_phase = 0;
         self.modulator_phase = 0;

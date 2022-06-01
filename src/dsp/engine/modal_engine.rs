@@ -18,8 +18,8 @@ pub struct ModalEngine<'a> {
     temp_buffer_2: &'a mut [f32],
 }
 
-impl<'a> Engine for ModalEngine<'a> {
-    fn new<T: GlobalAlloc>(buffer_allocator: &T, block_size: usize) -> Self {
+impl<'a> ModalEngine<'a> {
+    pub fn new<T: GlobalAlloc>(buffer_allocator: &T, block_size: usize) -> Self {
         Self {
             voice: ModalVoice::default(),
             harmonics_lp: 0.0,
@@ -27,7 +27,9 @@ impl<'a> Engine for ModalEngine<'a> {
             temp_buffer_2: allocate_buffer(buffer_allocator, block_size),
         }
     }
+}
 
+impl<'a> Engine for ModalEngine<'a> {
     fn init(&mut self) {
         self.harmonics_lp = 0.0;
         self.reset();

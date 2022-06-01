@@ -2,8 +2,6 @@
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-use core::alloc::GlobalAlloc;
-
 use super::{note_to_frequency, Engine, EngineParameters};
 use crate::dsp::oscillator::wavetable_oscillator::{interpolate_wave_hermite, Differentiator};
 use crate::dsp::resources::WAV_INTEGRATED_WAVES;
@@ -34,11 +32,13 @@ pub struct WavetableEngine {
     diff_out: Differentiator,
 }
 
-impl Engine for WavetableEngine {
-    fn new<T: GlobalAlloc>(_buffer_allocator: &T, _block_size: usize) -> Self {
+impl WavetableEngine {
+    pub fn new() -> Self {
         Self::default()
     }
+}
 
+impl Engine for WavetableEngine {
     fn init(&mut self) {
         self.phase = 0.0;
 

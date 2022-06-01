@@ -26,8 +26,8 @@ pub struct SpeechEngine<'a> {
     speed: f32,
 }
 
-impl<'a> Engine for SpeechEngine<'a> {
-    fn new<T: GlobalAlloc>(buffer_allocator: &T, block_size: usize) -> Self {
+impl<'a> SpeechEngine<'a> {
+    pub fn new<T: GlobalAlloc>(buffer_allocator: &T, block_size: usize) -> Self {
         Self {
             word_bank_quantizer: HysteresisQuantizer::new(),
             naive_speech_synth: NaiveSpeechSynth::new(),
@@ -39,7 +39,9 @@ impl<'a> Engine for SpeechEngine<'a> {
             speed: 1.0,
         }
     }
+}
 
+impl<'a> Engine for SpeechEngine<'a> {
     fn init(&mut self) {
         self.sam_speech_synth.init();
         self.naive_speech_synth.init();
