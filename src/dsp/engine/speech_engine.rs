@@ -158,3 +158,13 @@ impl<'a> Engine for SpeechEngine<'a> {
         }
     }
 }
+
+impl<'a> SpeechEngine<'a> {
+    pub fn set_prosody_amount(&mut self, prosody_amount: f32) {
+        self.prosody_amount = prosody_amount;
+    }
+
+    pub fn set_speed(&mut self, speed: f32) {
+        self.speed = speed;
+    }
+}
