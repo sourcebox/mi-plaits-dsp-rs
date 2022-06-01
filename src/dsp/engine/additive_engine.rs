@@ -37,6 +37,7 @@ impl AdditiveEngine {
         Self::default()
     }
 }
+
 impl Engine for AdditiveEngine {
     fn init(&mut self) {
         self.amplitudes = [0.0; NUM_HARMONICS];
