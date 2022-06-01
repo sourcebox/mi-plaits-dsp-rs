@@ -35,7 +35,7 @@ impl HysteresisQuantizer {
     }
 
     #[inline]
-    fn process(&mut self, base: i32, value: f32, num_steps: usize, hysteresis: f32) -> i32 {
+    pub fn process(&mut self, base: i32, value: f32, num_steps: usize, hysteresis: f32) -> i32 {
         let mut value = value * (num_steps - 1) as f32;
         value += base as f32;
         let hysteresis_feedback = if value > (self.quantized_value as f32) {

@@ -13,7 +13,7 @@ pub struct SnareDrumEngine {
 }
 
 impl SnareDrumEngine {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self::default()
     }
 }
