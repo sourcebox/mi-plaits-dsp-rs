@@ -36,7 +36,7 @@ pub trait Engine {
     );
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct EngineParameters {
     /// Trigger signal state
     pub trigger: TriggerState,
@@ -68,6 +68,12 @@ pub enum TriggerState {
     RisingEdge = 1,
     Unpatched = 2,
     UnpatchedAutotriggered = 3,
+}
+
+impl Default for TriggerState {
+    fn default() -> Self {
+        Self::Low
+    }
 }
 
 #[inline]
