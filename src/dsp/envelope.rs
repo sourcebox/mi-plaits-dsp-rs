@@ -85,7 +85,7 @@ impl LpgEnvelope {
 }
 
 #[derive(Debug, Default)]
-struct DecayEnvelope {
+pub struct DecayEnvelope {
     value: f32,
 }
 
