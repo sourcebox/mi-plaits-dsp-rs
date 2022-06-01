@@ -49,7 +49,7 @@ impl LpgEnvelope {
     }
 
     #[inline]
-    fn process_lp(&mut self, level: f32, short_decay: f32, decay_tail: f32, hf: f32) {
+    pub fn process_lp(&mut self, level: f32, short_decay: f32, decay_tail: f32, hf: f32) {
         let vactrol_input = level;
         let vactrol_error = vactrol_input - self.vactrol_state;
         let vactrol_state_2 = self.vactrol_state * self.vactrol_state;
