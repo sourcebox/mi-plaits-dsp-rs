@@ -11,6 +11,7 @@ pub mod oscillator;
 pub mod physical_modelling;
 pub mod resources;
 pub mod speech;
+pub mod voice;
 
 pub const SAMPLE_RATE: f32 = 48000.0;
 
