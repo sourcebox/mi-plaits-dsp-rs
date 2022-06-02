@@ -43,7 +43,7 @@ impl LowPassGate {
     }
 
     #[inline]
-    pub fn process_i16(
+    pub fn process_to_i16(
         &mut self,
         gain: f32,
         frequency: f32,
