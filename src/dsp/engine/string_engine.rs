@@ -47,8 +47,8 @@ impl<'a> Engine for StringEngine<'a> {
             voice.init();
         }
         self.f0 = [0.0; NUM_STRINGS];
-        self.f0_delay.reset();
         self.active_string = NUM_STRINGS - 1;
+        self.reset();
     }
 
     fn reset(&mut self) {
