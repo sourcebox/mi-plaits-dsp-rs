@@ -10,7 +10,7 @@ const BLOCK_SIZE: usize = 24;
 
 #[test]
 fn fm_engine_harmonics() {
-    let mut engine = fm_engine::FmEngine::new(&std::alloc::System, BLOCK_SIZE);
+    let mut engine = fm_engine::FmEngine::new();
     let mut out = [0.0; BLOCK_SIZE];
     let mut aux = [0.0; BLOCK_SIZE];
     let mut wav_data = Vec::new();
@@ -47,7 +47,7 @@ fn fm_engine_harmonics() {
 
 #[test]
 fn fm_engine_timbre() {
-    let mut engine = fm_engine::FmEngine::new(&std::alloc::System, BLOCK_SIZE);
+    let mut engine = fm_engine::FmEngine::new();
     let mut out = [0.0; BLOCK_SIZE];
     let mut aux = [0.0; BLOCK_SIZE];
     let mut wav_data = Vec::new();
@@ -84,7 +84,7 @@ fn fm_engine_timbre() {
 
 #[test]
 fn fm_engine_morph() {
-    let mut engine = fm_engine::FmEngine::new(&std::alloc::System, BLOCK_SIZE);
+    let mut engine = fm_engine::FmEngine::new();
     let mut out = [0.0; BLOCK_SIZE];
     let mut aux = [0.0; BLOCK_SIZE];
     let mut wav_data = Vec::new();

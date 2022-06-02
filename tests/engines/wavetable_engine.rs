@@ -10,7 +10,7 @@ const BLOCK_SIZE: usize = 24;
 
 #[test]
 fn wavetable_engine_harmonics() {
-    let mut engine = wavetable_engine::WavetableEngine::new(&std::alloc::System, BLOCK_SIZE);
+    let mut engine = wavetable_engine::WavetableEngine::new();
     let mut out = [0.0; BLOCK_SIZE];
     let mut aux = [0.0; BLOCK_SIZE];
     let mut wav_data = Vec::new();
@@ -51,7 +51,7 @@ fn wavetable_engine_harmonics() {
 
 #[test]
 fn wavetable_engine_timbre() {
-    let mut engine = wavetable_engine::WavetableEngine::new(&std::alloc::System, BLOCK_SIZE);
+    let mut engine = wavetable_engine::WavetableEngine::new();
     let mut out = [0.0; BLOCK_SIZE];
     let mut aux = [0.0; BLOCK_SIZE];
     let mut wav_data = Vec::new();
@@ -88,7 +88,7 @@ fn wavetable_engine_timbre() {
 
 #[test]
 fn wavetable_engine_morph() {
-    let mut engine = wavetable_engine::WavetableEngine::new(&std::alloc::System, BLOCK_SIZE);
+    let mut engine = wavetable_engine::WavetableEngine::new();
     let mut out = [0.0; BLOCK_SIZE];
     let mut aux = [0.0; BLOCK_SIZE];
     let mut wav_data = Vec::new();

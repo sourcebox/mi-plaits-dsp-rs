@@ -10,7 +10,7 @@ const BLOCK_SIZE: usize = 24;
 
 #[test]
 fn waveshaping_engine_harmonics() {
-    let mut engine = waveshaping_engine::WaveshapingEngine::new(&std::alloc::System, BLOCK_SIZE);
+    let mut engine = waveshaping_engine::WaveshapingEngine::new();
     let mut out = [0.0; BLOCK_SIZE];
     let mut aux = [0.0; BLOCK_SIZE];
     let mut wav_data = Vec::new();
@@ -51,7 +51,7 @@ fn waveshaping_engine_harmonics() {
 
 #[test]
 fn waveshaping_engine_timbre() {
-    let mut engine = waveshaping_engine::WaveshapingEngine::new(&std::alloc::System, BLOCK_SIZE);
+    let mut engine = waveshaping_engine::WaveshapingEngine::new();
     let mut out = [0.0; BLOCK_SIZE];
     let mut aux = [0.0; BLOCK_SIZE];
     let mut wav_data = Vec::new();
@@ -92,7 +92,7 @@ fn waveshaping_engine_timbre() {
 
 #[test]
 fn waveshaping_engine_morph() {
-    let mut engine = waveshaping_engine::WaveshapingEngine::new(&std::alloc::System, BLOCK_SIZE);
+    let mut engine = waveshaping_engine::WaveshapingEngine::new();
     let mut out = [0.0; BLOCK_SIZE];
     let mut aux = [0.0; BLOCK_SIZE];
     let mut wav_data = Vec::new();

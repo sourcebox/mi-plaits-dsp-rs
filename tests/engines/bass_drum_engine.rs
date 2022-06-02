@@ -10,7 +10,7 @@ const BLOCK_SIZE: usize = 24;
 
 #[test]
 fn bass_drum_engine_harmonics() {
-    let mut engine = bass_drum_engine::BassDrumEngine::new(&std::alloc::System, BLOCK_SIZE);
+    let mut engine = bass_drum_engine::BassDrumEngine::new();
     let mut out = [0.0; BLOCK_SIZE];
     let mut aux = [0.0; BLOCK_SIZE];
     let mut wav_data = Vec::new();
@@ -51,7 +51,7 @@ fn bass_drum_engine_harmonics() {
 
 #[test]
 fn bass_drum_engine_timbre() {
-    let mut engine = bass_drum_engine::BassDrumEngine::new(&std::alloc::System, BLOCK_SIZE);
+    let mut engine = bass_drum_engine::BassDrumEngine::new();
     let mut out = [0.0; BLOCK_SIZE];
     let mut aux = [0.0; BLOCK_SIZE];
     let mut wav_data = Vec::new();
@@ -88,7 +88,7 @@ fn bass_drum_engine_timbre() {
 
 #[test]
 fn bass_drum_engine_morph() {
-    let mut engine = bass_drum_engine::BassDrumEngine::new(&std::alloc::System, BLOCK_SIZE);
+    let mut engine = bass_drum_engine::BassDrumEngine::new();
     let mut out = [0.0; BLOCK_SIZE];
     let mut aux = [0.0; BLOCK_SIZE];
     let mut wav_data = Vec::new();
