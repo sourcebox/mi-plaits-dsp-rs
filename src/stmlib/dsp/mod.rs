@@ -17,6 +17,7 @@ use num_traits::float::Float;
 
 #[inline]
 pub fn interpolate(table: &[f32], mut index: f32, size: f32) -> f32 {
+    index = index.clamp(0.0, 1.0);
     index *= size;
     let index_integral = index as usize;
     let index_fractional = index - (index_integral as f32);
@@ -28,6 +29,7 @@ pub fn interpolate(table: &[f32], mut index: f32, size: f32) -> f32 {
 
 #[inline]
 pub fn interpolate_hermite(table: &[f32], mut index: f32, size: f32) -> f32 {
+    index = index.clamp(0.0, 1.0);
     index *= size;
     let index_integral = index as usize;
     let index_fractional = index - (index_integral as f32);
@@ -48,6 +50,7 @@ pub fn interpolate_hermite(table: &[f32], mut index: f32, size: f32) -> f32 {
 #[inline]
 pub fn interpolate_wrap(table: &[f32], mut index: f32, size: f32) -> f32 {
     index -= (index as i32) as f32;
+    index = index.clamp(0.0, 1.0);
     index *= size;
     let index_integral = index as usize;
     let index_fractional = index - (index_integral as f32);
