@@ -227,8 +227,8 @@ impl<'a> Voice<'a> {
             p.trigger = TriggerState::Unpatched;
         }
 
-        let short_decay =
-            (200.0 * out.len() as f32) / SAMPLE_RATE * semitones_to_ratio(-96.0 * patch.decay);
+        let short_decay = (200.0 * out.len() as f32) / SAMPLE_RATE
+            * semitones_to_ratio(-96.0 * patch.decay.clamp(0.1, 1.0));
 
         self.decay_envelope.process(short_decay * 2.0);
 
