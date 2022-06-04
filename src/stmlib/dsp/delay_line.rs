@@ -2,7 +2,7 @@
 
 // Based on MIT-licensed code (c) 2014 by Olivier Gillet (ol.gillet@gmail.com)
 
-use num_traits::{Num, Signed};
+use num_traits::{FromPrimitive, Num, Signed, ToPrimitive};
 
 #[derive(Debug)]
 pub struct DelayLine<T, const MAX_DELAY: usize> {
@@ -13,8 +13,16 @@ pub struct DelayLine<T, const MAX_DELAY: usize> {
 
 impl<T, const MAX_DELAY: usize> DelayLine<T, MAX_DELAY>
 where
-    T: Copy + Num + Signed + From<f32>,
+    T: Copy + Default + Num + Signed + FromPrimitive + ToPrimitive,
 {
+    pub fn new() -> Self {
+        Self {
+            write_ptr: 0,
+            delay: 1,
+            line: [T::zero(); MAX_DELAY],
+        }
+    }
+
     pub fn init(&mut self) {
         self.reset();
     }
@@ -27,6 +35,10 @@ where
         self.write_ptr = 0;
     }
 
+    pub fn max_delay(&self) -> usize {
+        MAX_DELAY
+    }
+
     #[inline]
     pub fn set_delay(&mut self, delay: usize) {
         self.delay = delay;
@@ -35,7 +47,7 @@ where
     #[inline]
     pub fn write(&mut self, sample: T) {
         self.line[self.write_ptr] = sample;
-        self.write_ptr = (self.write_ptr - 1 + MAX_DELAY) % MAX_DELAY;
+        self.write_ptr = (self.write_ptr + MAX_DELAY - 1) % MAX_DELAY;
     }
 
     #[inline]
@@ -70,7 +82,8 @@ where
         let a = self.line[(self.write_ptr + delay_integral) % MAX_DELAY];
         let b = self.line[(self.write_ptr + delay_integral + 1) % MAX_DELAY];
 
-        a + (b - a) * delay_fractional.into()
+        T::from_f32((a + (b - a)).to_f32().unwrap_or_default() * delay_fractional)
+            .unwrap_or_default()
     }
 
     #[inline]
@@ -82,13 +95,22 @@ where
         let x0 = self.line[(t) % MAX_DELAY];
         let x1 = self.line[(t + 1) % MAX_DELAY];
         let x2 = self.line[(t + 2) % MAX_DELAY];
-        let c = (x1 - xm1) * 0.5.into();
+        let c = T::from_f32((x1 - xm1).to_f32().unwrap_or_default() * 0.5).unwrap_or_default();
         let v = x0 - x1;
         let w = c + v;
-        let a = w + v + (x2 - x0) * 0.5.into();
+        let a = T::from_f32(
+            (w + v).to_f32().unwrap_or_default() + ((x2 - x0).to_f32().unwrap_or_default() * 0.5),
+        )
+        .unwrap_or_default();
         let b_neg = w + a;
-        let f = delay_fractional.into();
+        let f = delay_fractional;
 
-        (((a * f) - b_neg) * f + c) * f + x0
+        T::from_f32(
+            (((a.to_f32().unwrap_or_default() * f) - b_neg.to_f32().unwrap_or_default()) * f
+                + c.to_f32().unwrap_or_default())
+                * f
+                + x0.to_f32().unwrap_or_default(),
+        )
+        .unwrap_or_default()
     }
 }
