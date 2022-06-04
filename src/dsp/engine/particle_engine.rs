@@ -34,7 +34,7 @@ impl<'a> ParticleEngine<'a> {
                 Particle::new(),
                 Particle::new(),
             ],
-            diffuser: Diffuser::new(buffer_allocator),
+            diffuser: Diffuser::new(),
             post_filter: Svf::new(),
             temp_buffer: allocate_buffer(buffer_allocator, block_size),
         }
