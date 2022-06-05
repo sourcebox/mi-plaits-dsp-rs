@@ -62,7 +62,7 @@ impl WavetableOscillator {
             ParameterInterpolator::new(&mut self.amplitude, amplitude, out.len());
         let mut waveform_modulation = ParameterInterpolator::new(
             &mut self.waveform,
-            waveform * (num_waves as f32 - 1.0001) as f32,
+            waveform * (num_waves as f32 - 1.0001),
             out.len(),
         );
 

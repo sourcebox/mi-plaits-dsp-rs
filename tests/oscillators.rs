@@ -473,7 +473,37 @@ fn vosim_oscillator() {
 
 #[test]
 fn wavetable_oscillator() {
-    // TODO: implement
+    let frequency = 110.0;
+    let duration = 2.0;
+    let wavetable = &[
+        &mi_plaits_dsp::dsp::resources::WAV_INTEGRATED_WAVES[0..260],
+        &mi_plaits_dsp::dsp::resources::WAV_INTEGRATED_WAVES[260..520],
+        &mi_plaits_dsp::dsp::resources::WAV_INTEGRATED_WAVES[520..780],
+        &mi_plaits_dsp::dsp::resources::WAV_INTEGRATED_WAVES[780..1040],
+        &mi_plaits_dsp::dsp::resources::WAV_INTEGRATED_WAVES[1040..1300],
+        &mi_plaits_dsp::dsp::resources::WAV_INTEGRATED_WAVES[1300..1560],
+        &mi_plaits_dsp::dsp::resources::WAV_INTEGRATED_WAVES[1560..1820],
+        &mi_plaits_dsp::dsp::resources::WAV_INTEGRATED_WAVES[1820..2080],
+        &mi_plaits_dsp::dsp::resources::WAV_INTEGRATED_WAVES[2080..2340],
+    ];
+
+    let mut osc = wavetable_oscillator::WavetableOscillator::new();
+    let mut out = [0.0; BLOCK_SIZE];
+    let mut wav_data = Vec::new();
+    osc.init();
+
+    let blocks = (duration * SAMPLE_RATE / (BLOCK_SIZE as f32)) as usize;
+    let f = frequency / SAMPLE_RATE;
+
+    for n in 0..blocks {
+        let modulation = modulation::ramp_up(n, blocks);
+        let waveform = modulation;
+        out.fill(0.0);
+        osc.render(f, 1.0, waveform, wavetable, &mut out, 256, 8, true);
+        wav_data.extend_from_slice(&out);
+    }
+
+    wav_writer::write("oscillator/wavetable.wav", &wav_data).ok();
 }
 
 #[test]
