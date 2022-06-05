@@ -12,8 +12,8 @@ const BLOCK_SIZE: usize = 24;
 
 #[test]
 fn sample_rate_reducer() {
-    let frequency = 100.0;
-    let duration = 5.0;
+    let frequency = 110.0;
+    let duration = 2.0;
 
     let mut osc = SineOscillator::new();
     let mut fx = sample_rate_reducer::SampleRateReducer::new();
@@ -27,7 +27,7 @@ fn sample_rate_reducer() {
 
     for n in 0..blocks {
         osc.render(f, &mut in_out);
-        let fx_f = modulation::triangle(n, blocks, 1.0 / 2.0) * 0.3;
+        let fx_f = modulation::ramp_up(n, blocks) * 0.1;
         fx.process(fx_f, &mut in_out, true);
         wav_data.extend_from_slice(&in_out);
     }
