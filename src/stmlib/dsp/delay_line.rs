@@ -11,6 +11,15 @@ pub struct DelayLine<T, const MAX_DELAY: usize> {
     line: [T; MAX_DELAY],
 }
 
+impl<T, const MAX_DELAY: usize> Default for DelayLine<T, MAX_DELAY>
+where
+    T: Copy + Default + Num + Signed + FromPrimitive + ToPrimitive,
+{
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl<T, const MAX_DELAY: usize> DelayLine<T, MAX_DELAY>
 where
     T: Copy + Default + Num + Signed + FromPrimitive + ToPrimitive,

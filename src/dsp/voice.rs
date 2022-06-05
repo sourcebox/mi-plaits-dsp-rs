@@ -189,11 +189,10 @@ impl<'a> Voice<'a> {
                 self.decay_envelope.trigger();
                 self.engine_cv = modulations.engine;
             }
-        } else {
-            if trigger_value < 0.1 {
-                self.trigger_state = false;
-            }
+        } else if trigger_value < 0.1 {
+            self.trigger_state = false;
         }
+
         if !modulations.trigger_patched {
             self.engine_cv = modulations.engine;
         }
@@ -437,6 +436,7 @@ impl ChannelPostProcessor {
         }
     }
 
+    #[allow(clippy::too_many_arguments)]
     #[inline]
     pub fn process_to_i16(
         &mut self,
@@ -471,6 +471,7 @@ impl ChannelPostProcessor {
     }
 }
 
+#[allow(clippy::too_many_arguments)]
 #[inline]
 fn apply_modulations(
     base_value: f32,
@@ -489,12 +490,10 @@ fn apply_modulations(
 
     let modulation = if use_external_modulation {
         external_modulation
+    } else if use_internal_envelope {
+        envelope
     } else {
-        if use_internal_envelope {
-            envelope
-        } else {
-            default_internal_modulation
-        }
+        default_internal_modulation
     };
 
     value += modulation_amount * modulation;

@@ -233,6 +233,7 @@ impl<'a> ChordEngine<'a> {
 
             let ratio = self.ratios[chord_index as usize * CHORD_NUM_NOTES + i];
 
+            #[allow(clippy::comparison_chain)]
             if i == rotated_note {
                 ratios[target_voice] = ratio * transposition;
                 ratios[previous_voice] = ratios[target_voice] * 2.0;

@@ -9,7 +9,7 @@ use crate::stmlib::dsp::clip_16;
 use crate::stmlib::dsp::cosine_oscillator::{CosineOscillator, CosineOscillatorMode};
 use crate::stmlib::dsp::delay_line::DelayLine;
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct Diffuser {
     ap1: DelayLine<i16, 126>,
     ap2: DelayLine<i16, 180>,
