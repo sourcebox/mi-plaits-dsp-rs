@@ -2,8 +2,12 @@
 name = "mi-plaits-dsp"
 version = "0.1.0"
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+authors = ["Oliver Rockstedt <info@sourcebox.de>"]
+description = "Port of DSP code from Mutable Instruments Plaits module"
+repository = "https://github.com/sourcebox/mi-plaits-dsp-rs"
+license = "MIT"
+keywords = ["audio", "dsp", "synthesizer"]
+categories = ["no-std", "multimedia::audio"]
 
 [dependencies]
 num-traits = { version = "0.2", default-features = false, features = ["libm"] }
