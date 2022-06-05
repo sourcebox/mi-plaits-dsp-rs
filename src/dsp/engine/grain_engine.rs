@@ -13,8 +13,6 @@ pub struct GrainEngine {
     grainlet: [GrainletOscillator; 2],
     z_oscillator: ZOscillator,
     dc_blocker: [OnePole; 2],
-
-    grain_balance: f32,
 }
 
 impl GrainEngine {

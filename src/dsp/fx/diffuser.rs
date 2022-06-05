@@ -143,20 +143,8 @@ impl Context {
         Self::default()
     }
 
-    pub fn load(&mut self, value: f32) {
-        self.accumulator = value;
-    }
-
-    pub fn read_with_scale(&mut self, value: f32, scale: f32) {
-        self.accumulator += value * scale;
-    }
-
     pub fn read(&mut self, value: f32) {
         self.accumulator += value;
-    }
-
-    pub fn write(&mut self, value: &mut f32) {
-        *value = self.accumulator;
     }
 
     pub fn write_with_scale(&mut self, value: &mut f32, scale: f32) {
@@ -197,11 +185,6 @@ impl Context {
     pub fn lp(&mut self, state: &mut f32, coefficient: f32) {
         *state += coefficient * (self.accumulator - *state);
         self.accumulator = *state;
-    }
-
-    pub fn hp(&mut self, state: &mut f32, coefficient: f32) {
-        *state += coefficient * (self.accumulator - *state);
-        self.accumulator -= *state;
     }
 
     pub fn interpolate<T, const SIZE: usize>(

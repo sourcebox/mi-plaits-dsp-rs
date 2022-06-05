@@ -23,7 +23,6 @@ pub struct ChordEngine<'a> {
 
     morph_lp: f32,
     timbre_lp: f32,
-    previous_root_normalization: f32,
 
     ratios: [f32; CHORD_NUM_CHORDS * CHORD_NUM_NOTES],
 
@@ -56,7 +55,6 @@ impl<'a> Default for ChordEngine<'a> {
             chord_index_quantizer: HysteresisQuantizer::default(),
             morph_lp: 0.0,
             timbre_lp: 0.0,
-            previous_root_normalization: 0.0,
             ratios: [0.0; CHORD_NUM_CHORDS * CHORD_NUM_NOTES],
             wavetable: [
                 &WAV_INTEGRATED_WAVES[wt_index(2, 6, 1)..],

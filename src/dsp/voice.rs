@@ -102,9 +102,6 @@ pub struct Voice<'a> {
 
     out_post_processor: ChannelPostProcessor,
     aux_post_processor: ChannelPostProcessor,
-
-    out_buffer: &'a mut [f32],
-    aux_buffer: &'a mut [f32],
 }
 
 impl<'a> Voice<'a> {
@@ -145,9 +142,6 @@ impl<'a> Voice<'a> {
 
             out_post_processor: ChannelPostProcessor::new(),
             aux_post_processor: ChannelPostProcessor::new(),
-
-            out_buffer: allocate_buffer(buffer_allocator, block_size),
-            aux_buffer: allocate_buffer(buffer_allocator, block_size),
         }
     }
 

@@ -14,28 +14,3 @@ pub fn fast_rsqrt_carmack(x: f32) -> f32 {
 
     y
 }
-
-#[inline]
-fn fast_rsqrt_accurate(fp0: f32) -> f32 {
-    let _min = 1.0e-38;
-    let _1p5 = 1.5;
-
-    let q = fp0 as u32;
-    let mut fp2 = (0x5F3997BB - ((q >> 1) & 0x3FFFFFFF)) as f32;
-    let fp1 = _1p5 * fp0 - fp0;
-    let mut fp3 = fp2 * fp2;
-
-    if fp0 < _min {
-        return if fp0 > 0.0 { fp2 } else { 1000.0 };
-    }
-
-    fp3 = _1p5 - fp1 * fp3;
-    fp2 *= fp3;
-    fp3 = fp2 * fp2;
-    fp3 = _1p5 - fp1 * fp3;
-    fp2 *= fp3;
-    fp3 = fp2 * fp2;
-    fp3 = _1p5 - fp1 * fp3;
-
-    fp2 * fp3
-}
