@@ -13,7 +13,7 @@ fn formant_oscillator() {
     let carrier_frequency = 239.7;
     let formant_frequency = 105.0;
     let phase_shift = 0.75;
-    let duration = 5.0;
+    let duration = 2.0;
 
     let mut osc = formant_oscillator::FormantOscillator::new();
     let mut out = [0.0; BLOCK_SIZE];
@@ -25,7 +25,7 @@ fn formant_oscillator() {
     let f_formant = formant_frequency / SAMPLE_RATE;
 
     for n in 0..blocks {
-        let modulation = 1.0 + 4.0 * modulation::triangle(n, blocks, 1.0 / 8.0);
+        let modulation = modulation::ramp_up(n, blocks);
         osc.render(f_carrier, f_formant * modulation, phase_shift, &mut out);
         wav_data.extend_from_slice(&out);
     }
@@ -38,7 +38,7 @@ fn grainlet_oscillator() {
     let carrier_frequency = 80.0;
     let formant_frequency = 400.0;
     let carrier_bleed = 1.0;
-    let duration = 5.0;
+    let duration = 2.0;
 
     let mut osc = grainlet_oscillator::GrainletOscillator::new();
     let mut out = [0.0; BLOCK_SIZE];
@@ -50,8 +50,8 @@ fn grainlet_oscillator() {
     let f_formant = formant_frequency / SAMPLE_RATE;
 
     for n in 0..blocks {
-        let modulation3 = modulation::triangle(n, blocks, 1.0 / 13.0);
-        osc.render(f_carrier, f_formant, modulation3, carrier_bleed, &mut out);
+        let modulation = modulation::ramp_up(n, blocks);
+        osc.render(f_carrier, f_formant, modulation, carrier_bleed, &mut out);
         wav_data.extend_from_slice(&out);
     }
 
@@ -61,7 +61,7 @@ fn grainlet_oscillator() {
 #[test]
 fn harmonic_oscillator() {
     let frequency = 110.0;
-    let duration = 1.0;
+    let duration = 2.0;
 
     let mut osc = harmonic_oscillator::HarmonicOscillator::<8>::new();
     let mut out = [0.0; BLOCK_SIZE];
@@ -74,8 +74,9 @@ fn harmonic_oscillator() {
     amplitudes[1] = 0.1;
 
     for n in 0..blocks {
-        amplitudes[0] = 0.5 - 0.5 * (n as f32) / (blocks as f32);
-        amplitudes[5] = 0.1 * (n as f32) / (blocks as f32);
+        let modulation = modulation::ramp_up(n, blocks);
+        amplitudes[0] = 0.5;
+        amplitudes[5] = modulation;
         osc.render(f0, &amplitudes, &mut out, 1);
         wav_data.extend_from_slice(&out);
     }
@@ -85,8 +86,8 @@ fn harmonic_oscillator() {
 
 #[test]
 fn oscillator_impulse_train() {
-    let frequency = 112.0;
-    let duration = 1.0;
+    let frequency = 110.0;
+    let duration = 2.0;
 
     let mut osc = oscillator::Oscillator::new();
     let mut out = [0.0; BLOCK_SIZE];
@@ -97,7 +98,8 @@ fn oscillator_impulse_train() {
     let f = frequency / SAMPLE_RATE;
 
     for n in 0..blocks {
-        let pw = (n as f32) / (blocks as f32);
+        let modulation = modulation::ramp_up(n, blocks);
+        let pw = modulation;
         osc.render(
             f,
             pw,
@@ -114,8 +116,8 @@ fn oscillator_impulse_train() {
 
 #[test]
 fn oscillator_saw() {
-    let frequency = 112.0;
-    let duration = 1.0;
+    let frequency = 110.0;
+    let duration = 2.0;
 
     let mut osc = oscillator::Oscillator::new();
     let mut out = [0.0; BLOCK_SIZE];
@@ -126,7 +128,8 @@ fn oscillator_saw() {
     let f = frequency / SAMPLE_RATE;
 
     for n in 0..blocks {
-        let pw = (n as f32) / (blocks as f32);
+        let modulation = modulation::ramp_up(n, blocks);
+        let pw = modulation;
         osc.render(
             f,
             pw,
@@ -143,8 +146,8 @@ fn oscillator_saw() {
 
 #[test]
 fn oscillator_triangle() {
-    let frequency = 112.0;
-    let duration = 1.0;
+    let frequency = 110.0;
+    let duration = 2.0;
 
     let mut osc = oscillator::Oscillator::new();
     let mut out = [0.0; BLOCK_SIZE];
@@ -155,7 +158,8 @@ fn oscillator_triangle() {
     let f = frequency / SAMPLE_RATE;
 
     for n in 0..blocks {
-        let pw = (n as f32) / (blocks as f32);
+        let modulation = modulation::ramp_up(n, blocks);
+        let pw = modulation;
         osc.render(
             f,
             pw,
@@ -172,8 +176,8 @@ fn oscillator_triangle() {
 
 #[test]
 fn oscillator_slope() {
-    let frequency = 112.0;
-    let duration = 1.0;
+    let frequency = 110.0;
+    let duration = 2.0;
 
     let mut osc = oscillator::Oscillator::new();
     let mut out = [0.0; BLOCK_SIZE];
@@ -184,7 +188,8 @@ fn oscillator_slope() {
     let f = frequency / SAMPLE_RATE;
 
     for n in 0..blocks {
-        let pw = (n as f32) / (blocks as f32);
+        let modulation = modulation::ramp_up(n, blocks);
+        let pw = modulation;
         osc.render(
             f,
             pw,
@@ -201,8 +206,8 @@ fn oscillator_slope() {
 
 #[test]
 fn oscillator_square() {
-    let frequency = 112.0;
-    let duration = 1.0;
+    let frequency = 110.0;
+    let duration = 2.0;
 
     let mut osc = oscillator::Oscillator::new();
     let mut out = [0.0; BLOCK_SIZE];
@@ -213,7 +218,8 @@ fn oscillator_square() {
     let f = frequency / SAMPLE_RATE;
 
     for n in 0..blocks {
-        let pw = (n as f32) / (blocks as f32);
+        let modulation = modulation::ramp_up(n, blocks);
+        let pw = modulation;
         osc.render(
             f,
             pw,
@@ -230,8 +236,8 @@ fn oscillator_square() {
 
 #[test]
 fn oscillator_square_bright() {
-    let frequency = 112.0;
-    let duration = 1.0;
+    let frequency = 110.0;
+    let duration = 2.0;
 
     let mut osc = oscillator::Oscillator::new();
     let mut out = [0.0; BLOCK_SIZE];
@@ -242,7 +248,8 @@ fn oscillator_square_bright() {
     let f = frequency / SAMPLE_RATE;
 
     for n in 0..blocks {
-        let pw = (n as f32) / (blocks as f32);
+        let modulation = modulation::ramp_up(n, blocks);
+        let pw = modulation;
         osc.render(
             f,
             pw,
@@ -259,8 +266,8 @@ fn oscillator_square_bright() {
 
 #[test]
 fn oscillator_square_dark() {
-    let frequency = 112.0;
-    let duration = 1.0;
+    let frequency = 110.0;
+    let duration = 2.0;
 
     let mut osc = oscillator::Oscillator::new();
     let mut out = [0.0; BLOCK_SIZE];
@@ -271,7 +278,8 @@ fn oscillator_square_dark() {
     let f = frequency / SAMPLE_RATE;
 
     for n in 0..blocks {
-        let pw = (n as f32) / (blocks as f32);
+        let modulation = modulation::ramp_up(n, blocks);
+        let pw = modulation;
         osc.render(
             f,
             pw,
@@ -288,8 +296,8 @@ fn oscillator_square_dark() {
 
 #[test]
 fn oscillator_square_triangle() {
-    let frequency = 112.0;
-    let duration = 1.0;
+    let frequency = 110.0;
+    let duration = 2.0;
 
     let mut osc = oscillator::Oscillator::new();
     let mut out = [0.0; BLOCK_SIZE];
@@ -300,7 +308,8 @@ fn oscillator_square_triangle() {
     let f = frequency / SAMPLE_RATE;
 
     for n in 0..blocks {
-        let pw = (n as f32) / (blocks as f32);
+        let modulation = modulation::ramp_up(n, blocks);
+        let pw = modulation;
         osc.render(
             f,
             pw,
@@ -317,8 +326,8 @@ fn oscillator_square_triangle() {
 
 #[test]
 fn sine_oscillator() {
-    let frequency = 440.0;
-    let duration = 1.0;
+    let frequency = 110.0;
+    let duration = 2.0;
 
     let mut osc = sine_oscillator::SineOscillator::new();
     let mut out = [0.0; BLOCK_SIZE];
@@ -338,8 +347,8 @@ fn sine_oscillator() {
 
 #[test]
 fn fast_sine_oscillator() {
-    let frequency = 440.0;
-    let duration = 1.0;
+    let frequency = 110.0;
+    let duration = 2.0;
 
     let mut osc = sine_oscillator::FastSineOscillator::new();
     let mut out = [0.0; BLOCK_SIZE];
@@ -361,7 +370,7 @@ fn fast_sine_oscillator() {
 fn string_synth_oscillator() {
     let frequency = 55.0;
     let registration: [f32; 7] = [1.0, 0.0, 0.5, 0.0, 0.2, 0.0, 0.5];
-    let duration = 1.0;
+    let duration = 2.0;
 
     let mut osc = string_synth_oscillator::StringSynthOscillator::new();
     let mut out = [0.0; BLOCK_SIZE];
@@ -382,9 +391,9 @@ fn string_synth_oscillator() {
 
 #[test]
 fn variable_saw_oscillator() {
-    let frequency = 220.0;
+    let frequency = 110.0;
     let waveshape = 1.0;
-    let duration = 1.0;
+    let duration = 2.0;
 
     let mut osc = variable_saw_oscillator::VariableSawOscillator::new();
     let mut out = [0.0; BLOCK_SIZE];
@@ -395,7 +404,8 @@ fn variable_saw_oscillator() {
     let f = frequency / SAMPLE_RATE;
 
     for n in 0..blocks {
-        let pw = (n as f32) / (blocks as f32);
+        let modulation = modulation::ramp_up(n, blocks);
+        let pw = modulation;
         osc.render(f, pw, waveshape, &mut out);
         wav_data.extend_from_slice(&out);
     }
@@ -406,9 +416,9 @@ fn variable_saw_oscillator() {
 #[test]
 fn variable_shape_oscillator() {
     let master_frequency = 110.0;
-    let frequency = 410.0;
+    let frequency = 110.0;
     let waveshape = 1.0;
-    let duration = 1.0;
+    let duration = 2.0;
 
     let mut osc = variable_shape_oscillator::VariableShapeOscillator::new();
     let mut out = [0.0; BLOCK_SIZE];
@@ -420,7 +430,8 @@ fn variable_shape_oscillator() {
     let f = frequency / SAMPLE_RATE;
 
     for n in 0..blocks {
-        let pw = (n as f32) / (blocks as f32);
+        let modulation = modulation::ramp_up(n, blocks);
+        let pw = modulation;
         osc.render(master_f, f, pw, waveshape, &mut out, true);
         wav_data.extend_from_slice(&out);
     }
@@ -433,7 +444,7 @@ fn vosim_oscillator() {
     let carrier_frequency = 105.0;
     let formant_frequency_1 = 1390.7;
     let formant_frequency_2 = 817.2;
-    let duration = 5.0;
+    let duration = 2.0;
 
     let mut osc = vosim_oscillator::VosimOscillator::new();
     let mut out = [0.0; BLOCK_SIZE];
@@ -470,7 +481,7 @@ fn z_oscillator() {
     let carrier_frequency = 80.0;
     let formant_frequency = 250.7;
     let carrier_shape = 0.5;
-    let duration = 5.0;
+    let duration = 2.0;
 
     let mut osc = z_oscillator::ZOscillator::new();
     let mut out = [0.0; BLOCK_SIZE];
@@ -482,8 +493,8 @@ fn z_oscillator() {
     let formant_f = formant_frequency / SAMPLE_RATE;
 
     for n in 0..blocks {
-        let modulation = modulation::triangle(n, blocks, 1.0 / 7.0);
-        let modulation_2 = modulation::triangle(n, blocks, 1.0 / 11.0);
+        let modulation = modulation::ramp_up(n, blocks);
+        let modulation_2 = modulation::ramp_up(n, blocks);
         osc.render(
             carrier_f,
             formant_f * (1.0 + modulation * 8.0),
