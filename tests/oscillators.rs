@@ -474,18 +474,16 @@ fn vosim_oscillator() {
 #[test]
 fn wavetable_oscillator() {
     let frequency = 110.0;
-    let duration = 2.0;
-    let wavetable = &[
-        &mi_plaits_dsp::dsp::resources::WAV_INTEGRATED_WAVES[0..260],
-        &mi_plaits_dsp::dsp::resources::WAV_INTEGRATED_WAVES[260..520],
-        &mi_plaits_dsp::dsp::resources::WAV_INTEGRATED_WAVES[520..780],
-        &mi_plaits_dsp::dsp::resources::WAV_INTEGRATED_WAVES[780..1040],
-        &mi_plaits_dsp::dsp::resources::WAV_INTEGRATED_WAVES[1040..1300],
-        &mi_plaits_dsp::dsp::resources::WAV_INTEGRATED_WAVES[1300..1560],
-        &mi_plaits_dsp::dsp::resources::WAV_INTEGRATED_WAVES[1560..1820],
-        &mi_plaits_dsp::dsp::resources::WAV_INTEGRATED_WAVES[1820..2080],
-        &mi_plaits_dsp::dsp::resources::WAV_INTEGRATED_WAVES[2080..2340],
-    ];
+    let duration = 10.0;
+
+    let mut wavetable = [&mi_plaits_dsp::dsp::resources::WAV_INTEGRATED_WAVES[0..260]; 256];
+
+    for (n, wt) in mi_plaits_dsp::dsp::resources::WAV_INTEGRATED_WAVES
+        .chunks(260)
+        .enumerate()
+    {
+        wavetable[n] = wt;
+    }
 
     let mut osc = wavetable_oscillator::WavetableOscillator::new();
     let mut out = [0.0; BLOCK_SIZE];
@@ -499,7 +497,7 @@ fn wavetable_oscillator() {
         let modulation = modulation::ramp_up(n, blocks);
         let waveform = modulation;
         out.fill(0.0);
-        osc.render(f, 1.0, waveform, wavetable, &mut out, 256, 8, true);
+        osc.render(f, 1.0, waveform, &wavetable, &mut out, 256, 192, true);
         wav_data.extend_from_slice(&out);
     }
 
