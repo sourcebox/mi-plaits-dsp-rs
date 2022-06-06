@@ -88,7 +88,7 @@ fn resonator() {
 
 #[test]
 fn string() {
-    let frequency = 220.0;
+    let frequency = 110.0;
     let non_linearity_amount = 0.2;
     let brightness = 0.5;
     let damping = 0.7;
@@ -124,12 +124,12 @@ fn string() {
 
 #[test]
 fn string_voice() {
-    let frequency = 220.0;
-    let accent = 0.1;
-    let structure = 0.1;
-    let brightness = 0.1;
-    let damping = 0.5;
-    let duration = 1.0;
+    let frequency = 110.0;
+    let accent = 1.0;
+    let structure = 0.5;
+    let brightness = 0.5;
+    let damping = 0.7;
+    let duration = 2.0;
 
     let mut model = string_voice::StringVoice::new(&std::alloc::System);
     let mut out = [0.0; BLOCK_SIZE];
@@ -143,10 +143,15 @@ fn string_voice() {
     let blocks = (duration * SAMPLE_RATE / (BLOCK_SIZE as f32)) as usize;
     let f0 = frequency / SAMPLE_RATE;
 
-    for _ in 0..blocks {
+    for n in 0..blocks {
+        let trigger = n == 0;
+        out.fill(0.0);
+        aux.fill(0.0);
+        temp.fill(0.0);
+        temp_2.fill(0.0);
         model.render(
-            true,
-            true,
+            false,
+            trigger,
             accent,
             f0,
             structure,
