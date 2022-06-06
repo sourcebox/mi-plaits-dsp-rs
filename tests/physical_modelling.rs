@@ -57,7 +57,33 @@ fn modal_voice() {
 
 #[test]
 fn resonator() {
-    // TODO: implement
+    let frequency = 110.0;
+    let position = 0.015;
+    let resolution = 24;
+    let structure = 0.5;
+    let brightness = 0.5;
+    let damping = 0.7;
+    let duration = 2.0;
+
+    let mut model = resonator::Resonator::new();
+    let mut out = [0.0; BLOCK_SIZE];
+    let mut wav_data = Vec::new();
+    model.init(position, resolution);
+
+    let blocks = (duration * SAMPLE_RATE / (BLOCK_SIZE as f32)) as usize;
+    let f0 = frequency / SAMPLE_RATE;
+
+    for n in 0..blocks {
+        let mut in_ = [0.0; BLOCK_SIZE];
+        if n == 0 {
+            in_[0] = 1.0;
+        }
+        out.fill(0.0);
+        model.process(f0, structure, brightness, damping, &mut in_, &mut out);
+        wav_data.extend_from_slice(&out);
+    }
+
+    wav_writer::write("physical_modelling/resonator.wav", &wav_data).ok();
 }
 
 #[test]
@@ -70,7 +96,7 @@ fn string() {
 
     let mut model = string::String::new(&std::alloc::System);
     let mut in_ = [0.0; BLOCK_SIZE];
-    in_[0] = 0.1;
+    in_[0] = 1.0;
     let mut out = [0.0; BLOCK_SIZE];
     let mut wav_data = Vec::new();
     model.reset();
@@ -79,6 +105,7 @@ fn string() {
     let f0 = frequency / SAMPLE_RATE;
 
     for _ in 0..blocks {
+        out.fill(0.0);
         model.process(
             f0,
             non_linearity_amount,
