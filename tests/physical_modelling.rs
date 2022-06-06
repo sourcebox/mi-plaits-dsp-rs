@@ -8,11 +8,6 @@ use mi_plaits_dsp::dsp::SAMPLE_RATE;
 const BLOCK_SIZE: usize = 24;
 
 #[test]
-fn delay_line() {
-    // TODO: implement
-}
-
-#[test]
 fn modal_voice() {
     let frequency = 110.0;
     let accent = 1.0;
