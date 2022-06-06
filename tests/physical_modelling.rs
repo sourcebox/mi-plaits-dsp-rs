@@ -90,13 +90,11 @@ fn resonator() {
 fn string() {
     let frequency = 220.0;
     let non_linearity_amount = 0.2;
-    let brightness = 0.1;
-    let damping = 0.5;
-    let duration = 1.0;
+    let brightness = 0.5;
+    let damping = 0.7;
+    let duration = 2.0;
 
     let mut model = string::String::new(&std::alloc::System);
-    let mut in_ = [0.0; BLOCK_SIZE];
-    in_[0] = 1.0;
     let mut out = [0.0; BLOCK_SIZE];
     let mut wav_data = Vec::new();
     model.reset();
@@ -104,7 +102,11 @@ fn string() {
     let blocks = (duration * SAMPLE_RATE / (BLOCK_SIZE as f32)) as usize;
     let f0 = frequency / SAMPLE_RATE;
 
-    for _ in 0..blocks {
+    for n in 0..blocks {
+        let mut in_ = [0.0; BLOCK_SIZE];
+        if n == 0 {
+            in_[0] = 1.0;
+        }
         out.fill(0.0);
         model.process(
             f0,
