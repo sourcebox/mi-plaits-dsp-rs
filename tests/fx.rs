@@ -59,3 +59,28 @@ fn sample_rate_reducer() {
 
     wav_writer::write("fx/sample_rate_reducer.wav", &wav_data).ok();
 }
+
+#[test]
+fn overdrive() {
+    let frequency = 110.0;
+    let duration = 2.0;
+
+    let mut osc = SineOscillator::new();
+    let mut fx = overdrive::Overdrive::new();
+    let mut in_out = [0.0; BLOCK_SIZE];
+    let mut wav_data = Vec::new();
+    osc.init();
+    fx.init();
+
+    let blocks = (duration * SAMPLE_RATE / (BLOCK_SIZE as f32)) as usize;
+    let f = frequency / SAMPLE_RATE;
+
+    for n in 0..blocks {
+        osc.render(f, &mut in_out);
+        let drive = modulation::ramp_up(n, blocks);
+        fx.process(drive, &mut in_out);
+        wav_data.extend_from_slice(&in_out);
+    }
+
+    wav_writer::write("fx/overdrive.wav", &wav_data).ok();
+}
