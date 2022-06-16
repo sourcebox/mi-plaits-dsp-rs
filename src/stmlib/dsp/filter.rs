@@ -618,7 +618,7 @@ impl NaiveSvf {
 }
 
 /// Modified Chamberlin SVF (Duane K. Wise)
-/// http://www.dafx.ca/proceedings/papers/p_053.pdf
+/// <http://www.dafx.ca/proceedings/papers/p_053.pdf>
 #[derive(Debug, Default)]
 pub struct ModifiedSvf {
     f: f32,

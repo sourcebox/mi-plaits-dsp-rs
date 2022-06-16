@@ -3,12 +3,13 @@
 //! A mixture of 7 sawtooth and square waveforms in the style of divide-down
 //! organs:
 //!
-//! [0]     [1]        [2]     [3]        [4]     [5]        [6]
-//! Saw 8', Square 8', Saw 4', Square 4', Saw 2', Square 2', Saw 1'
+//! | 0         | 1         | 2         | 3         | 4         | 5         | 6         |
+//! |-----------|-----------|-----------|-----------|-----------|-----------|-----------|
+//! | Saw 8'    | Square 8' | Saw 4'    | Square 4' | Saw 2'    | Square 2' | Saw 1'    |
 //!
-//! Internally, this renders 4 band-limited sawtooths, from 8' to 1' from a
-//! single phase counter. The square waveforms are obtained by algebraic
-//! manipulations on the sawtooths, using the identity:
+//! Internally, this renders 4 band-limited sawtooths, from 8' to 1' from a single phase counter.
+//!
+//! The square waveforms are obtained by algebraic manipulations on the sawtooths, using the identity:
 //! Square 16' = 2 Sawtooth 16' - Sawtooth 8'
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
