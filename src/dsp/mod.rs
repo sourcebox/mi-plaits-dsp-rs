@@ -1,4 +1,4 @@
-//! Utility DSP routines.
+//! Top-level module for all DSP related code specific to the device.
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
@@ -13,26 +13,15 @@ pub mod resources;
 pub mod speech;
 pub mod voice;
 
-pub const SAMPLE_RATE: f32 = 48000.0;
-
-// There is no proper PLL for I2S, only a divider on the system clock to derive
-// the bit clock.
-// The division ratio is set to 47 (23 EVEN, 1 ODD) by the ST libraries.
-//
-// Bit clock = 72000000 / 47 = 1531.91 kHz
-// Frame clock = Bit clock / 32 = 47872.34 Hz
-//
-// That's only 4.6 cts of error, but we care!
-
 use core::alloc::{GlobalAlloc, Layout};
 
-pub const CORRECTED_SAMPLE_RATE: f32 = 47872.34;
-pub const A0: f32 = (440.0 / 8.0) / CORRECTED_SAMPLE_RATE;
+/// Audio sample rate in Hz.
+pub const SAMPLE_RATE: f32 = 48000.0;
 
-pub const MAX_BLOCK_SIZE: usize = 24;
-pub const BLOCK_SIZE: usize = 12;
+/// Normalized frequency of note A0.
+pub const A0: f32 = (440.0 / 8.0) / SAMPLE_RATE;
 
-/// Allocate a zeroed buffer of f32s with a given number of elements
+/// Allocate a zeroed buffer of f32s with a given number of elements.
 pub fn allocate_buffer<T: GlobalAlloc>(
     buffer_allocator: &T,
     buffer_length: usize,

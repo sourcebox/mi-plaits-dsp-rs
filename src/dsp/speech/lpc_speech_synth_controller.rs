@@ -7,7 +7,7 @@ use core::alloc::{GlobalAlloc, Layout};
 use super::lpc_speech_synth::{LpcSpeechSynth, LpcSpeechSynthFrame, LPC_SPEECH_SYNTH_DEFAULT_F0};
 use super::lpc_speech_synth_phonemes::PHONEMES;
 use super::lpc_speech_synth_words::{NUM_WORD_BANKS, WORD_BANKS};
-use crate::dsp::{CORRECTED_SAMPLE_RATE, SAMPLE_RATE};
+use crate::dsp::SAMPLE_RATE;
 use crate::stmlib::dsp::parameter_interpolator::ParameterInterpolator;
 use crate::stmlib::dsp::polyblep::{next_blep_sample, this_blep_sample};
 use crate::stmlib::dsp::units::semitones_to_ratio;
@@ -81,8 +81,7 @@ impl<'a> LpcSpeechSynthController<'a> {
         let rate = rate_ratio / 6.0;
 
         // All utterances have been normalized for an average f0 of 100 Hz.
-        let pitch_shift =
-            frequency / (rate_ratio * LPC_SPEECH_SYNTH_DEFAULT_F0 / CORRECTED_SAMPLE_RATE);
+        let pitch_shift = frequency / (rate_ratio * LPC_SPEECH_SYNTH_DEFAULT_F0 / SAMPLE_RATE);
         let time_stretch = semitones_to_ratio(
             -speed * 24.0
                 + (if formant_shift < 0.4 {
