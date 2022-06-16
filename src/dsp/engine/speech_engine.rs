@@ -1,4 +1,21 @@
-//! Various flavours of speech synthesis.
+//! Vowel and speech synthesis.
+//!
+//! A collection of speech synthesis algorithms.
+//!
+//! Engine parameters:
+//! - *HARMONICS:* crossfades between formant filtering, SAM, and LPC vowels, then goes
+//!   through several banks of LPC words.
+//! - *TIMBRE:* species selection, from Daleks to chipmunks. How does it work?
+//!   This parameter either shifts the formants up or down independently of the pitch;
+//!   or underclocks/overclocks the emulated LPC chip (with appropriate compensation
+//!   to keep the pitch unchanged).
+//! - *MORPH:* phoneme or word segment selection. When *HARMONICS* is past 11 o’clock,
+//!   a list of words can be scanned through by turning the *MORPH* knob or by sending a CV
+//!   to the corresponding input. One can also patch the trigger input to trigger the
+//!   utterance of a word, use the FM attenuverter to control the intonation and the
+//!   *MORPH* attenuverter to control speed.
+//!
+//! *AUX* signal: unfiltered vocal cords’ signal.
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 

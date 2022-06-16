@@ -1,4 +1,18 @@
-//! 808 and synthetic bass drum generators.
+//! Analog bass drum model.
+//!
+//! Behavioral simulation of circuits from classic drum machines.
+//!
+//! Engine parameters:
+//! - *HARMONICS:* attack sharpness and amount of overdrive.
+//! - *TIMBRE:* brightness.
+//! - *MORPH:* decay time.
+//!
+//! Outputs:
+//! - *OUT* signal: bridged T-network excited by a nicely shaped pulse.
+//! - *AUX* signal: frequency-modulated triangle VCO, turned into a sine with a pair of diodes,
+//!   and shaped by a dirty VCA.
+//!
+//! Without any signal patched to the *TRIG* input, a continuous tone is produced.
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 

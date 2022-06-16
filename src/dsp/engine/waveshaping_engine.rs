@@ -1,4 +1,13 @@
-//! Slope -> Waveshaper -> Wavefolder.
+//! Waveshaping oscillator.
+//!
+//! Asymmetric triangle processed by a waveshaper and a wavefolder.
+//!
+//! Engine parameters:
+//! - *HARMONICS:* waveshaper waveform.
+//! - *TIMBRE:* wavefolder amount.
+//! - *MORPH:* waveform asymmetry.
+//!
+//! *AUX* signal: variant employing another wavefolder curve, as available in *Warps*.
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 

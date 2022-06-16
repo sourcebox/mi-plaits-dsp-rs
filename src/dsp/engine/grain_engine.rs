@@ -1,4 +1,17 @@
-//! Windowed sine segments.
+//! Granular formant oscillator.
+//!
+//! Simulation of formants and filtered waveforms through the multiplication, addition and
+//! synchronization of segments of sine waves.
+//!
+//! Engine parameters:
+//! - *HARMONICS:* frequency ratio between formant 1 and 2.
+//! - *TIMBRE:* formant frequency.
+//! - *MORPH:* formant width and shape. This controls the shape of the window by which a sum
+//!   of two synchronized sine oscillators is multiplied.
+//!
+//! *AUX* signal: simulation of filtered waveforms by windowed sine waves -
+//! a recreation of Braids’ Z*** models. *HARMONICS* controls the filter type (peaking, LP, BP, HP),
+//! with smooth variation from one response to another.
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 

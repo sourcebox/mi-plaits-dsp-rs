@@ -1,4 +1,17 @@
-//! Additive synthesis with 24+8 partials.
+//! Harmonic oscillator.
+//!
+//! An additive mixture of harmonically-related sine waves.
+//!
+//! Engine parameters:
+//! - *HARMONICS*: number of bumps in the spectrum. Starts with one big bump, and progressively
+//!   adds ripples around it.
+//! - *TIMBRE:* index of the most prominent harmonic. This control is somewhat similar to
+//!   the cutoff frequency of a band-pass filter.
+//! - *MORPH:* bump shape - from flat and wide to peaked and narrow. This control is
+//!   somewhat similar to the resonance of a band-pass filter.
+//!
+//! *AUX* signal: variant including only the subset of harmonics present in the drawbars
+//! of a Hammond organ (frequency ratios of 1, 2, 3, 4, 6, 8, 10 and 12).
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 

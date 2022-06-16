@@ -1,4 +1,14 @@
-//! Clocked noise processed by a multimode filter.
+//! Filtered noise.
+//!
+//! Variable-clock white noise processed by a resonant filter.
+//!
+//! Engine parameters:
+//! - *HARMONICS:* filter response, from LP to BP to HP.
+//! - *TIMBRE:* clock frequency.
+//! - *MORPH:* filter resonance.
+//!
+//! *AUX* signal: variant employing two band-pass filters, with their separation
+//! controlled by *HARMONICS*.
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 

@@ -1,4 +1,14 @@
-//! 808 and synthetic snare drum generators.
+//! Analog snare drum model.
+//!
+//! Engine parameters:
+//! - *HARMONICS:* balance of the harmonic and noisy components.
+//! - *TIMBRE:* balance between the different modes of the drum.
+//! - *MORPH:* decay time.
+//!
+//! Outputs:
+//! - *OUT* signal: bunch of bridged T-networks, one for each mode of
+//!    the shell, excited by a nicely shaped pulse; plus some band-pass filtered noise.
+//! - *AUX* signal: pair of frequency-modulated sine VCO, mixed with high-pass filtered noise.
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 

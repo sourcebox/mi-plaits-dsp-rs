@@ -1,4 +1,14 @@
-//! Classic 2-op FM, as found in Braids, Rings and Elements.
+//! Two operator FM.
+//!
+//! Two sine-wave oscillators modulating each other’s phase.
+//!
+//! Engine parameters:
+//! - *HARMONICS:* frequency ratio.
+//! - *TIMBRE:* modulation index.
+//! - *MORPH:* feedback, in the form of operator 2 modulating its own phase (past 12 o’clock, rough!)
+//!   or operator 1’s phase (before 12 o’clock, chaotic!).
+//!
+//! *AUX* signal: sub-oscillator.
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 

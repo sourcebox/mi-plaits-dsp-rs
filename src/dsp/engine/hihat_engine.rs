@@ -1,5 +1,16 @@
-//! 808-style HH with two noise sources - one faithful to the original, the other
-//! more metallic.
+//! Analog hi-hat model.
+//!
+//! A bunch of square oscillators generating a harsh, metallic tone.
+//!
+//! Engine parameters:
+//! - *HARMONICS:* balance of the metallic and filtered noise.
+//! - *TIMBRE:* high-pass filter cutoff.
+//! - *MORPH:* decay time.
+//!
+//! Outputs:
+//! - *OUT* signal: 6 square oscillators and a dirty transistor VCA
+//! - *AUX* signal: uses three pairs of square oscillators ringmodulating each other,
+//!   and a clean, linear VCA
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 

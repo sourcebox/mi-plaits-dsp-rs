@@ -1,4 +1,15 @@
-//! 2 variable shape oscillators with sync and crossfading.
+//! Pair of classic waveforms.
+//!
+//! Virtual-analog synthesis of classic waveforms using two variable shape oscillators
+//! with sync and crossfading.
+//!
+//! Engine parameters:
+//! - *HARMONICS:* detuning between the two waves.
+//! - *TIMBRE:* variable square, from narrow pulse to full square to hardsync formants.
+//! - *MORPH:* variable saw, from triangle to saw with an increasingly wide notch (*Braids’* CSAW).
+//!
+//! *AUX* signal: sum of two hardsync’ed waveforms, the shape of which is controlled by *MORPH*
+//! and detuning by *HARMONICS*.
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 

@@ -1,4 +1,23 @@
-//! 8x8x3 wave terrain.
+//! Wavetable oscillator.
+//!
+//! Four banks of 8x8 waveforms, accessed by row and column, with or without interpolation.
+//!
+//! Banks:
+//! - Bank A: harmonically poor waveforms obtained by additive synthesis
+//!   (sine harmonics, drawbar organ waveforms).
+//! - Bank B: harmonically rich waveforms obtained by formant synthesis or waveshaping.
+//! - Bank C: wavetables from the Shruthi-1 / Ambika, sampled from classic wavetable
+//!   or ROM playback synths.
+//! - Bank D: a joyous semi-random permutation of waveforms from the other 3 banks.
+//!
+//! Engine parameters:
+//! - *HARMONICS:* bank selection. 4 interpolated banks followed by the same 4 banks,
+//!   in reverse order, without interpolation.
+//! - *TIMBRE:* row index. Within a row, the waves are sorted by spectral brightness
+//!   (except for bank D which is a mess!).
+//! - *MORPH:* column index.
+//!
+//! *AUX* signal: low-fi (5-bit) output.
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 

@@ -1,4 +1,14 @@
-//! Filtered random pulses.
+//! Particle noise.
+//!
+//! Dust noise processed by networks of all-pass or band-pass filters.
+//!
+//! Engine parameters:
+//! - *HARMONICS:* amount of frequency randomization.
+//! - *TIMBRE:* particle density.
+//! - *MORPH:* filter type - reverberating all-pass network before 12 o’clock,
+//!   then increasingly resonant band-pass filters.
+//!
+//! *AUX* signal: raw dust noise.
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 

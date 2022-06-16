@@ -1,4 +1,15 @@
-//! Three voices of string synthesis.
+//! Inharmonic string modeling.
+//!
+//! Engine parameters:
+//! - *HARMONICS:* amount of inharmonicity, or material selection.
+//! - *TIMBRE:* excitation brightness and dust density.
+//! - *MORPH:* decay time (energy absorption).
+//!
+//! *AUX* signal: raw exciter signal.
+//!
+//! When the *TRIG* input is not patched, the string is excited by dust (particle) noise.
+//! Otherwise, the string is excited by a short burst of filtered white noise,
+//! or by a low-pass filtered click.
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 

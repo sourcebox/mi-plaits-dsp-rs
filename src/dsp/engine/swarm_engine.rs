@@ -1,4 +1,14 @@
-//! Swarm of sawtooths and sines.
+//! Granular cloud.
+//!
+//! A swarm of 8 enveloped sawtooth waves.
+//!
+//! Engine parameters:
+//! - *HARMONICS:* amount of pitch randomization.
+//! - *TIMBRE:* grain density.
+//! - *MORPH:* grain duration and overlap. When this setting is at maximum, the grains merge into
+//!   each other: the result is a stack of eight randomly frequency-modulated waveforms.
+//!
+//! *AUX* signal: variant with sine wave oscillators.
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
