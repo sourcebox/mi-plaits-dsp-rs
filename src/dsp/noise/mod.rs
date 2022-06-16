@@ -1,3 +1,5 @@
+//! Noise generators.
+
 pub mod clocked_noise;
 pub mod dust;
 pub mod particle;

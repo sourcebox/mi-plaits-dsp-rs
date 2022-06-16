@@ -1,3 +1,5 @@
+//! Collection of oscillators.
+
 #[allow(clippy::module_inception)]
 pub mod oscillator;
 

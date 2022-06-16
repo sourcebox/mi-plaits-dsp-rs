@@ -1,4 +1,4 @@
-//! Hysteresis quantizer
+//! Hysteresis quantizer.
 //!
 //! Quantize a float in [0, 1] to an integer in [0, num_steps[. Apply hysteresis
 //! to prevent jumps near the decision boundary.

@@ -1,3 +1,5 @@
+//! Drum synthesis models.
+
 pub mod analog_bass_drum;
 pub mod analog_snare_drum;
 pub mod hihat;

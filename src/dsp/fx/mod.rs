@@ -1,3 +1,5 @@
+//! Effects used by different engines.
+
 pub mod diffuser;
 pub mod low_pass_gate;
 pub mod overdrive;

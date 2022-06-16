@@ -1,7 +1,8 @@
-// Linear interpolation of parameters in rendering loops.
+//! Linear interpolation of parameters in rendering loops.
 
 // Based on MIT-licensed code (c) 2015 by Olivier Gillet (ol.gillet@gmail.com)
 
+/// Original implementation keeping a mutable reference to the interpolated value.
 #[derive(Debug)]
 pub struct ParameterInterpolator<'a> {
     state: &'a mut f32,
@@ -54,7 +55,7 @@ impl<'a> Drop for ParameterInterpolator<'a> {
     }
 }
 
-/// Simplified version of the interpolator not keeping any references
+/// Simplified version of the interpolator not keeping any references to avoid borrowing issues.
 #[derive(Debug, Default, Copy, Clone)]
 pub struct SimpleParameterInterpolator {
     increment: f32,

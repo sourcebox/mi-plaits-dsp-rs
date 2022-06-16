@@ -1,3 +1,5 @@
+//! Speech synthesis in various flavors.
+
 pub mod lpc_speech_synth;
 pub mod lpc_speech_synth_controller;
 pub mod lpc_speech_synth_phonemes;
