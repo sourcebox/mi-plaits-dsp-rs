@@ -34,8 +34,8 @@ impl<'a> ModalEngine<'a> {
         Self {
             voice: ModalVoice::default(),
             harmonics_lp: 0.0,
-            temp_buffer_1: allocate_buffer(buffer_allocator, block_size),
-            temp_buffer_2: allocate_buffer(buffer_allocator, block_size),
+            temp_buffer_1: allocate_buffer(buffer_allocator, block_size).unwrap(),
+            temp_buffer_2: allocate_buffer(buffer_allocator, block_size).unwrap(),
         }
     }
 }

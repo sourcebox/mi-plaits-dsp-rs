@@ -46,7 +46,7 @@ impl<'a> NoiseEngine<'a> {
             previous_f1: 0.0,
             previous_q: 0.0,
             previous_mode: 0.0,
-            temp_buffer: allocate_buffer(buffer_allocator, block_size),
+            temp_buffer: allocate_buffer(buffer_allocator, block_size).unwrap(),
         }
     }
 }

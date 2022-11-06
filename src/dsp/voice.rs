@@ -136,6 +136,7 @@ impl<'a> Voice<'a> {
 
             trigger_delay: DelayLine::new(
                 allocate_buffer(buffer_allocator, MAX_TRIGGER_DELAY)
+                    .unwrap()
                     .try_into()
                     .unwrap(),
             ),

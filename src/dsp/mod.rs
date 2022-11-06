@@ -25,12 +25,20 @@ pub const A0: f32 = (440.0 / 8.0) / SAMPLE_RATE;
 pub fn allocate_buffer<T: GlobalAlloc>(
     buffer_allocator: &T,
     buffer_length: usize,
-) -> &'static mut [f32] {
+) -> Result<&'static mut [f32], AllocError> {
     let size = buffer_length * core::mem::size_of::<f32>();
     let buffer = unsafe {
         buffer_allocator.alloc_zeroed(Layout::from_size_align(size, 8).unwrap()) as *mut f32
     };
+
+    if buffer.is_null() {
+        return Err(AllocError);
+    }
+
     let buffer: &mut [f32] = unsafe { core::slice::from_raw_parts_mut(buffer, buffer_length) };
 
-    buffer
+    Ok(buffer)
 }
+
+#[derive(Debug)]
+pub struct AllocError;

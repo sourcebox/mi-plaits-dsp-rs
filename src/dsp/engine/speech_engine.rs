@@ -50,8 +50,8 @@ impl<'a> SpeechEngine<'a> {
             naive_speech_synth: NaiveSpeechSynth::new(),
             sam_speech_synth: SamSpeechSynth::new(),
             lpc_speech_synth_controller: LpcSpeechSynthController::new(buffer_allocator),
-            temp_buffer_1: allocate_buffer(buffer_allocator, block_size),
-            temp_buffer_2: allocate_buffer(buffer_allocator, block_size),
+            temp_buffer_1: allocate_buffer(buffer_allocator, block_size).unwrap(),
+            temp_buffer_2: allocate_buffer(buffer_allocator, block_size).unwrap(),
             prosody_amount: 0.0,
             speed: 1.0,
         }

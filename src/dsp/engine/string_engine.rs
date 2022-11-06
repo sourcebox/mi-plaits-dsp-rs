@@ -43,11 +43,14 @@ impl<'a> StringEngine<'a> {
             ],
             f0: [0.0; NUM_STRINGS],
             f0_delay: DelayLine::<'a, f32, 16>::new(
-                allocate_buffer(buffer_allocator, 16).try_into().unwrap(),
+                allocate_buffer(buffer_allocator, 16)
+                    .unwrap()
+                    .try_into()
+                    .unwrap(),
             ),
             active_string: 0,
-            temp_buffer_1: allocate_buffer(buffer_allocator, block_size),
-            temp_buffer_2: allocate_buffer(buffer_allocator, block_size),
+            temp_buffer_1: allocate_buffer(buffer_allocator, block_size).unwrap(),
+            temp_buffer_2: allocate_buffer(buffer_allocator, block_size).unwrap(),
         }
     }
 }

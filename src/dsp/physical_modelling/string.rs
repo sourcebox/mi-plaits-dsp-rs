@@ -42,8 +42,8 @@ pub struct String<'a> {
 
 impl<'a> String<'a> {
     pub fn new<T: GlobalAlloc>(buffer_allocator: &T) -> Self {
-        let string_line = allocate_buffer(buffer_allocator, DELAY_LINE_SIZE);
-        let stretch_line = allocate_buffer(buffer_allocator, DELAY_LINE_SIZE / 4);
+        let string_line = allocate_buffer(buffer_allocator, DELAY_LINE_SIZE).unwrap();
+        let stretch_line = allocate_buffer(buffer_allocator, DELAY_LINE_SIZE / 4).unwrap();
         Self {
             string: DelayLine::new(string_line.try_into().unwrap()),
             stretch: DelayLine::new(stretch_line.try_into().unwrap()),

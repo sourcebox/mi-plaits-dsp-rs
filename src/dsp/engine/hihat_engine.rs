@@ -34,8 +34,8 @@ impl<'a> HihatEngine<'a> {
         Self {
             hi_hat_1: Hihat::default(),
             hi_hat_2: Hihat::default(),
-            temp_buffer_1: allocate_buffer(buffer_allocator, block_size),
-            temp_buffer_2: allocate_buffer(buffer_allocator, block_size),
+            temp_buffer_1: allocate_buffer(buffer_allocator, block_size).unwrap(),
+            temp_buffer_2: allocate_buffer(buffer_allocator, block_size).unwrap(),
         }
     }
 }

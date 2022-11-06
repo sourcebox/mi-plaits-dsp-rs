@@ -43,7 +43,7 @@ impl<'a> VirtualAnalogEngine<'a> {
             variable_saw: VariableSawOscillator::new(),
             auxiliary_amount: 0.0,
             xmod_amount: 0.0,
-            temp_buffer: allocate_buffer(buffer_allocator, block_size),
+            temp_buffer: allocate_buffer(buffer_allocator, block_size).unwrap(),
         }
     }
 }
