@@ -178,7 +178,7 @@ impl<'a> Voice<'a> {
         if !previous_trigger_state {
             if trigger_value > 0.3 {
                 self.trigger_state = true;
-                if modulations.level_patched {
+                if !modulations.level_patched {
                     self.lpg_envelope.trigger();
                 }
                 self.decay_envelope.trigger();
