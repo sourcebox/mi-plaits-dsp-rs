@@ -156,7 +156,7 @@ impl<'a> Engine for ChordEngine<'a> {
             let mut divide_down_amount = 1.0 - wavetable_amount;
             let destination = ((1 << note) & aux_note_mask) != 0;
 
-            let note_f0 = f0 * ratios[note] as f32;
+            let note_f0 = f0 * ratios[note];
             let mut divide_down_gain = 4.0 - note_f0 * 32.0;
             divide_down_gain = divide_down_gain.clamp(0.0, 1.0);
             divide_down_amount *= divide_down_gain;
