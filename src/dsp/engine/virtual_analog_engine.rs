@@ -52,6 +52,7 @@ impl<'a> Engine for VirtualAnalogEngine<'a> {
     fn init(&mut self) {
         self.primary.init();
         self.auxiliary.init();
+        self.auxiliary.set_master_phase(0.25);
         self.sync.init();
         self.variable_saw.init();
         self.auxiliary_amount = 0.0;

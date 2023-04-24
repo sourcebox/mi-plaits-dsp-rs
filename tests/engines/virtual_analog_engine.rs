@@ -78,8 +78,8 @@ fn virtual_analog_engine_timbre() {
             },
             note: 48.0,
             timbre: modulation::ramp_up(n, blocks),
-            morph: 0.4,
-            harmonics: 0.6,
+            morph: 0.5,
+            harmonics: 0.5,
             accent: 1.0,
         };
 
@@ -123,9 +123,9 @@ fn virtual_analog_engine_morph() {
                 TriggerState::Low
             },
             note: 48.0,
-            timbre: 0.4,
+            timbre: 0.5,
             morph: modulation::ramp_up(n, blocks),
-            harmonics: 0.6,
+            harmonics: 0.5,
             accent: 1.0,
         };
 

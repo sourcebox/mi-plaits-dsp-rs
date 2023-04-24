@@ -47,6 +47,10 @@ impl VariableShapeOscillator {
         self.waveshape = 0.0;
     }
 
+    pub fn set_master_phase(&mut self, phase: f32) {
+        self.master_phase = phase;
+    }
+
     #[inline]
     pub fn render(
         &mut self,
