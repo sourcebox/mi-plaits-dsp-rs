@@ -36,7 +36,7 @@ const MAX_TRIGGER_DELAY: usize = 8;
 const NUM_ENGINES: usize = 16;
 
 /// Patch parameters.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Patch {
     /// Note number in the range from `-119.0` to `120.0`. Default is `48.0`.
     pub note: f32,
@@ -86,7 +86,7 @@ impl Default for Patch {
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct Modulations {
     pub engine: f32,
     pub note: f32,
