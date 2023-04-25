@@ -35,19 +35,55 @@ use crate::stmlib::dsp::units::semitones_to_ratio;
 const MAX_TRIGGER_DELAY: usize = 8;
 const NUM_ENGINES: usize = 16;
 
-#[derive(Debug, Default)]
+/// Patch parameters.
+#[derive(Debug)]
 pub struct Patch {
+    /// Note number in the range from `-119.0` to `120.0`. Default is `48.0`.
     pub note: f32,
+
+    /// HARMONICS parameter in the range from `0.0` to `1.0`. Default is `0.5`.
     pub harmonics: f32,
+
+    /// TIMBRE parameter in the range from `0.0` to `1.0`. Default is `0.5`.
     pub timbre: f32,
+
+    /// MORPH parameter in the range from `0.0` to `1.0`. Default is `0.5`.
     pub morph: f32,
+
+    /// Frequency modulation amount in the range from `-1.0` to `1.0`. Default is `0.0`.
     pub frequency_modulation_amount: f32,
+
+    /// TIMBRE modulation amount in the range from `-1.0` to `1.0`. Default is `0.0`.
     pub timbre_modulation_amount: f32,
+
+    /// MORPH modulation amount in the range from `-1.0` to `1.0`. Default is `0.0`.
     pub morph_modulation_amount: f32,
 
+    /// Engine selection in the range from `0` to `15`. Default is `0`.
     pub engine: usize,
+
+    /// Envelope decay in the range from `0.0` to `1.0`. Default is `0.5`.
     pub decay: f32,
+
+    /// Low-pass gate color in the range from `0.0` to `1.0`. Default is `0.5`.
     pub lpg_colour: f32,
+}
+
+impl Default for Patch {
+    fn default() -> Self {
+        Self {
+            note: 48.0,
+            harmonics: 0.5,
+            timbre: 0.5,
+            morph: 0.5,
+            frequency_modulation_amount: 0.0,
+            timbre_modulation_amount: 0.0,
+            morph_modulation_amount: 0.0,
+            engine: 0,
+            decay: 0.5,
+            lpg_colour: 0.5,
+        }
+    }
 }
 
 #[derive(Debug, Default)]
