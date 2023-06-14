@@ -229,6 +229,7 @@ impl GrainEnvelope {
         self.fm = 0.0;
         self.amplitude = 0.5;
         self.previous_size_ratio = 0.0;
+        self.filter_coefficient = 0.0;
     }
 
     #[inline]
