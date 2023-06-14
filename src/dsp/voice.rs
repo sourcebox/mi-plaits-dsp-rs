@@ -28,7 +28,7 @@ use super::fx::low_pass_gate::LowPassGate;
 use super::physical_modelling::delay_line::DelayLine;
 use crate::dsp::{allocate_buffer, SAMPLE_RATE};
 use crate::stmlib::dsp::clip_16;
-use crate::stmlib::dsp::hysteresis_quantizer::HysteresisQuantizer;
+use crate::stmlib::dsp::hysteresis_quantizer::HysteresisQuantizer2;
 use crate::stmlib::dsp::limiter::Limiter;
 use crate::stmlib::dsp::units::semitones_to_ratio;
 
@@ -148,7 +148,7 @@ pub struct Voice<'a> {
     waveshaping_engine: WaveshapingEngine,
     wavetable_engine: WavetableEngine,
 
-    engine_quantizer: HysteresisQuantizer,
+    engine_quantizer: HysteresisQuantizer2,
 
     reload_user_data: bool,
     previous_engine_index: usize,
@@ -186,7 +186,7 @@ impl<'a> Voice<'a> {
             waveshaping_engine: WaveshapingEngine::new(),
             wavetable_engine: WavetableEngine::new(),
 
-            engine_quantizer: HysteresisQuantizer::new(),
+            engine_quantizer: HysteresisQuantizer2::new(),
             reload_user_data: false,
             previous_engine_index: 0,
             engine_cv: 0.0,
@@ -218,7 +218,7 @@ impl<'a> Voice<'a> {
             self.get_engine(i).unwrap().0.init();
         }
 
-        self.engine_quantizer.init();
+        self.engine_quantizer.init(NUM_ENGINES as i32, 0.05, true);
         self.out_post_processor.init();
         self.aux_post_processor.init();
         self.decay_envelope.init();
@@ -267,8 +267,7 @@ impl<'a> Voice<'a> {
         // Engine selection.
         let mut engine_index =
             self.engine_quantizer
-                .process(patch.engine as i32, self.engine_cv, NUM_ENGINES, 0.25)
-                as usize;
+                .process_with_base(patch.engine as i32, self.engine_cv) as usize;
         engine_index = engine_index.clamp(0, NUM_ENGINES);
 
         // TODO: remove when all engines are working.
