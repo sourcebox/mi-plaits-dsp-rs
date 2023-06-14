@@ -211,6 +211,10 @@ impl<'a> Voice<'a> {
 
     pub fn init(&mut self) {
         for i in 0..NUM_ENGINES {
+            // TODO: remove when all engines are working.
+            if self.get_engine(i).is_none() {
+                continue;
+            }
             self.get_engine(i).unwrap().0.init();
         }
 
@@ -266,6 +270,11 @@ impl<'a> Voice<'a> {
                 .process(patch.engine as i32, self.engine_cv, NUM_ENGINES, 0.25)
                 as usize;
         engine_index = engine_index.clamp(0, NUM_ENGINES);
+
+        // TODO: remove when all engines are working.
+        if self.get_engine(engine_index).is_none() {
+            return;
+        }
 
         if engine_index != self.previous_engine_index || self.reload_user_data {
             let engine = self.get_engine(engine_index).unwrap().0;
