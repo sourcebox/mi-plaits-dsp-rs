@@ -62,7 +62,7 @@ impl<'a> Engine for ParticleEngine<'a> {
     }
 
     fn reset(&mut self) {
-        self.diffuser.clear();
+        self.diffuser.reset();
     }
 
     #[inline]
