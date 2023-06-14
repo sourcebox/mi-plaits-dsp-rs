@@ -16,28 +16,22 @@
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
 use super::{note_to_frequency, Engine, EngineParameters};
+use crate::dsp::chords::chord_bank::{ChordBank, CHORD_NUM_VOICES};
 use crate::dsp::oscillator::string_synth_oscillator::StringSynthOscillator;
 use crate::dsp::oscillator::wavetable_oscillator::WavetableOscillator;
 use crate::dsp::resources::WAV_INTEGRATED_WAVES;
-use crate::stmlib::dsp::hysteresis_quantizer::HysteresisQuantizer;
 use crate::stmlib::dsp::one_pole;
-use crate::stmlib::dsp::units::semitones_to_ratio;
 
-const CHORD_NUM_NOTES: usize = 4;
-const CHORD_NUM_VOICES: usize = 5;
 const CHORD_NUM_HARMONICS: usize = 3;
-const CHORD_NUM_CHORDS: usize = 11;
 
 #[derive(Debug)]
 pub struct ChordEngine<'a> {
     divide_down_voice: [StringSynthOscillator; CHORD_NUM_VOICES],
     wavetable_voice: [WavetableOscillator; CHORD_NUM_VOICES],
-    chord_index_quantizer: HysteresisQuantizer,
+    chords: ChordBank,
 
     morph_lp: f32,
     timbre_lp: f32,
-
-    ratios: [f32; CHORD_NUM_CHORDS * CHORD_NUM_NOTES],
 
     wavetable: [&'a [i16]; 15],
 }
@@ -65,10 +59,9 @@ impl<'a> Default for ChordEngine<'a> {
                 WavetableOscillator::default(),
                 WavetableOscillator::default(),
             ],
-            chord_index_quantizer: HysteresisQuantizer::default(),
+            chords: ChordBank::new(),
             morph_lp: 0.0,
             timbre_lp: 0.0,
-            ratios: [0.0; CHORD_NUM_CHORDS * CHORD_NUM_NOTES],
             wavetable: [
                 &WAV_INTEGRATED_WAVES[wt_index(2, 6, 1)..],
                 &WAV_INTEGRATED_WAVES[wt_index(2, 6, 6)..],
@@ -97,7 +90,7 @@ impl<'a> Engine for ChordEngine<'a> {
             self.wavetable_voice[i].init();
         }
 
-        self.chord_index_quantizer.init();
+        self.chords.init();
 
         self.morph_lp = 0.0;
         self.timbre_lp = 0.0;
@@ -106,11 +99,7 @@ impl<'a> Engine for ChordEngine<'a> {
     }
 
     fn reset(&mut self) {
-        for (i, _) in CHORDS.iter().enumerate().take(CHORD_NUM_CHORDS) {
-            for j in 0..CHORD_NUM_NOTES {
-                self.ratios[i * CHORD_NUM_NOTES + j] = semitones_to_ratio(CHORDS[i][j]);
-            }
-        }
+        self.chords.reset();
     }
 
     #[inline]
@@ -124,9 +113,7 @@ impl<'a> Engine for ChordEngine<'a> {
         one_pole(&mut self.morph_lp, parameters.morph, 0.1);
         one_pole(&mut self.timbre_lp, parameters.timbre, 0.1);
 
-        let chord_index = self
-            .chord_index_quantizer
-            .process_with_default(parameters.harmonics * 1.02, CHORD_NUM_CHORDS);
+        self.chords.set_chord(parameters.harmonics);
 
         let mut harmonics: [f32; CHORD_NUM_HARMONICS * 2 + 2] = [0.0; CHORD_NUM_HARMONICS * 2 + 2];
         let mut note_amplitudes: [f32; CHORD_NUM_VOICES] = [0.0; CHORD_NUM_VOICES];
@@ -136,12 +123,9 @@ impl<'a> Engine for ChordEngine<'a> {
         harmonics[CHORD_NUM_HARMONICS * 2] = 0.0;
 
         let mut ratios: [f32; CHORD_NUM_VOICES] = [0.0; CHORD_NUM_VOICES];
-        let aux_note_mask = self.compute_chord_inversion(
-            chord_index,
-            self.timbre_lp,
-            &mut ratios,
-            &mut note_amplitudes,
-        );
+        let aux_note_mask =
+            self.chords
+                .compute_chord_inversion(self.timbre_lp, &mut ratios, &mut note_amplitudes);
 
         out.fill(0.0);
         aux.fill(0.0);
@@ -213,64 +197,7 @@ impl<'a> Engine for ChordEngine<'a> {
     }
 }
 
-impl<'a> ChordEngine<'a> {
-    #[inline]
-    fn compute_chord_inversion(
-        &self,
-        chord_index: i32,
-        mut inversion: f32,
-        ratios: &mut [f32],
-        amplitudes: &mut [f32],
-    ) -> i32 {
-        inversion *= (CHORD_NUM_NOTES * 5) as f32;
-
-        let inversion_integral = inversion as usize;
-        let inversion_fractional = inversion - (inversion_integral as f32);
-
-        let num_rotations = inversion_integral / CHORD_NUM_NOTES;
-        let rotated_note = inversion_integral % CHORD_NUM_NOTES;
-
-        const BASE_GAIN: f32 = 0.25;
-
-        let mut mask = 0;
-
-        for i in 0..CHORD_NUM_NOTES {
-            let transposition = 0.25
-                * (1 << ((CHORD_NUM_NOTES - 1 + inversion_integral - i) / CHORD_NUM_NOTES)) as f32;
-            let target_voice =
-                (i.wrapping_sub(num_rotations).wrapping_add(CHORD_NUM_VOICES)) % CHORD_NUM_VOICES;
-            let previous_voice =
-                (target_voice.wrapping_sub(1).wrapping_add(CHORD_NUM_VOICES)) % CHORD_NUM_VOICES;
-
-            let ratio = self.ratios[chord_index as usize * CHORD_NUM_NOTES + i];
-
-            #[allow(clippy::comparison_chain)]
-            if i == rotated_note {
-                ratios[target_voice] = ratio * transposition;
-                ratios[previous_voice] = ratios[target_voice] * 2.0;
-                amplitudes[previous_voice] = BASE_GAIN * inversion_fractional;
-                amplitudes[target_voice] = BASE_GAIN * (1.0 - inversion_fractional);
-            } else if i < rotated_note {
-                ratios[previous_voice] = ratio * transposition;
-                amplitudes[previous_voice] = BASE_GAIN;
-            } else {
-                ratios[target_voice] = ratio * transposition;
-                amplitudes[target_voice] = BASE_GAIN;
-            }
-
-            if i == 0 {
-                if i >= rotated_note {
-                    mask |= 1 << target_voice;
-                }
-                if i <= rotated_note {
-                    mask |= 1 << previous_voice;
-                }
-            }
-        }
-
-        mask
-    }
-}
+impl<'a> ChordEngine<'a> {}
 
 const fn wt_index(bank: usize, row: usize, column: usize) -> usize {
     (bank * 64 + row * 8 + column) * 260
@@ -292,20 +219,6 @@ fn compute_registration(mut registration: f32, amplitudes: &mut [f32]) {
         *amplitude = a + (b - a) * registration_fractional;
     }
 }
-
-const CHORDS: [[f32; CHORD_NUM_NOTES]; CHORD_NUM_CHORDS] = [
-    [0.00, 0.01, 11.99, 12.00], // OCT
-    [0.00, 7.01, 7.00, 12.00],  // 5
-    [0.00, 5.00, 7.00, 12.00],  // sus4
-    [0.00, 3.00, 7.00, 12.00],  // m
-    [0.00, 3.00, 7.00, 10.00],  // m7
-    [0.00, 3.00, 10.00, 14.00], // m9
-    [0.00, 3.00, 10.00, 17.00], // m11
-    [0.00, 2.00, 9.00, 16.00],  // 69
-    [0.00, 4.00, 11.00, 14.00], // M9
-    [0.00, 4.00, 7.00, 11.00],  // M7
-    [0.00, 4.00, 7.00, 12.00],  // M
-];
 
 const REGISTRATION_TABLE_SIZE: usize = 8;
 
