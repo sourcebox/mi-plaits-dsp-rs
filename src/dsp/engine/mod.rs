@@ -27,6 +27,8 @@ pub trait Engine {
 
     fn reset(&mut self) {}
 
+    fn load_user_data(&mut self, _user_data: &[u8]) {}
+
     fn render(
         &mut self,
         parameters: &EngineParameters,
