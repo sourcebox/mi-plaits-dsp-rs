@@ -48,6 +48,10 @@ impl SwarmEngine {
 
 impl Engine for SwarmEngine {
     fn init(&mut self) {
+        self.reset();
+    }
+
+    fn reset(&mut self) {
         let n = (NUM_SWARM_VOICES as i32 - 1) / 2;
 
         for i in 0..NUM_SWARM_VOICES as i32 {
