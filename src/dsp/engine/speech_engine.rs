@@ -27,11 +27,11 @@ use crate::dsp::speech::lpc_speech_synth_controller::LpcSpeechSynthController;
 use crate::dsp::speech::lpc_speech_synth_words::NUM_WORD_BANKS;
 use crate::dsp::speech::naive_speech_synth::NaiveSpeechSynth;
 use crate::dsp::speech::sam_speech_synth::SamSpeechSynth;
-use crate::stmlib::dsp::hysteresis_quantizer::HysteresisQuantizer;
+use crate::stmlib::dsp::hysteresis_quantizer::HysteresisQuantizer2;
 
 #[derive(Debug)]
 pub struct SpeechEngine<'a> {
-    word_bank_quantizer: HysteresisQuantizer,
+    word_bank_quantizer: HysteresisQuantizer2,
 
     naive_speech_synth: NaiveSpeechSynth,
     sam_speech_synth: SamSpeechSynth,
@@ -46,7 +46,7 @@ pub struct SpeechEngine<'a> {
 impl<'a> SpeechEngine<'a> {
     pub fn new<T: GlobalAlloc>(buffer_allocator: &T, block_size: usize) -> Self {
         Self {
-            word_bank_quantizer: HysteresisQuantizer::new(),
+            word_bank_quantizer: HysteresisQuantizer2::new(),
             naive_speech_synth: NaiveSpeechSynth::new(),
             sam_speech_synth: SamSpeechSynth::new(),
             lpc_speech_synth_controller: LpcSpeechSynthController::new(buffer_allocator),
@@ -63,7 +63,8 @@ impl<'a> Engine for SpeechEngine<'a> {
         self.sam_speech_synth.init();
         self.naive_speech_synth.init();
         self.lpc_speech_synth_controller.init();
-        self.word_bank_quantizer.init();
+        self.word_bank_quantizer
+            .init(NUM_WORD_BANKS as i32, 0.1, false);
         self.prosody_amount = 0.0;
         self.speed = 0.0;
         self.reset();
@@ -139,10 +140,7 @@ impl<'a> Engine for SpeechEngine<'a> {
             }
         } else {
             // Change phonemes/words for LPC.
-            let word_bank = self
-                .word_bank_quantizer
-                .process_with_default((group - 2.0) * 0.275, NUM_WORD_BANKS + 1)
-                - 1;
+            let word_bank = self.word_bank_quantizer.process((group - 2.0) * 0.275) - 1;
 
             let replay_prosody = word_bank >= 0 && !trigger;
 
