@@ -105,6 +105,7 @@ fn hihat() {
             hihat::NoiseType::RingMod,
             hihat::VcaType::Swing,
             false,
+            false,
         );
         wav_data.extend_from_slice(&out);
     }

@@ -80,6 +80,7 @@ impl<'a> Engine for HihatEngine<'a> {
             NoiseType::Square,
             VcaType::Swing,
             true,
+            false,
         );
 
         self.hi_hat_2.render(
@@ -96,6 +97,7 @@ impl<'a> Engine for HihatEngine<'a> {
             NoiseType::RingMod,
             VcaType::Linear,
             false,
+            true,
         );
     }
 }

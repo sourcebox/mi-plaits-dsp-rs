@@ -73,6 +73,7 @@ impl Hihat {
         noise_type: NoiseType,
         vca_type: VcaType,
         resonance: bool,
+        two_stage_envelope: bool,
     ) {
         let envelope_decay = 1.0 - 0.003 * semitones_to_ratio(-decay * 84.0);
         let cut_decay = 1.0 - 0.0025 * semitones_to_ratio(-decay * 36.0);
@@ -96,7 +97,7 @@ impl Hihat {
         cutoff = cutoff.clamp(0.0, 16000.0 / SAMPLE_RATE);
         self.noise_coloration_svf.set_f_q(
             cutoff,
-            if resonance { 3.0 + 6.0 * tone } else { 1.0 },
+            if resonance { 3.0 + 3.0 * tone } else { 1.0 },
             FrequencyApproximation::Accurate,
         );
         self.noise_coloration_svf
@@ -123,7 +124,7 @@ impl Hihat {
         let mut sustain_gain =
             ParameterInterpolator::new(&mut self.sustain_gain, accent * decay, out.len());
         for sample_out in out.iter_mut() {
-            self.envelope *= if self.envelope > 0.5 {
+            self.envelope *= if self.envelope > 0.5 || !two_stage_envelope {
                 envelope_decay
             } else {
                 cut_decay
@@ -267,10 +268,10 @@ impl RingModNoise {
 
 #[inline]
 fn swing_vca(mut s: f32, gain: f32) -> f32 {
-    s *= if s > 0.0 { 10.0 } else { 0.1 };
+    s *= if s > 0.0 { 4.0 } else { 0.1 };
     s = s / (1.0 + s.abs());
 
-    (s + 1.0) * gain
+    (s + 0.1) * gain
 }
 
 #[inline]
