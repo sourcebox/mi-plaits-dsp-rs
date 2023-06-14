@@ -2,7 +2,7 @@
 
 mod wav_writer;
 
-use mi_plaits_dsp::dsp::voice::{Modulations, Patch, Voice};
+use mi_plaits_dsp::dsp::voice::{Modulations, Patch, Voice, NUM_ENGINES};
 use mi_plaits_dsp::dsp::SAMPLE_RATE;
 
 const BLOCK_SIZE: usize = 24;
@@ -49,7 +49,7 @@ fn all_engines() {
         level_patched: false,
     };
 
-    for engine in 0..=15 {
+    for engine in 0..NUM_ENGINES {
         patch.engine = engine;
 
         for _ in 0..blocks {
@@ -105,7 +105,7 @@ fn all_engines_trigger() {
         level_patched: false,
     };
 
-    for engine in 0..=15 {
+    for engine in 0..NUM_ENGINES {
         patch.engine = engine;
 
         for n in 0..blocks {

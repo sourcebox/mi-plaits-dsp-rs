@@ -33,7 +33,7 @@ use crate::stmlib::dsp::limiter::Limiter;
 use crate::stmlib::dsp::units::semitones_to_ratio;
 
 const MAX_TRIGGER_DELAY: usize = 8;
-const NUM_ENGINES: usize = 24;
+pub const NUM_ENGINES: usize = 24;
 
 /// Patch parameters.
 #[derive(Debug, Clone)]
