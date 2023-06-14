@@ -413,6 +413,8 @@ impl<'a> Voice<'a> {
                 self.lpg_envelope
                     .process_ping(attack, short_decay, decay_tail, hf);
             }
+        } else {
+            self.lpg_envelope.init();
         }
 
         self.out_post_processor.process(
