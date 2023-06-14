@@ -21,6 +21,7 @@ impl LpgEnvelope {
         self.gain = 1.0;
         self.frequency = 0.5;
         self.hf_bleed = 0.0;
+        self.ramp_up = false;
     }
 
     pub fn trigger(&mut self) {
