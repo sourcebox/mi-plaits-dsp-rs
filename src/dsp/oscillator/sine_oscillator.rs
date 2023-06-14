@@ -200,3 +200,14 @@ fn fast_2_sin(f: f32) -> f32 {
     let f_pi = f * core::f32::consts::PI;
     f_pi * (2.0 - (2.0 * 0.96 / 6.0) * f_pi * f_pi)
 }
+
+#[inline]
+pub fn sine_pm(mut phase: u32, fm: f32) -> f32 {
+    phase = phase.wrapping_add((((fm + 4.0) * 536870912.0) as u32) << 3);
+    let integral = phase >> 22;
+    let fractional = (phase << 10) as f32 / 4294967296.0;
+    let a = LUT_SINE[integral as usize];
+    let b = LUT_SINE[integral as usize + 1];
+
+    a + (b - a) * fractional
+}

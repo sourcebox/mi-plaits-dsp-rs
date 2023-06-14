@@ -14,7 +14,8 @@
 
 use super::{note_to_frequency, Engine, EngineParameters};
 use crate::dsp::downsampler::Downsampler;
-use crate::dsp::resources::{LUT_FM_FREQUENCY_QUANTIZER, LUT_SINE};
+use crate::dsp::oscillator::sine_oscillator::sine_pm;
+use crate::dsp::resources::LUT_FM_FREQUENCY_QUANTIZER;
 use crate::dsp::A0;
 use crate::stmlib::dsp::parameter_interpolator::ParameterInterpolator;
 use crate::stmlib::dsp::{interpolate, one_pole};
@@ -138,15 +139,4 @@ impl Engine for FmEngine {
             *aux_sample = sub_downsampler.read();
         }
     }
-}
-
-#[inline]
-fn sine_pm(mut phase: u32, fm: f32) -> f32 {
-    phase = phase.wrapping_add((((fm + 4.0) * 536870912.0) as u32) << 3);
-    let integral = phase >> 22;
-    let fractional = (phase << 10) as f32 / 4294967296.0;
-    let a = LUT_SINE[integral as usize];
-    let b = LUT_SINE[integral as usize + 1];
-
-    a + (b - a) * fractional
 }
