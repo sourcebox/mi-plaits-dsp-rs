@@ -67,7 +67,7 @@ pub enum TriggerState {
     Low = 0,
     RisingEdge = 1,
     Unpatched = 2,
-    UnpatchedAutotriggered = 3,
+    High = 4,
 }
 
 impl Default for TriggerState {

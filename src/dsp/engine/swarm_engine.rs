@@ -70,15 +70,8 @@ impl Engine for SwarmEngine {
         let spread = parameters.harmonics * parameters.harmonics * parameters.harmonics;
         let mut size_ratio = 0.25 * semitones_to_ratio((1.0 - parameters.morph) * 84.0);
 
-        let sustain = matches!(
-            parameters.trigger,
-            TriggerState::Unpatched | TriggerState::UnpatchedAutotriggered
-        );
-
-        let trigger = matches!(
-            parameters.trigger,
-            TriggerState::RisingEdge | TriggerState::UnpatchedAutotriggered
-        );
+        let sustain = matches!(parameters.trigger, TriggerState::Unpatched);
+        let trigger = matches!(parameters.trigger, TriggerState::RisingEdge);
 
         let burst_mode = !(sustain);
         let start_burst = trigger;

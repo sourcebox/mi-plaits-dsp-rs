@@ -85,15 +85,8 @@ impl<'a> Engine for SpeechEngine<'a> {
 
         let group = parameters.harmonics * 6.0;
 
-        let sustain = matches!(
-            parameters.trigger,
-            TriggerState::Unpatched | TriggerState::UnpatchedAutotriggered
-        );
-
-        let trigger = matches!(
-            parameters.trigger,
-            TriggerState::RisingEdge | TriggerState::UnpatchedAutotriggered
-        );
+        let sustain = matches!(parameters.trigger, TriggerState::Unpatched);
+        let trigger = matches!(parameters.trigger, TriggerState::RisingEdge);
 
         // Interpolates between the 3 models: naive, SAM, LPC.
         if group <= 2.0 {

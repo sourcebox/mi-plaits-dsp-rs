@@ -80,15 +80,8 @@ impl<'a> Engine for StringEngine<'a> {
         aux: &mut [f32],
         _already_enveloped: &mut bool,
     ) {
-        let sustain = matches!(
-            parameters.trigger,
-            TriggerState::Unpatched | TriggerState::UnpatchedAutotriggered
-        );
-
-        let trigger = matches!(
-            parameters.trigger,
-            TriggerState::RisingEdge | TriggerState::UnpatchedAutotriggered
-        );
+        let sustain = matches!(parameters.trigger, TriggerState::Unpatched);
+        let trigger = matches!(parameters.trigger, TriggerState::RisingEdge);
 
         if trigger {
             // 8 in original firmware version.

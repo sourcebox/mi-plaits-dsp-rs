@@ -63,15 +63,8 @@ impl<'a> Engine for ModalEngine<'a> {
 
         one_pole(&mut self.harmonics_lp, parameters.harmonics, 0.01);
 
-        let sustain = matches!(
-            parameters.trigger,
-            TriggerState::Unpatched | TriggerState::UnpatchedAutotriggered
-        );
-
-        let trigger = matches!(
-            parameters.trigger,
-            TriggerState::RisingEdge | TriggerState::UnpatchedAutotriggered
-        );
+        let sustain = matches!(parameters.trigger, TriggerState::Unpatched);
+        let trigger = matches!(parameters.trigger, TriggerState::RisingEdge);
 
         self.voice.render(
             sustain,

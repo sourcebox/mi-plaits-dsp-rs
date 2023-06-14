@@ -56,15 +56,8 @@ impl<'a> Engine for HihatEngine<'a> {
     ) {
         let f0 = note_to_frequency(parameters.note);
 
-        let sustain = matches!(
-            parameters.trigger,
-            TriggerState::Unpatched | TriggerState::UnpatchedAutotriggered
-        );
-
-        let trigger = matches!(
-            parameters.trigger,
-            TriggerState::RisingEdge | TriggerState::UnpatchedAutotriggered
-        );
+        let sustain = matches!(parameters.trigger, TriggerState::Unpatched);
+        let trigger = matches!(parameters.trigger, TriggerState::RisingEdge);
 
         self.hi_hat_1.render(
             sustain,

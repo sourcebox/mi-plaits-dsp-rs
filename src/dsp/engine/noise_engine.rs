@@ -73,15 +73,8 @@ impl<'a> Engine for NoiseEngine<'a> {
         aux: &mut [f32],
         _already_enveloped: &mut bool,
     ) {
-        let sustain = matches!(
-            parameters.trigger,
-            TriggerState::Unpatched | TriggerState::UnpatchedAutotriggered
-        );
-
-        let trigger = matches!(
-            parameters.trigger,
-            TriggerState::RisingEdge | TriggerState::UnpatchedAutotriggered
-        );
+        let sustain = matches!(parameters.trigger, TriggerState::Unpatched);
+        let trigger = matches!(parameters.trigger, TriggerState::RisingEdge);
 
         let f0 = note_to_frequency(parameters.note);
         let f1 = note_to_frequency(parameters.note + parameters.harmonics * 48.0 - 24.0);
