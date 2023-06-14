@@ -44,6 +44,10 @@ impl Diffuser {
         self.lp_decay = 0.0;
     }
 
+    pub fn reset(&mut self) {
+        self.engine.clear();
+    }
+
     pub fn clear(&mut self) {
         self.ap1.reset();
         self.ap2.reset();
