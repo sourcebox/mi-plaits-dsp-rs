@@ -150,6 +150,7 @@ pub struct Voice<'a> {
 
     engine_quantizer: HysteresisQuantizer,
 
+    reload_user_data: bool,
     previous_engine_index: usize,
     engine_cv: f32,
 
@@ -186,6 +187,7 @@ impl<'a> Voice<'a> {
             wavetable_engine: WavetableEngine::new(),
 
             engine_quantizer: HysteresisQuantizer::new(),
+            reload_user_data: false,
             previous_engine_index: 0,
             engine_cv: 0.0,
 
@@ -217,6 +219,11 @@ impl<'a> Voice<'a> {
         self.aux_post_processor.init();
         self.decay_envelope.init();
         self.lpg_envelope.init();
+    }
+
+    #[inline]
+    pub fn reload_user_data(&mut self) {
+        self.reload_user_data = true;
     }
 
     #[inline]
@@ -260,10 +267,13 @@ impl<'a> Voice<'a> {
                 as usize;
         engine_index = engine_index.clamp(0, NUM_ENGINES);
 
-        if engine_index != self.previous_engine_index {
-            self.get_engine(engine_index).unwrap().0.reset();
+        if engine_index != self.previous_engine_index || self.reload_user_data {
+            let engine = self.get_engine(engine_index).unwrap().0;
+            // TODO: engine.load_user_data(user_data);
+            engine.reset();
             self.out_post_processor.reset();
             self.previous_engine_index = engine_index;
+            self.reload_user_data = false;
         }
 
         let mut p = EngineParameters::default();
