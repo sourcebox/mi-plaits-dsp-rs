@@ -299,10 +299,8 @@ impl<'a> Voice<'a> {
 
         self.decay_envelope.process(short_decay * 2.0);
 
-        let compressed_level = f32::max(
-            1.3 * modulations.level / (0.3 + modulations.level.abs()),
-            0.0,
-        );
+        let compressed_level =
+            (1.3 * modulations.level / (0.3 + modulations.level.abs())).clamp(0.0, 1.0);
         p.accent = if modulations.level_patched {
             compressed_level
         } else {
