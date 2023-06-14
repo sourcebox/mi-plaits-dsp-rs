@@ -53,10 +53,13 @@ impl AdditiveEngine {
 
 impl Engine for AdditiveEngine {
     fn init(&mut self) {
-        self.amplitudes = [0.0; NUM_HARMONICS];
         for osc in self.harmonic_oscillator.iter_mut() {
             osc.init();
         }
+    }
+
+    fn reset(&mut self) {
+        self.amplitudes = [0.0; NUM_HARMONICS];
     }
 
     #[inline]
