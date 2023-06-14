@@ -33,7 +33,7 @@ use crate::stmlib::dsp::limiter::Limiter;
 use crate::stmlib::dsp::units::semitones_to_ratio;
 
 const MAX_TRIGGER_DELAY: usize = 8;
-const NUM_ENGINES: usize = 16;
+const NUM_ENGINES: usize = 24;
 
 /// Patch parameters.
 #[derive(Debug, Clone)]
@@ -315,8 +315,9 @@ impl<'a> Voice<'a> {
         p.harmonics = p.harmonics.clamp(0.0, 1.0);
 
         let mut internal_envelope_amplitude = 1.0;
+        let mut internal_envelope_amplitude_timbre = 1.0;
 
-        if engine_index == 7 {
+        if engine_index == 15 {
             internal_envelope_amplitude = 2.0 - p.harmonics * 6.0;
             internal_envelope_amplitude = internal_envelope_amplitude.clamp(0.0, 1.0);
             self.speech_engine.set_prosody_amount(
@@ -333,6 +334,19 @@ impl<'a> Voice<'a> {
                     patch.morph_modulation_amount
                 },
             );
+        } else if engine_index == 7 {
+            if modulations.trigger_patched && !modulations.timbre_patched {
+                // Disable internal envelope on TIMBRE, and enable the envelope generator
+                // built into the chiptune engine.
+                internal_envelope_amplitude_timbre = 0.0;
+                // TODO
+                // self.chiptune_engine
+                //     .set_envelope_shape(patch.timbre_modulation_amount);
+            } else {
+                // TODO
+                // self.chiptune_engine
+                //     .set_envelope_shape(ChiptuneEngine::NO_ENVELOPE);
+            }
         }
 
         p.note = apply_modulations(
@@ -356,7 +370,7 @@ impl<'a> Voice<'a> {
             modulations.timbre_patched,
             modulations.timbre,
             use_internal_envelope,
-            self.decay_envelope.value(),
+            internal_envelope_amplitude_timbre * self.decay_envelope.value(),
             0.0,
             0.0,
             1.0,
@@ -427,22 +441,30 @@ impl<'a> Voice<'a> {
     /// Return reference to engine by index as well as additional parameters
     fn get_engine(&mut self, index: usize) -> Option<(&mut dyn Engine, bool, f32, f32)> {
         match index {
-            0 => Some((&mut self.virtual_analog_engine, false, 0.8, 0.8)),
-            1 => Some((&mut self.waveshaping_engine, false, 0.7, 0.6)),
-            2 => Some((&mut self.fm_engine, false, 0.6, 0.6)),
-            3 => Some((&mut self.grain_engine, false, 0.7, 0.6)),
-            4 => Some((&mut self.additive_engine, false, 0.8, 0.8)),
-            5 => Some((&mut self.wavetable_engine, false, 0.6, 0.6)),
-            6 => Some((&mut self.chord_engine, false, 0.8, 0.8)),
-            7 => Some((&mut self.speech_engine, false, -0.7, 0.8)),
-            8 => Some((&mut self.swarm_engine, false, -3.0, 1.0)),
-            9 => Some((&mut self.noise_engine, false, -1.0, -1.0)),
-            10 => Some((&mut self.particle_engine, false, -2.0, 1.0)),
-            11 => Some((&mut self.string_engine, true, -1.0, 0.8)),
-            12 => Some((&mut self.modal_engine, true, -1.0, 0.8)),
-            13 => Some((&mut self.bass_drum_engine, true, 0.8, 0.8)),
-            14 => Some((&mut self.snare_drum_engine, true, 0.8, 0.8)),
-            15 => Some((&mut self.hihat_engine, true, 0.8, 0.8)),
+            0 => None,
+            1 => None,
+            2 => None,
+            3 => None,
+            4 => None,
+            5 => None,
+            6 => None,
+            7 => None,
+            8 => Some((&mut self.virtual_analog_engine, false, 0.8, 0.8)),
+            9 => Some((&mut self.waveshaping_engine, false, 0.7, 0.6)),
+            10 => Some((&mut self.fm_engine, false, 0.6, 0.6)),
+            11 => Some((&mut self.grain_engine, false, 0.7, 0.6)),
+            12 => Some((&mut self.additive_engine, false, 0.8, 0.8)),
+            13 => Some((&mut self.wavetable_engine, false, 0.6, 0.6)),
+            14 => Some((&mut self.chord_engine, false, 0.8, 0.8)),
+            15 => Some((&mut self.speech_engine, false, -0.7, 0.8)),
+            16 => Some((&mut self.swarm_engine, false, -3.0, 1.0)),
+            17 => Some((&mut self.noise_engine, false, -1.0, -1.0)),
+            18 => Some((&mut self.particle_engine, false, -2.0, 1.0)),
+            19 => Some((&mut self.string_engine, true, -1.0, 0.8)),
+            20 => Some((&mut self.modal_engine, true, -1.0, 0.8)),
+            21 => Some((&mut self.bass_drum_engine, true, 0.8, 0.8)),
+            22 => Some((&mut self.snare_drum_engine, true, 0.8, 0.8)),
+            23 => Some((&mut self.hihat_engine, true, 0.8, 0.8)),
             _ => None,
         }
     }
