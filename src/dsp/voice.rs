@@ -285,6 +285,8 @@ impl<'a> Voice<'a> {
         if modulations.trigger_patched {
             p.trigger = if rising_edge {
                 TriggerState::RisingEdge
+            } else if self.trigger_state {
+                TriggerState::High
             } else {
                 TriggerState::Low
             };
