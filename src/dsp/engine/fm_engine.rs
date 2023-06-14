@@ -13,13 +13,13 @@
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
 use super::{note_to_frequency, Engine, EngineParameters};
+use crate::dsp::downsampler::Downsampler;
 use crate::dsp::resources::{LUT_FM_FREQUENCY_QUANTIZER, LUT_SINE};
 use crate::dsp::A0;
 use crate::stmlib::dsp::parameter_interpolator::ParameterInterpolator;
 use crate::stmlib::dsp::{interpolate, one_pole};
 
 const OVERSAMPLING: usize = 4;
-const FIR_HALF_SIZE: usize = 4;
 
 #[derive(Debug, Default)]
 pub struct FmEngine {
@@ -139,46 +139,6 @@ impl Engine for FmEngine {
         }
     }
 }
-
-#[derive(Debug)]
-pub struct Downsampler<'a> {
-    head: f32,
-    tail: f32,
-    state: &'a mut f32,
-}
-
-impl<'a> Downsampler<'a> {
-    pub fn new(state: &'a mut f32) -> Self {
-        Self {
-            head: *state,
-            tail: 0.0,
-            state,
-        }
-    }
-
-    #[inline]
-    pub fn accumulate(&mut self, i: usize, sample: f32) {
-        self.head += sample * FIR_COEFFICIENT[3 - (i & 3)];
-        self.tail += sample * FIR_COEFFICIENT[i & 3];
-    }
-
-    #[inline]
-    pub fn read(&mut self) -> f32 {
-        let value = self.head;
-        self.head = self.tail;
-        self.tail = 0.0;
-
-        value
-    }
-}
-
-impl<'a> Drop for Downsampler<'a> {
-    fn drop(&mut self) {
-        *self.state = self.head;
-    }
-}
-
-const FIR_COEFFICIENT: [f32; FIR_HALF_SIZE] = [0.02442415, 0.09297315, 0.16712938, 0.21547332];
 
 #[inline]
 fn sine_pm(mut phase: u32, fm: f32) -> f32 {
