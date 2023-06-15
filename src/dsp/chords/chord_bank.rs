@@ -36,6 +36,7 @@ impl ChordBank {
     pub fn init(&mut self) {
         self.chord_index_quantizer
             .init(CHORD_NUM_CHORDS as i32, 0.075, false);
+        self.reset();
     }
 
     pub fn reset(&mut self) {
@@ -115,7 +116,7 @@ impl ChordBank {
     }
 
     #[inline]
-    fn sort(&mut self) {
+    pub fn sort(&mut self) {
         for i in 0..CHORD_NUM_NOTES {
             let mut r = self.ratio(i as i32);
             while r > 2.0 {

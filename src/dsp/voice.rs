@@ -23,6 +23,7 @@ use super::engine::virtual_analog_engine::VirtualAnalogEngine;
 use super::engine::waveshaping_engine::WaveshapingEngine;
 use super::engine::wavetable_engine::WavetableEngine;
 use super::engine::{note_to_frequency, Engine, EngineParameters, TriggerState};
+use super::engine2::chiptune_engine::{self, ChiptuneEngine};
 use super::envelope::{DecayEnvelope, LpgEnvelope};
 use super::fx::low_pass_gate::LowPassGate;
 use super::physical_modelling::delay_line::DelayLine;
@@ -133,6 +134,7 @@ pub struct Modulations {
 pub struct Voice<'a> {
     additive_engine: AdditiveEngine,
     bass_drum_engine: BassDrumEngine,
+    chiptune_engine: ChiptuneEngine,
     chord_engine: ChordEngine<'a>,
     fm_engine: FmEngine,
     grain_engine: GrainEngine,
@@ -171,6 +173,7 @@ impl<'a> Voice<'a> {
         Self {
             additive_engine: AdditiveEngine::new(),
             bass_drum_engine: BassDrumEngine::new(),
+            chiptune_engine: ChiptuneEngine::new(),
             chord_engine: ChordEngine::new(),
             fm_engine: FmEngine::new(),
             grain_engine: GrainEngine::new(),
@@ -347,13 +350,11 @@ impl<'a> Voice<'a> {
                 // Disable internal envelope on TIMBRE, and enable the envelope generator
                 // built into the chiptune engine.
                 internal_envelope_amplitude_timbre = 0.0;
-                // TODO
-                // self.chiptune_engine
-                //     .set_envelope_shape(patch.timbre_modulation_amount);
+                self.chiptune_engine
+                    .set_envelope_shape(patch.timbre_modulation_amount);
             } else {
-                // TODO
-                // self.chiptune_engine
-                //     .set_envelope_shape(ChiptuneEngine::NO_ENVELOPE);
+                self.chiptune_engine
+                    .set_envelope_shape(chiptune_engine::NO_ENVELOPE);
             }
         }
 
@@ -458,7 +459,7 @@ impl<'a> Voice<'a> {
             4 => None,
             5 => None,
             6 => None,
-            7 => None,
+            7 => Some((&mut self.chiptune_engine, false, 0.5, 0.5)),
             8 => Some((&mut self.virtual_analog_engine, false, 0.8, 0.8)),
             9 => Some((&mut self.waveshaping_engine, false, 0.7, 0.6)),
             10 => Some((&mut self.fm_engine, false, 0.6, 0.6)),

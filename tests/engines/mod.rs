@@ -1,5 +1,6 @@
 mod additive_engine;
 mod bass_drum_engine;
+mod chiptune_engine;
 mod chord_engine;
 mod fm_engine;
 mod grain_engine;

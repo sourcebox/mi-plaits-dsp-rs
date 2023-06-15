@@ -15,6 +15,21 @@ pub enum ArpeggiatorMode {
     Last,
 }
 
+impl<T> From<T> for ArpeggiatorMode
+where
+    T: Into<i32>,
+{
+    fn from(value: T) -> Self {
+        match value.into() {
+            1 => ArpeggiatorMode::Down,
+            2 => ArpeggiatorMode::UpDown,
+            3 => ArpeggiatorMode::Random,
+            4 => ArpeggiatorMode::Last,
+            _ => ArpeggiatorMode::Up,
+        }
+    }
+}
+
 #[derive(Debug, Default)]
 pub struct Arpeggiator {
     mode: ArpeggiatorMode,
@@ -58,6 +73,10 @@ impl Arpeggiator {
     }
 
     pub fn clock(&mut self, num_notes: i32) {
+        if num_notes == 0 {
+            return;
+        }
+
         if num_notes == 1 && self.range == 1 {
             self.note = 0;
             self.octave = 0;
@@ -116,5 +135,7 @@ impl Arpeggiator {
                 }
             }
         }
+
+        self.note = self.note.max(0);
     }
 }

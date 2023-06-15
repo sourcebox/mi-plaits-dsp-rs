@@ -64,7 +64,7 @@ pub struct EngineParameters {
     pub accent: f32,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum TriggerState {
     Low = 0,
     RisingEdge = 1,
