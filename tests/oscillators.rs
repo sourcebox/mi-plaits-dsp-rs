@@ -411,6 +411,29 @@ fn string_synth_oscillator() {
 }
 
 #[test]
+fn super_square_oscillator() {
+    let frequency = 110.0;
+    let duration = 2.0;
+
+    let mut osc = super_square_oscillator::SuperSquareOscillator::new();
+    let mut out = [0.0; BLOCK_SIZE];
+    let mut wav_data = Vec::new();
+    osc.init();
+
+    let blocks = (duration * SAMPLE_RATE / (BLOCK_SIZE as f32)) as usize;
+    let f0 = frequency / SAMPLE_RATE;
+
+    for n in 0..blocks {
+        let modulation = modulation::ramp_up(n, blocks);
+        let shape = modulation;
+        osc.render(f0, shape, &mut out);
+        wav_data.extend_from_slice(&out);
+    }
+
+    wav_writer::write("oscillator/super_square.wav", &wav_data).ok();
+}
+
+#[test]
 fn variable_saw_oscillator() {
     let frequency = 110.0;
     let waveshape = 1.0;

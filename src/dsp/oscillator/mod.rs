@@ -9,6 +9,7 @@ pub mod harmonic_oscillator;
 pub mod nes_triangle_oscillator;
 pub mod sine_oscillator;
 pub mod string_synth_oscillator;
+pub mod super_square_oscillator;
 pub mod variable_saw_oscillator;
 pub mod variable_shape_oscillator;
 pub mod vosim_oscillator;
