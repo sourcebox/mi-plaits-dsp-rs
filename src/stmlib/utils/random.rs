@@ -17,7 +17,7 @@ pub fn seed(seed: u32) {
 }
 
 #[inline]
-fn get_word() -> u32 {
+pub fn get_word() -> u32 {
     RNG_STATE.store(
         RNG_STATE
             .load(Ordering::Relaxed)
