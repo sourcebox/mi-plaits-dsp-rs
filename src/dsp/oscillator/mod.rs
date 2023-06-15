@@ -6,6 +6,7 @@ pub mod oscillator;
 pub mod formant_oscillator;
 pub mod grainlet_oscillator;
 pub mod harmonic_oscillator;
+pub mod nes_triangle_oscillator;
 pub mod sine_oscillator;
 pub mod string_synth_oscillator;
 pub mod variable_saw_oscillator;

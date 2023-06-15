@@ -85,6 +85,27 @@ fn harmonic_oscillator() {
 }
 
 #[test]
+fn nes_triangle_oscillator() {
+    let frequency = 110.0;
+    let duration = 2.0;
+
+    let mut osc = nes_triangle_oscillator::NesTriangleOscillator::new();
+    let mut out = [0.0; BLOCK_SIZE];
+    let mut wav_data = Vec::new();
+    osc.init();
+
+    let blocks = (duration * SAMPLE_RATE / (BLOCK_SIZE as f32)) as usize;
+    let f0 = frequency / SAMPLE_RATE;
+
+    for _ in 0..blocks {
+        osc.render(f0, &mut out, 5);
+        wav_data.extend_from_slice(&out);
+    }
+
+    wav_writer::write("oscillator/nes_triangle.wav", &wav_data).ok();
+}
+
+#[test]
 fn oscillator_impulse_train() {
     let frequency = 110.0;
     let duration = 2.0;
