@@ -11,8 +11,8 @@ use crate::stmlib::dsp::polyblep::{
     next_blep_sample, next_integrated_blep_sample, this_blep_sample, this_integrated_blep_sample,
 };
 
-const MAX_FREQUENCY: f32 = 0.25;
-const MIN_FREQUENCY: f32 = 0.000001;
+pub const MAX_FREQUENCY: f32 = 0.25;
+pub const MIN_FREQUENCY: f32 = 0.000001;
 
 #[derive(Debug)]
 pub enum OscillatorShape {

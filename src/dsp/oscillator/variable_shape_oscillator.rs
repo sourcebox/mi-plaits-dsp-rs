@@ -6,12 +6,11 @@
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
+use crate::dsp::oscillator::oscillator::MAX_FREQUENCY;
 use crate::stmlib::dsp::parameter_interpolator::ParameterInterpolator;
 use crate::stmlib::dsp::polyblep::{
     next_blep_sample, next_integrated_blep_sample, this_blep_sample, this_integrated_blep_sample,
 };
-
-const MAX_FREQUENCY: f32 = 0.5;
 
 #[derive(Debug, Default)]
 pub struct VariableShapeOscillator {

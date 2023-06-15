@@ -13,6 +13,7 @@
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
 use super::{note_to_frequency, Engine, EngineParameters, TriggerState};
+use crate::dsp::oscillator::oscillator::MAX_FREQUENCY;
 use crate::dsp::oscillator::sine_oscillator::{sine, FastSineOscillator};
 use crate::stmlib::dsp::one_pole;
 use crate::stmlib::dsp::parameter_interpolator::ParameterInterpolator;
@@ -21,7 +22,6 @@ use crate::stmlib::dsp::units::semitones_to_ratio;
 use crate::stmlib::utils::random;
 
 const NUM_SWARM_VOICES: usize = 8;
-const MAX_FREQUENCY: f32 = 0.5;
 
 #[derive(Debug, Default)]
 pub struct SwarmEngine {
