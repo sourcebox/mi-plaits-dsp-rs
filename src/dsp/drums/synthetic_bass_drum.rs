@@ -5,12 +5,12 @@
 
 use num_traits::float::Float;
 
-use crate::dsp::resources::LUT_SINE;
+use crate::dsp::oscillator::sine_oscillator::sine;
 use crate::dsp::SAMPLE_RATE;
 use crate::stmlib::dsp::filter::{FilterMode, FrequencyApproximation, Svf};
 use crate::stmlib::dsp::parameter_interpolator::ParameterInterpolator;
 use crate::stmlib::dsp::units::semitones_to_ratio;
-use crate::stmlib::dsp::{interpolate_wrap, one_pole, slope};
+use crate::stmlib::dsp::{one_pole, slope};
 use crate::stmlib::utils::random;
 
 #[derive(Debug, Default)]
@@ -163,10 +163,10 @@ impl SyntheticBassDrum {
         let phase_fractional = phase - (phase_integral as f32);
         phase = phase_fractional;
         let triangle = (if phase < 0.5 { phase } else { 1.0 - phase }) * 4.0 - 1.0;
-        let sine = 2.0 * triangle / (1.0 + triangle.abs());
-        let clean_sine = interpolate_wrap(&LUT_SINE, phase + 0.75, 1024.0);
+        let sine_ = 2.0 * triangle / (1.0 + triangle.abs());
+        let clean_sine = sine(phase + 0.75);
 
-        sine + (1.0 - dirtiness) * (clean_sine - sine)
+        sine_ + (1.0 - dirtiness) * (clean_sine - sine_)
     }
 
     #[inline]

@@ -13,12 +13,11 @@
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
 use super::{note_to_frequency, Engine, EngineParameters, TriggerState};
-use crate::dsp::oscillator::sine_oscillator::FastSineOscillator;
-use crate::dsp::resources::LUT_SINE;
+use crate::dsp::oscillator::sine_oscillator::{sine, FastSineOscillator};
+use crate::stmlib::dsp::one_pole;
 use crate::stmlib::dsp::parameter_interpolator::ParameterInterpolator;
 use crate::stmlib::dsp::polyblep::{next_blep_sample, this_blep_sample};
 use crate::stmlib::dsp::units::semitones_to_ratio;
-use crate::stmlib::dsp::{interpolate_wrap, one_pole};
 use crate::stmlib::utils::random;
 
 const NUM_SWARM_VOICES: usize = 8;
@@ -280,7 +279,7 @@ impl GrainEnvelope {
         if size_ratio >= 1.0 {
             let mut phase = (self.phase - 0.5) * size_ratio;
             phase = phase.clamp(-1.0, 1.0);
-            let e = interpolate_wrap(&LUT_SINE, 0.5 * phase + 1.25, 1024.0);
+            let e = sine(0.5 * phase + 1.25);
             target_amplitude = 0.5 * (e + 1.0);
         }
 

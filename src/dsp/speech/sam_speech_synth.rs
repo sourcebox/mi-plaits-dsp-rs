@@ -2,7 +2,7 @@
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-use crate::dsp::resources::LUT_SINE;
+use crate::dsp::oscillator::sine_oscillator::sine_raw;
 use crate::dsp::SAMPLE_RATE;
 use crate::stmlib::dsp::parameter_interpolator::ParameterInterpolator;
 use crate::stmlib::dsp::polyblep::{next_blep_sample, this_blep_sample};
@@ -107,9 +107,9 @@ impl SamSpeechSynth {
             *excitation_sample = d;
 
             let mut s = 0.0;
-            s += LUT_SINE[(self.formant_phase[0] >> 22) as usize] * formant_amplitude[0];
-            s += LUT_SINE[(self.formant_phase[1] >> 22) as usize] * formant_amplitude[1];
-            s += LUT_SINE[(self.formant_phase[2] >> 22) as usize] * formant_amplitude[2];
+            s += sine_raw(self.formant_phase[0]) * formant_amplitude[0];
+            s += sine_raw(self.formant_phase[1]) * formant_amplitude[1];
+            s += sine_raw(self.formant_phase[2]) * formant_amplitude[2];
             s *= 1.0 - self.phase;
             *output_sample = s;
         }

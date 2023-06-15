@@ -2,8 +2,7 @@
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-use crate::dsp::resources::LUT_SINE;
-use crate::stmlib::dsp::interpolate_wrap;
+use crate::dsp::oscillator::sine_oscillator::sine;
 use crate::stmlib::dsp::parameter_interpolator::ParameterInterpolator;
 
 const MAX_FREQUENCY: f32 = 0.5;
@@ -102,9 +101,4 @@ impl VosimOscillator {
             *out_sample = carrier * (formant_0 + formant_1) * 0.25 + reset_amplitude;
         }
     }
-}
-
-#[inline]
-fn sine(phase: f32) -> f32 {
-    interpolate_wrap(&LUT_SINE, phase, 1024.0)
 }

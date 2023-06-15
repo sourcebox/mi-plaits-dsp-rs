@@ -6,9 +6,12 @@
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
 use crate::dsp::resources::LUT_SINE;
-use crate::stmlib::dsp::interpolate;
 use crate::stmlib::dsp::parameter_interpolator::ParameterInterpolator;
 use crate::stmlib::dsp::rsqrt::fast_rsqrt_carmack;
+use crate::stmlib::dsp::{interpolate, interpolate_wrap};
+
+const SINE_LUT_SIZE: f32 = 1024.0;
+const SINE_LUT_BITS: u32 = 10;
 
 #[derive(Debug, Default)]
 pub struct SineOscillator {
@@ -43,7 +46,7 @@ impl SineOscillator {
             self.phase -= 1.0;
         }
 
-        interpolate(&LUT_SINE, self.phase, 1024.0)
+        sine_no_wrap(self.phase)
     }
 
     #[inline]
@@ -64,8 +67,8 @@ impl SineOscillator {
             self.phase -= 1.0;
         }
 
-        *sin = amplitude * interpolate(&LUT_SINE, self.phase, 1024.0);
-        *cos = amplitude * interpolate(&LUT_SINE[256..], self.phase, 1024.0);
+        *sin = amplitude * sine_no_wrap(self.phase);
+        *cos = amplitude * sine_no_wrap(self.phase + 0.25);
     }
 
     #[inline]
@@ -100,7 +103,7 @@ impl SineOscillator {
                 self.phase -= 1.0;
             }
 
-            let s = interpolate(&LUT_SINE, self.phase, 1024.0);
+            let s = sine_no_wrap(self.phase);
 
             if additive {
                 *out_sample += am.next() * s;
@@ -201,6 +204,17 @@ fn fast_2_sin(f: f32) -> f32 {
     f_pi * (2.0 - (2.0 * 0.96 / 6.0) * f_pi * f_pi)
 }
 
+// Safe for phase >= 0.0f, will wrap.
+pub fn sine(phase: f32) -> f32 {
+    interpolate_wrap(&LUT_SINE, phase, SINE_LUT_SIZE)
+}
+
+// Potentially unsafe, if phase >= 1.25.
+pub fn sine_no_wrap(phase: f32) -> f32 {
+    interpolate(&LUT_SINE, phase, SINE_LUT_SIZE)
+}
+
+// With positive of negative phase modulation up to an index of 32.
 #[inline]
 pub fn sine_pm(mut phase: u32, fm: f32) -> f32 {
     phase = phase.wrapping_add((((fm + 4.0) * 536870912.0) as u32) << 3);
@@ -210,4 +224,10 @@ pub fn sine_pm(mut phase: u32, fm: f32) -> f32 {
     let b = LUT_SINE[integral as usize + 1];
 
     a + (b - a) * fractional
+}
+
+// Direct lookup without interpolation.
+#[inline]
+pub fn sine_raw(phase: u32) -> f32 {
+    LUT_SINE[(phase >> (32 - SINE_LUT_BITS)) as usize]
 }

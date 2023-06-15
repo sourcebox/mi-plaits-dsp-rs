@@ -5,11 +5,10 @@
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-use crate::dsp::resources::LUT_SINE;
+use crate::dsp::oscillator::sine_oscillator::{sine, sine_no_wrap};
 use crate::stmlib::dsp::parameter_interpolator::{
     ParameterInterpolator, SimpleParameterInterpolator,
 };
-use crate::stmlib::dsp::{interpolate, interpolate_wrap};
 
 #[derive(Debug)]
 pub struct HarmonicOscillator<const NUM_HARMONICS: usize> {
@@ -75,7 +74,7 @@ impl<const NUM_HARMONICS: usize> HarmonicOscillator<NUM_HARMONICS> {
             if self.phase >= 1.0 {
                 self.phase -= 1.0;
             }
-            let two_x = 2.0 * interpolate(&LUT_SINE, self.phase, 1024.0);
+            let two_x = 2.0 * sine_no_wrap(self.phase);
             let mut previous;
             let mut current;
             if first_harmonic_index == 1 {
@@ -83,8 +82,8 @@ impl<const NUM_HARMONICS: usize> HarmonicOscillator<NUM_HARMONICS> {
                 current = two_x * 0.5;
             } else {
                 let k = first_harmonic_index as f32;
-                previous = interpolate_wrap(&LUT_SINE, self.phase * (k - 1.0) + 0.25, 1024.0);
-                current = interpolate_wrap(&LUT_SINE, self.phase * k, 1024.0);
+                previous = sine(self.phase * (k - 1.0) + 0.25);
+                current = sine(self.phase * k);
             }
 
             let mut sum = 0.0;

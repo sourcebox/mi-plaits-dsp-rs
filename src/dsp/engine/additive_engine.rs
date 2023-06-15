@@ -19,8 +19,8 @@ use num_traits::float::Float;
 
 use super::{note_to_frequency, Engine, EngineParameters};
 use crate::dsp::oscillator::harmonic_oscillator::HarmonicOscillator;
-use crate::dsp::resources::LUT_SINE;
-use crate::stmlib::dsp::{interpolate_wrap, one_pole};
+use crate::dsp::oscillator::sine_oscillator::sine;
+use crate::stmlib::dsp::one_pole;
 
 const HARMONIC_BATCH_SIZE: usize = 12;
 const NUM_HARMONICS: usize = 36;
@@ -126,7 +126,7 @@ fn update_amplitudes(
         gain *= gain;
 
         let b = 0.25 + order * bumps;
-        let bump_factor = 1.0 + interpolate_wrap(&LUT_SINE, b, 1024.0);
+        let bump_factor = 1.0 + sine(b);
 
         gain *= bump_factor;
         gain *= gain;

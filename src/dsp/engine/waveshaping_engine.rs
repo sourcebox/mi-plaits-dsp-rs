@@ -15,9 +15,10 @@ use num_traits::float::Float;
 
 use super::{note_to_frequency, Engine, EngineParameters};
 use crate::dsp::oscillator::oscillator::{Oscillator, OscillatorShape};
-use crate::dsp::resources::{LOOKUP_TABLE_I16_TABLE, LUT_FOLD, LUT_FOLD_2, LUT_SINE};
+use crate::dsp::oscillator::sine_oscillator::sine;
+use crate::dsp::resources::{LOOKUP_TABLE_I16_TABLE, LUT_FOLD, LUT_FOLD_2};
+use crate::stmlib::dsp::interpolate_hermite;
 use crate::stmlib::dsp::parameter_interpolator::ParameterInterpolator;
-use crate::stmlib::dsp::{interpolate_hermite, interpolate_wrap};
 
 #[derive(Debug, Default)]
 pub struct WaveshapingEngine {
@@ -118,7 +119,7 @@ impl Engine for WaveshapingEngine {
             let fold = interpolate_hermite(&LUT_FOLD[1..], index, 512.0);
             let fold_2 = -interpolate_hermite(&LUT_FOLD_2[1..], index, 512.0);
 
-            let sine = interpolate_wrap(&LUT_SINE, *aux_sample * 0.25 + 0.5, 1024.0);
+            let sine = sine(*aux_sample * 0.25 + 0.5);
             *out_sample = fold;
             *aux_sample = sine + (fold_2 - sine) * overtone_gain_modulation.next();
         }

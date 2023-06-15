@@ -5,8 +5,7 @@
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-use crate::dsp::resources::LUT_SINE;
-use crate::stmlib::dsp::interpolate_wrap;
+use crate::dsp::oscillator::sine_oscillator::sine;
 use crate::stmlib::dsp::parameter_interpolator::ParameterInterpolator;
 use crate::stmlib::dsp::polyblep::this_blep_sample;
 
@@ -118,11 +117,6 @@ impl GrainletOscillator {
 
         self.next_sample = next_sample;
     }
-}
-
-#[inline]
-fn sine(phase: f32) -> f32 {
-    interpolate_wrap(&LUT_SINE, phase, 1024.0)
 }
 
 #[inline]
