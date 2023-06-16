@@ -14,5 +14,6 @@ mod speech_engine;
 mod string_engine;
 mod swarm_engine;
 mod virtual_analog_engine;
+mod virtual_analog_vcf_engine;
 mod waveshaping_engine;
 mod wavetable_engine;

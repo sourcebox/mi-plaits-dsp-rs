@@ -25,6 +25,7 @@ use super::engine::wavetable_engine::WavetableEngine;
 use super::engine::{note_to_frequency, Engine, EngineParameters, TriggerState};
 use super::engine2::chiptune_engine::{self, ChiptuneEngine};
 use super::engine2::phase_distortion_engine::PhaseDistortionEngine;
+use super::engine2::virtual_analog_vcf_engine::VirtualAnalogVcfEngine;
 use super::envelope::{DecayEnvelope, LpgEnvelope};
 use super::fx::low_pass_gate::LowPassGate;
 use super::physical_modelling::delay_line::DelayLine;
@@ -149,6 +150,7 @@ pub struct Voice<'a> {
     string_engine: StringEngine<'a>,
     swarm_engine: SwarmEngine,
     virtual_analog_engine: VirtualAnalogEngine<'a>,
+    virtual_analog_vcf_engine: VirtualAnalogVcfEngine,
     waveshaping_engine: WaveshapingEngine,
     wavetable_engine: WavetableEngine,
 
@@ -189,6 +191,7 @@ impl<'a> Voice<'a> {
             string_engine: StringEngine::new(buffer_allocator, block_size),
             swarm_engine: SwarmEngine::new(),
             virtual_analog_engine: VirtualAnalogEngine::new(buffer_allocator, block_size),
+            virtual_analog_vcf_engine: VirtualAnalogVcfEngine::new(),
             waveshaping_engine: WaveshapingEngine::new(),
             wavetable_engine: WavetableEngine::new(),
 
@@ -457,7 +460,7 @@ impl<'a> Voice<'a> {
     /// Return reference to engine by index as well as additional parameters
     fn get_engine(&mut self, index: usize) -> Option<(&mut dyn Engine, bool, f32, f32)> {
         match index {
-            0 => None,
+            0 => Some((&mut self.virtual_analog_vcf_engine, false, 1.0, 1.0)),
             1 => Some((&mut self.phase_distortion_engine, false, 0.7, 0.7)),
             2 => None,
             3 => None,
