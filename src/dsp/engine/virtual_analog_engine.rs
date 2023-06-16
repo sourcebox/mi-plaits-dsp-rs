@@ -89,9 +89,17 @@ impl<'a> Engine for VirtualAnalogEngine<'a> {
 
         // Render monster sync to AUX.
         self.primary
-            .render(primary_f, primary_sync_f, pw, shape, out, true);
-        self.auxiliary
-            .render(auxiliary_f, auxiliary_sync_f, pw, shape, aux, true);
+            .render(primary_f, primary_sync_f, pw, shape, 0.0, out, true, false);
+        self.auxiliary.render(
+            auxiliary_f,
+            auxiliary_sync_f,
+            pw,
+            shape,
+            0.0,
+            aux,
+            true,
+            false,
+        );
         for (aux_sample, out_sample) in aux.iter_mut().zip(out.iter()) {
             *aux_sample = (*aux_sample - *out_sample) * 0.5;
         }
@@ -129,8 +137,10 @@ impl<'a> Engine for VirtualAnalogEngine<'a> {
             square_sync_f,
             square_pw,
             1.0,
+            0.0,
             self.temp_buffer,
             true,
+            false,
         );
         self.variable_saw
             .render(auxiliary_f, saw_pw, saw_shape, out);
