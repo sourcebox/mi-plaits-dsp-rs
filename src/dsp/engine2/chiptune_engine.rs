@@ -98,10 +98,7 @@ impl Engine for ChiptuneEngine {
     ) {
         let f0 = note_to_frequency(parameters.note);
         let shape = parameters.morph * 0.995;
-        let clocked = !(matches!(
-            parameters.trigger,
-            TriggerState::Unpatched | TriggerState::High
-        ));
+        let clocked = parameters.trigger != TriggerState::Unpatched;
         let mut root_transposition = 1.0;
 
         *already_enveloped = clocked;
