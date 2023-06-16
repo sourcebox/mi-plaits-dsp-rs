@@ -476,7 +476,7 @@ fn variable_shape_oscillator() {
     for n in 0..blocks {
         let modulation = modulation::ramp_up(n, blocks);
         let pw = modulation;
-        osc.render(master_f, f, pw, waveshape, &mut out, true);
+        osc.render(master_f, f, pw, waveshape, 0.0, &mut out, true, false);
         wav_data.extend_from_slice(&out);
     }
 

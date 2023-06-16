@@ -6,6 +6,8 @@
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
+use num_traits::float::Float;
+
 use crate::dsp::oscillator::oscillator::MAX_FREQUENCY;
 use crate::stmlib::dsp::parameter_interpolator::ParameterInterpolator;
 use crate::stmlib::dsp::polyblep::{
@@ -26,6 +28,7 @@ pub struct VariableShapeOscillator {
     slave_frequency: f32,
     pw: f32,
     waveshape: f32,
+    phase_modulation: f32,
 }
 
 impl VariableShapeOscillator {
@@ -44,12 +47,14 @@ impl VariableShapeOscillator {
         self.slave_frequency = 0.01;
         self.pw = 0.5;
         self.waveshape = 0.0;
+        self.phase_modulation = 0.0;
     }
 
     pub fn set_master_phase(&mut self, phase: f32) {
         self.master_phase = phase;
     }
 
+    #[allow(clippy::too_many_arguments)]
     #[inline]
     pub fn render(
         &mut self,
@@ -57,8 +62,10 @@ impl VariableShapeOscillator {
         mut frequency: f32,
         mut pw: f32,
         waveshape: f32,
+        phase_modulation_amount: f32,
         out: &mut [f32],
         enable_sync: bool,
+        output_phase: bool,
     ) {
         if master_frequency >= MAX_FREQUENCY {
             master_frequency = MAX_FREQUENCY;
@@ -79,6 +86,11 @@ impl VariableShapeOscillator {
         let mut pwm = ParameterInterpolator::new(&mut self.pw, pw, out.len());
         let mut waveshape_modulation =
             ParameterInterpolator::new(&mut self.waveshape, waveshape, out.len());
+        let mut phase_modulation = ParameterInterpolator::new(
+            &mut self.phase_modulation,
+            phase_modulation_amount,
+            out.len(),
+        );
 
         let mut next_sample = self.next_sample;
 
@@ -180,7 +192,21 @@ impl VariableShapeOscillator {
             );
             self.previous_pw = pw;
 
-            *out_sample = 2.0 * this_sample - 1.0;
+            if output_phase {
+                let mut phasor = self.master_phase;
+                if enable_sync {
+                    // A trick to prevent discontinuities when the phase wraps around.
+                    let w = 4.0 * (1.0 - self.master_phase) * self.master_phase;
+                    this_sample *= w * (2.0 - w);
+
+                    // Apply some asymmetry on the main phasor too.
+                    let p2 = phasor * phasor;
+                    phasor += (p2 * p2 - phasor) * f32::abs(pw - 0.5) * 2.0;
+                }
+                *out_sample = phasor + phase_modulation.next() * this_sample;
+            } else {
+                *out_sample = 2.0 * this_sample - 1.0;
+            }
         }
 
         self.next_sample = next_sample;
