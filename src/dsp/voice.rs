@@ -24,6 +24,7 @@ use super::engine::waveshaping_engine::WaveshapingEngine;
 use super::engine::wavetable_engine::WavetableEngine;
 use super::engine::{note_to_frequency, Engine, EngineParameters, TriggerState};
 use super::engine2::chiptune_engine::{self, ChiptuneEngine};
+use super::engine2::phase_distortion_engine::PhaseDistortionEngine;
 use super::envelope::{DecayEnvelope, LpgEnvelope};
 use super::fx::low_pass_gate::LowPassGate;
 use super::physical_modelling::delay_line::DelayLine;
@@ -142,6 +143,7 @@ pub struct Voice<'a> {
     modal_engine: ModalEngine<'a>,
     noise_engine: NoiseEngine<'a>,
     particle_engine: ParticleEngine<'a>,
+    phase_distortion_engine: PhaseDistortionEngine<'a>,
     snare_drum_engine: SnareDrumEngine,
     speech_engine: SpeechEngine<'a>,
     string_engine: StringEngine<'a>,
@@ -181,6 +183,7 @@ impl<'a> Voice<'a> {
             modal_engine: ModalEngine::new(buffer_allocator, block_size),
             noise_engine: NoiseEngine::new(buffer_allocator, block_size),
             particle_engine: ParticleEngine::new(buffer_allocator, block_size),
+            phase_distortion_engine: PhaseDistortionEngine::new(buffer_allocator, block_size),
             snare_drum_engine: SnareDrumEngine::new(),
             speech_engine: SpeechEngine::new(buffer_allocator, block_size),
             string_engine: StringEngine::new(buffer_allocator, block_size),
@@ -455,7 +458,7 @@ impl<'a> Voice<'a> {
     fn get_engine(&mut self, index: usize) -> Option<(&mut dyn Engine, bool, f32, f32)> {
         match index {
             0 => None,
-            1 => None,
+            1 => Some((&mut self.phase_distortion_engine, false, 0.7, 0.7)),
             2 => None,
             3 => None,
             4 => None,

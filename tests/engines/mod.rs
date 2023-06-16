@@ -8,6 +8,7 @@ mod hihat_engine;
 mod modal_engine;
 mod noise_engine;
 mod particle_engine;
+mod phase_distortion_engine;
 mod snare_drum_engine;
 mod speech_engine;
 mod string_engine;
