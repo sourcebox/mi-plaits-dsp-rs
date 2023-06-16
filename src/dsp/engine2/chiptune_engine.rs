@@ -1,9 +1,12 @@
 //! Chiptune waveforms with arpeggiator.
 //!
+//! Arpeggiator is clocked via the trigger signal.
+//!
 //! Engine parameters:
 //! - *HARMONICS:* chord.
 //! - *TIMBRE:* arpeggio type or chord inversion.
 //! - *MORPH:* PW/Sync.
+//! - *TIMBRE modulation:* envelope shape.
 //!
 //! *OUT* signal: square wave voices.
 //! *AUX* signal: NES triangle voice.
