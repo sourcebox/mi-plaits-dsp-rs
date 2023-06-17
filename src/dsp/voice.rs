@@ -27,6 +27,7 @@ use super::engine2::chiptune_engine::{self, ChiptuneEngine};
 use super::engine2::phase_distortion_engine::PhaseDistortionEngine;
 use super::engine2::string_machine_engine::StringMachineEngine;
 use super::engine2::virtual_analog_vcf_engine::VirtualAnalogVcfEngine;
+use super::engine2::wave_terrain_engine::WaveTerrainEngine;
 use super::envelope::{DecayEnvelope, LpgEnvelope};
 use super::fx::low_pass_gate::LowPassGate;
 use super::physical_modelling::delay_line::DelayLine;
@@ -155,6 +156,7 @@ pub struct Voice<'a> {
     virtual_analog_vcf_engine: VirtualAnalogVcfEngine,
     waveshaping_engine: WaveshapingEngine,
     wavetable_engine: WavetableEngine,
+    waveterrain_engine: WaveTerrainEngine<'a>,
 
     engine_quantizer: HysteresisQuantizer2,
 
@@ -197,6 +199,7 @@ impl<'a> Voice<'a> {
             virtual_analog_vcf_engine: VirtualAnalogVcfEngine::new(),
             waveshaping_engine: WaveshapingEngine::new(),
             wavetable_engine: WavetableEngine::new(),
+            waveterrain_engine: WaveTerrainEngine::new(buffer_allocator, block_size),
 
             engine_quantizer: HysteresisQuantizer2::new(),
             reload_user_data: false,
@@ -468,7 +471,7 @@ impl<'a> Voice<'a> {
             2 => None,
             3 => None,
             4 => None,
-            5 => None,
+            5 => Some((&mut self.waveterrain_engine, false, 0.7, 0.7)),
             6 => Some((&mut self.string_machine_engine, false, 0.8, 0.8)),
             7 => Some((&mut self.chiptune_engine, false, 0.5, 0.5)),
             8 => Some((&mut self.virtual_analog_engine, false, 0.8, 0.8)),

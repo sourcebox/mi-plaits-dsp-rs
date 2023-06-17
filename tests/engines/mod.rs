@@ -16,5 +16,6 @@ mod string_machine_engine;
 mod swarm_engine;
 mod virtual_analog_engine;
 mod virtual_analog_vcf_engine;
+mod wave_terrain_engine;
 mod waveshaping_engine;
 mod wavetable_engine;
