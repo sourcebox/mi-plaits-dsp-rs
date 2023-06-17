@@ -171,7 +171,7 @@ impl Phoneme {
     }
 }
 
-const PHONEMES: [Phoneme; NUM_PHONEMES] = [
+const PHONEMES: [Phoneme; NUM_PHONEMES + 1] = [
     Phoneme::new([
         Formant::new(60, 15),
         Formant::new(90, 13),
@@ -252,6 +252,12 @@ const PHONEMES: [Phoneme; NUM_PHONEMES] = [
         Formant::new(58, 5),
         Formant::new(182, 5),
     ]),
+    Phoneme::new([
+        Formant::new(13, 7),
+        Formant::new(164, 10),
+        Formant::new(222, 14),
+    ]),
+    // GUARD
     Phoneme::new([
         Formant::new(13, 7),
         Formant::new(164, 10),
