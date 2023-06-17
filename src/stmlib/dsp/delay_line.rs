@@ -91,8 +91,9 @@ where
         let a = self.line[(self.write_ptr + delay_integral) % MAX_DELAY];
         let b = self.line[(self.write_ptr + delay_integral + 1) % MAX_DELAY];
 
-        T::from_f32((a + (b - a)).to_f32().unwrap_or_default() * delay_fractional)
-            .unwrap_or_default()
+        let frac = (b - a).to_f32().unwrap_or_default() * delay_fractional;
+
+        T::from_f32(a.to_f32().unwrap_or_default() + frac).unwrap_or_default()
     }
 
     #[inline]
