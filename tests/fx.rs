@@ -36,6 +36,36 @@ fn diffuser() {
 }
 
 #[test]
+fn ensemble() {
+    let frequency = 220.0;
+    let duration = 2.0;
+
+    let mut osc = SineOscillator::new();
+    let mut fx = ensemble::Ensemble::new();
+    let mut left = [0.0; BLOCK_SIZE];
+    let mut wav_data_left = Vec::new();
+    let mut wav_data_right = Vec::new();
+    osc.init();
+    fx.init();
+    fx.set_amount(0.5);
+    fx.set_depth(0.5);
+
+    let blocks = (duration * SAMPLE_RATE / (BLOCK_SIZE as f32)) as usize;
+    let f = frequency / SAMPLE_RATE;
+
+    for _ in 0..blocks {
+        osc.render(f, &mut left);
+        let mut right = left.clone();
+        fx.process(&mut left, &mut right);
+        wav_data_left.extend_from_slice(&left);
+        wav_data_right.extend_from_slice(&right);
+    }
+
+    wav_writer::write("fx/ensemble_left.wav", &wav_data_left).ok();
+    wav_writer::write("fx/ensemble_right.wav", &wav_data_right).ok();
+}
+
+#[test]
 fn sample_rate_reducer() {
     let frequency = 110.0;
     let duration = 2.0;
