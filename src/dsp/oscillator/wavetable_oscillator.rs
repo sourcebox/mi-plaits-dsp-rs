@@ -2,6 +2,8 @@
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
+use num_traits::{FromPrimitive, Num, ToPrimitive};
+
 use crate::dsp::oscillator::oscillator::MAX_FREQUENCY;
 use crate::stmlib::dsp::one_pole;
 use crate::stmlib::dsp::parameter_interpolator::ParameterInterpolator;
@@ -133,24 +135,26 @@ impl Differentiator {
 }
 
 #[inline]
-pub fn interpolate_wave(table: &[i16], index_integral: usize, index_fractional: f32) -> f32 {
-    let a = table[index_integral] as f32;
-    let b = table[index_integral + 1] as f32;
+pub fn interpolate_wave<T>(table: &[T], index_integral: usize, index_fractional: f32) -> f32
+where
+    T: Num + FromPrimitive + ToPrimitive,
+{
+    let a = table[index_integral].to_f32().unwrap_or_default();
+    let b = table[index_integral + 1].to_f32().unwrap_or_default();
     let t = index_fractional;
 
     a + (b - a) * t
 }
 
 #[inline]
-pub fn interpolate_wave_hermite(
-    table: &[i16],
-    index_integral: usize,
-    index_fractional: f32,
-) -> f32 {
-    let xm1 = table[index_integral] as f32;
-    let x0 = table[index_integral + 1] as f32;
-    let x1 = table[index_integral + 2] as f32;
-    let x2 = table[index_integral + 3] as f32;
+pub fn interpolate_wave_hermite<T>(table: &[T], index_integral: usize, index_fractional: f32) -> f32
+where
+    T: Num + FromPrimitive + ToPrimitive,
+{
+    let xm1 = table[index_integral].to_f32().unwrap_or_default();
+    let x0 = table[index_integral + 1].to_f32().unwrap_or_default();
+    let x1 = table[index_integral + 2].to_f32().unwrap_or_default();
+    let x2 = table[index_integral + 3].to_f32().unwrap_or_default();
     let c = (x1 - xm1) * 0.5;
     let v = x0 - x1;
     let w = c + v;
