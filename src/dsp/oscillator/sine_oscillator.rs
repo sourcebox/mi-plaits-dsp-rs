@@ -139,21 +139,21 @@ impl FastSineOscillator {
 
     #[inline]
     pub fn render(&mut self, frequency: f32, out: &mut [f32]) {
-        self.render_internal(frequency, 1.0, out, false);
+        self.render_internal(frequency, 1.0, out, RenderMode::Normal);
     }
 
     #[inline]
     pub fn render_add(&mut self, frequency: f32, amplitude: f32, out: &mut [f32]) {
-        self.render_internal(frequency, amplitude, out, true);
+        self.render_internal(frequency, amplitude, out, RenderMode::Additive);
     }
 
     #[inline]
-    pub fn render_internal(
+    pub fn render_quadrature(
         &mut self,
         mut frequency: f32,
         mut amplitude: f32,
         out: &mut [f32],
-        additive: bool,
+        out_2: &mut [f32],
     ) {
         if frequency >= 0.25 {
             frequency = 0.25;
@@ -176,20 +176,71 @@ impl FastSineOscillator {
             y *= scale;
         }
 
-        for sample in out.iter_mut() {
+        for (out_sample, out_2_sample) in out.iter_mut().zip(out_2.iter_mut()) {
             let e = epsilon.next();
             x += e * y;
             y -= e * x;
-            if additive {
-                *sample += am.next() * x;
-            } else {
-                *sample = x;
-            }
+
+            let amplitude = am.next();
+            *out_sample = x * amplitude;
+            *out_2_sample = y * amplitude;
         }
 
         self.x = x;
         self.y = y;
     }
+
+    #[inline]
+    fn render_internal(
+        &mut self,
+        mut frequency: f32,
+        mut amplitude: f32,
+        out: &mut [f32],
+        mode: RenderMode,
+    ) {
+        if frequency >= 0.25 {
+            frequency = 0.25;
+            amplitude = 0.0;
+        } else {
+            amplitude *= 1.0 - frequency * 4.0;
+        }
+
+        let mut epsilon =
+            ParameterInterpolator::new(&mut self.epsilon, fast_2_sin(frequency), out.len());
+        let mut am = ParameterInterpolator::new(&mut self.amplitude, amplitude, out.len());
+        let mut x = self.x;
+        let mut y = self.y;
+
+        let norm = x * x + y * y;
+
+        if norm <= 0.5 || norm >= 2.0 {
+            let scale = fast_rsqrt_carmack(norm);
+            x *= scale;
+            y *= scale;
+        }
+
+        for out_sample in out.iter_mut() {
+            let e = epsilon.next();
+            x += e * y;
+            y -= e * x;
+
+            match mode {
+                RenderMode::Normal => *out_sample = x,
+                RenderMode::Additive => *out_sample += am.next() * x,
+            };
+        }
+
+        self.x = x;
+        self.y = y;
+    }
+}
+
+#[derive(Debug, Default)]
+pub enum RenderMode {
+    #[default]
+    Normal,
+
+    Additive,
 }
 
 #[inline]
