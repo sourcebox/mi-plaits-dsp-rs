@@ -9,10 +9,12 @@ pub const CHORD_NUM_NOTES: usize = 4;
 pub const CHORD_NUM_VOICES: usize = 5;
 pub const CHORD_NUM_CHORDS: usize = 11;
 
+const RATIOS_LENGTH: usize = CHORD_NUM_CHORDS * CHORD_NUM_NOTES;
+
 #[derive(Debug)]
 pub struct ChordBank {
     chord_index_quantizer: HysteresisQuantizer2,
-    ratios: [f32; CHORD_NUM_CHORDS * CHORD_NUM_NOTES],
+    ratios: [f32; RATIOS_LENGTH],
     note_count: [i32; CHORD_NUM_CHORDS],
     sorted_ratios: [f32; CHORD_NUM_NOTES],
 }

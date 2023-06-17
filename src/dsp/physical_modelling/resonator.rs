@@ -11,11 +11,13 @@ use crate::stmlib::dsp::units::semitones_to_ratio;
 pub const MAX_NUM_MODES: usize = 24;
 pub const MODE_BATCH_SIZE: usize = 4;
 
+const MODE_FILTERS_LENGTH: usize = MAX_NUM_MODES / MODE_BATCH_SIZE;
+
 #[derive(Debug, Default)]
 pub struct Resonator {
     resolution: usize,
     mode_amplitude: [f32; MAX_NUM_MODES],
-    mode_filters: [ResonatorSvf<MODE_BATCH_SIZE>; MAX_NUM_MODES / MODE_BATCH_SIZE],
+    mode_filters: [ResonatorSvf<MODE_BATCH_SIZE>; MODE_FILTERS_LENGTH],
 }
 
 impl Resonator {
