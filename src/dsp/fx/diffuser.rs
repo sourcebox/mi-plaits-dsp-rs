@@ -2,11 +2,8 @@
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-use num_traits::{FromPrimitive, Num, Signed, ToPrimitive};
-
+use super::{DataFormat12Bit, FxContext, FxEngine};
 use crate::dsp::SAMPLE_RATE;
-use crate::stmlib::dsp::clip_16;
-use crate::stmlib::dsp::cosine_oscillator::{CosineOscillator, CosineOscillatorMode};
 use crate::stmlib::dsp::delay_line::DelayLine;
 
 #[derive(Debug, Default)]
@@ -19,7 +16,7 @@ pub struct Diffuser {
     dapb: DelayLine<i16, 2010>,
     del: DelayLine<i16, 3411>,
 
-    engine: Engine,
+    engine: FxEngine<8192, DataFormat12Bit>,
     lp_decay: f32,
 }
 
@@ -34,7 +31,7 @@ impl Diffuser {
             dapb: DelayLine::new(),
             del: DelayLine::new(),
 
-            engine: Engine::new(),
+            engine: FxEngine::new(),
             lp_decay: 0.0,
         }
     }
@@ -61,7 +58,7 @@ impl Diffuser {
 
     #[inline]
     pub fn process(&mut self, amount: f32, rt: f32, in_out: &mut [f32]) {
-        let mut c = Context::new();
+        let mut c = FxContext::new();
 
         let kap = 0.625;
         let klp = 0.75;
@@ -95,126 +92,4 @@ impl Diffuser {
 
         self.lp_decay = lp;
     }
-}
-
-#[derive(Debug, Default)]
-struct Engine {
-    lfo: CosineOscillator,
-    write_ptr: i32,
-}
-
-impl Engine {
-    pub fn new() -> Self {
-        Self::default()
-    }
-
-    pub fn clear(&mut self) {
-        self.write_ptr = 0;
-    }
-
-    pub fn set_lfo_frequency(&mut self, frequency: f32) {
-        self.lfo
-            .init(frequency * 32.0, CosineOscillatorMode::Approximate);
-    }
-
-    pub fn start(&mut self, c: &mut Context) {
-        self.write_ptr -= 1;
-
-        if self.write_ptr < 0 {
-            self.write_ptr += 8192;
-        }
-
-        c.accumulator = 0.0;
-        c.previous_read = 0.0;
-
-        if (self.write_ptr & 31) == 0 {
-            c.lfo_value = self.lfo.next();
-        } else {
-            c.lfo_value = self.lfo.value();
-        }
-    }
-}
-
-#[derive(Debug, Default)]
-struct Context {
-    accumulator: f32,
-    previous_read: f32,
-    lfo_value: f32,
-}
-
-impl Context {
-    pub fn new() -> Self {
-        Self::default()
-    }
-
-    pub fn read(&mut self, value: f32) {
-        self.accumulator += value;
-    }
-
-    pub fn write_with_scale(&mut self, value: &mut f32, scale: f32) {
-        *value = self.accumulator;
-        self.accumulator *= scale;
-    }
-
-    pub fn write_line<T, const SIZE: usize>(&mut self, line: &mut DelayLine<T, SIZE>, scale: f32)
-    where
-        T: Copy + Default + Num + Signed + FromPrimitive + ToPrimitive,
-    {
-        let w = compress(self.accumulator);
-        line.write(T::from_i16(w).unwrap_or_default());
-        self.accumulator *= scale;
-    }
-
-    pub fn write_all_pass<T, const SIZE: usize>(
-        &mut self,
-        line: &mut DelayLine<T, SIZE>,
-        scale: f32,
-    ) where
-        T: Copy + Default + Num + Signed + FromPrimitive + ToPrimitive,
-    {
-        self.write_line(line, scale);
-        self.accumulator += self.previous_read;
-    }
-
-    pub fn read_line<T, const SIZE: usize>(&mut self, line: &mut DelayLine<T, SIZE>, scale: f32)
-    where
-        T: Copy + Default + Num + Signed + FromPrimitive + ToPrimitive,
-    {
-        let r = line.read_with_delay(line.max_delay());
-        let r_f = decompress(r.to_i16().unwrap_or_default());
-        self.previous_read = r_f;
-        self.accumulator += r_f * scale;
-    }
-
-    pub fn lp(&mut self, state: &mut f32, coefficient: f32) {
-        *state += coefficient * (self.accumulator - *state);
-        self.accumulator = *state;
-    }
-
-    pub fn interpolate<T, const SIZE: usize>(
-        &mut self,
-        line: &mut DelayLine<T, SIZE>,
-        mut offset: f32,
-        amplitude: f32,
-        scale: f32,
-    ) where
-        T: Copy + Default + Num + Signed + FromPrimitive + ToPrimitive,
-    {
-        offset += amplitude * self.lfo_value;
-        let x = decompress(
-            line.read_with_delay_frac((line.max_delay()) as f32 + offset)
-                .to_i16()
-                .unwrap_or_default(),
-        );
-        self.previous_read = x;
-        self.accumulator += x * scale;
-    }
-}
-
-fn decompress(value: i16) -> f32 {
-    value as f32 / 4096.0
-}
-
-fn compress(value: f32) -> i16 {
-    clip_16((value * 4096.0) as i32) as i16
 }
