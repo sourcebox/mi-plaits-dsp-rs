@@ -136,7 +136,7 @@ fn update_amplitudes(
 
         // Warning about the following line: this is not a proper LP filter
         // because of the normalization. But in spite of its strange working,
-        // this line turns out ot be absolutely essential.
+        // this line turns out to be absolutely essential.
         //
         // I have tried both normalizing the LP-ed spectrum, and LP-ing the
         // normalized spectrum, and both of them cause more annoyances than this
