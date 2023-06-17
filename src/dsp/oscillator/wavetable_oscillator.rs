@@ -38,7 +38,7 @@ impl WavetableOscillator {
     #[inline]
     pub fn render(
         &mut self,
-        mut frequency: f32,
+        frequency: f32,
         mut amplitude: f32,
         waveform: f32,
         wavetable: &[&[i16]],
@@ -46,13 +46,16 @@ impl WavetableOscillator {
         wavetable_size: usize,
         num_waves: usize,
         approximate_scale: bool,
+        attenuate_high_frequencies: bool,
     ) {
-        if frequency >= MAX_FREQUENCY {
-            frequency = MAX_FREQUENCY;
+        let frequency = frequency.clamp(0.0000001, MAX_FREQUENCY);
+
+        if attenuate_high_frequencies {
+            amplitude *= 1.0 - 2.0 * frequency;
         }
-        amplitude *= 1.0 - 2.0 * frequency;
+
         if approximate_scale {
-            amplitude *= 1.0 / (frequency * 131072.0) * (0.95 - frequency);
+            amplitude *= 1.0 / (frequency * 131072.0);
         }
 
         let mut frequency_modulation =
@@ -75,7 +78,7 @@ impl WavetableOscillator {
             let scale = if approximate_scale {
                 1.0
             } else {
-                1.0 / (f0 * 131072.0) * (0.95 - f0)
+                1.0 / (f0 * 131072.0)
             };
 
             phase += f0;
@@ -96,8 +99,8 @@ impl WavetableOscillator {
 
             let s = self
                 .differentiator
-                .process(cutoff, x0 + (x1 - x0) * waveform_fractional);
-            one_pole(&mut lp, s * scale, cutoff * 0.5);
+                .process(cutoff, (x0 + (x1 - x0) * waveform_fractional) * scale);
+            one_pole(&mut lp, s, cutoff);
             *out_sample += amplitude_modulation.next() * lp;
         }
         self.lp = lp;

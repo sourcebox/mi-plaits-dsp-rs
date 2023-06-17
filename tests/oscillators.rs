@@ -541,7 +541,7 @@ fn wavetable_oscillator() {
         let modulation = modulation::ramp_up(n, blocks);
         let waveform = modulation;
         out.fill(0.0);
-        osc.render(f, 1.0, waveform, &wavetable, &mut out, 256, 192, true);
+        osc.render(f, 1.0, waveform, &wavetable, &mut out, 256, 192, true, true);
         wav_data.extend_from_slice(&out);
     }
 

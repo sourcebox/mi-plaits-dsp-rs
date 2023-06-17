@@ -156,6 +156,7 @@ impl<'a> Engine for ChordEngine<'a> {
                         256,
                         15,
                         true,
+                        true,
                     );
                 } else {
                     self.wavetable_voice[note].render(
@@ -166,6 +167,7 @@ impl<'a> Engine for ChordEngine<'a> {
                         out,
                         256,
                         15,
+                        true,
                         true,
                     );
                 }
