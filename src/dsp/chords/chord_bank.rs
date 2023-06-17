@@ -139,7 +139,7 @@ impl ChordBank {
     }
 
     #[inline]
-    fn ratio(&self, note: i32) -> f32 {
+    pub fn ratio(&self, note: i32) -> f32 {
         self.ratios[self.chord_index() as usize * CHORD_NUM_NOTES + note as usize]
     }
 

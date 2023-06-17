@@ -12,6 +12,7 @@ mod phase_distortion_engine;
 mod snare_drum_engine;
 mod speech_engine;
 mod string_engine;
+mod string_machine_engine;
 mod swarm_engine;
 mod virtual_analog_engine;
 mod virtual_analog_vcf_engine;

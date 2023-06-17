@@ -25,6 +25,7 @@ use super::engine::wavetable_engine::WavetableEngine;
 use super::engine::{note_to_frequency, Engine, EngineParameters, TriggerState};
 use super::engine2::chiptune_engine::{self, ChiptuneEngine};
 use super::engine2::phase_distortion_engine::PhaseDistortionEngine;
+use super::engine2::string_machine_engine::StringMachineEngine;
 use super::engine2::virtual_analog_vcf_engine::VirtualAnalogVcfEngine;
 use super::envelope::{DecayEnvelope, LpgEnvelope};
 use super::fx::low_pass_gate::LowPassGate;
@@ -148,6 +149,7 @@ pub struct Voice<'a> {
     snare_drum_engine: SnareDrumEngine,
     speech_engine: SpeechEngine<'a>,
     string_engine: StringEngine<'a>,
+    string_machine_engine: StringMachineEngine,
     swarm_engine: SwarmEngine,
     virtual_analog_engine: VirtualAnalogEngine<'a>,
     virtual_analog_vcf_engine: VirtualAnalogVcfEngine,
@@ -189,6 +191,7 @@ impl<'a> Voice<'a> {
             snare_drum_engine: SnareDrumEngine::new(),
             speech_engine: SpeechEngine::new(buffer_allocator, block_size),
             string_engine: StringEngine::new(buffer_allocator, block_size),
+            string_machine_engine: StringMachineEngine::new(),
             swarm_engine: SwarmEngine::new(),
             virtual_analog_engine: VirtualAnalogEngine::new(buffer_allocator, block_size),
             virtual_analog_vcf_engine: VirtualAnalogVcfEngine::new(),
@@ -466,7 +469,7 @@ impl<'a> Voice<'a> {
             3 => None,
             4 => None,
             5 => None,
-            6 => None,
+            6 => Some((&mut self.string_machine_engine, false, 0.8, 0.8)),
             7 => Some((&mut self.chiptune_engine, false, 0.5, 0.5)),
             8 => Some((&mut self.virtual_analog_engine, false, 0.8, 0.8)),
             9 => Some((&mut self.waveshaping_engine, false, 0.7, 0.6)),

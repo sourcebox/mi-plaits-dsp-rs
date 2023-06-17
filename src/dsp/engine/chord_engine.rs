@@ -22,7 +22,7 @@ use crate::dsp::oscillator::wavetable_oscillator::WavetableOscillator;
 use crate::dsp::resources::WAV_INTEGRATED_WAVES;
 use crate::stmlib::dsp::one_pole;
 
-const CHORD_NUM_HARMONICS: usize = 3;
+pub const CHORD_NUM_HARMONICS: usize = 3;
 
 #[derive(Debug)]
 pub struct ChordEngine<'a> {
