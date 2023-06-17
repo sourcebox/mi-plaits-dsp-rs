@@ -493,12 +493,13 @@ impl NaiveSvf {
 
     #[inline]
     pub fn set_f_q(&mut self, f: f32, resonance: f32, approximation: FrequencyApproximation) {
-        let f = if f < 0.497 { f } else { 0.497 };
         match approximation {
             FrequencyApproximation::Exact => {
+                let f = if f < 0.497 { f } else { 0.497 };
                 self.f = 2.0 * (M_PI_F * f).sin();
             }
             _ => {
+                let f = if f < 0.158 { f } else { 0.158 };
                 self.f = 2.0 * M_PI_F * f;
             }
         }
