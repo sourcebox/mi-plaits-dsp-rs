@@ -19,7 +19,7 @@ use super::{note_to_frequency, Engine, EngineParameters};
 use crate::dsp::chords::chord_bank::{ChordBank, CHORD_NUM_VOICES};
 use crate::dsp::oscillator::string_synth_oscillator::StringSynthOscillator;
 use crate::dsp::oscillator::wavetable_oscillator::WavetableOscillator;
-use crate::dsp::resources::WAV_INTEGRATED_WAVES;
+use crate::dsp::resources::waves::WAV_INTEGRATED_WAVES;
 use crate::stmlib::dsp::one_pole;
 
 pub const CHORD_NUM_HARMONICS: usize = 3;

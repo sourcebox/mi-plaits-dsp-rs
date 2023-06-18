@@ -18,7 +18,7 @@ use crate::dsp::allocate_buffer;
 use crate::dsp::engine::{note_to_frequency, Engine, EngineParameters};
 use crate::dsp::oscillator::sine_oscillator::{sine, FastSineOscillator};
 use crate::dsp::oscillator::wavetable_oscillator::interpolate_wave;
-use crate::dsp::resources::WAV_INTEGRATED_WAVES;
+use crate::dsp::resources::waves::WAV_INTEGRATED_WAVES;
 use crate::stmlib::dsp::parameter_interpolator::SimpleParameterInterpolator;
 
 #[derive(Debug)]

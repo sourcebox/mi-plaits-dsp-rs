@@ -520,9 +520,9 @@ fn wavetable_oscillator() {
     let frequency = 110.0;
     let duration = 10.0;
 
-    let mut wavetable = [&mi_plaits_dsp::dsp::resources::WAV_INTEGRATED_WAVES[0..260]; 256];
+    let mut wavetable = [&mi_plaits_dsp::dsp::resources::waves::WAV_INTEGRATED_WAVES[0..260]; 256];
 
-    for (n, wt) in mi_plaits_dsp::dsp::resources::WAV_INTEGRATED_WAVES
+    for (n, wt) in mi_plaits_dsp::dsp::resources::waves::WAV_INTEGRATED_WAVES
         .chunks(260)
         .enumerate()
     {

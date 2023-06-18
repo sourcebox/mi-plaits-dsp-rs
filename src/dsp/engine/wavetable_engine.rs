@@ -23,7 +23,7 @@
 
 use super::{note_to_frequency, Engine, EngineParameters};
 use crate::dsp::oscillator::wavetable_oscillator::{interpolate_wave_hermite, Differentiator};
-use crate::dsp::resources::WAV_INTEGRATED_WAVES;
+use crate::dsp::resources::waves::WAV_INTEGRATED_WAVES;
 use crate::dsp::A0;
 use crate::stmlib::dsp::one_pole;
 use crate::stmlib::dsp::parameter_interpolator::ParameterInterpolator;
