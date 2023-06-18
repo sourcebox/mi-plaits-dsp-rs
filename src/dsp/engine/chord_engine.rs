@@ -153,7 +153,7 @@ impl<'a> Engine for ChordEngine<'a> {
                         waveform,
                         &self.wavetable,
                         aux,
-                        256,
+                        128,
                         15,
                         true,
                         true,
@@ -165,7 +165,7 @@ impl<'a> Engine for ChordEngine<'a> {
                         waveform,
                         &self.wavetable,
                         out,
-                        256,
+                        128,
                         15,
                         true,
                         true,
@@ -202,7 +202,7 @@ impl<'a> Engine for ChordEngine<'a> {
 impl<'a> ChordEngine<'a> {}
 
 const fn wt_index(bank: usize, row: usize, column: usize) -> usize {
-    (bank * 64 + row * 8 + column) * 260
+    (bank * 64 + row * 8 + column) * 132
 }
 
 #[inline]

@@ -28,7 +28,7 @@ use crate::dsp::A0;
 use crate::stmlib::dsp::one_pole;
 use crate::stmlib::dsp::parameter_interpolator::ParameterInterpolator;
 
-const TABLE_SIZE: usize = 256;
+const TABLE_SIZE: usize = 128;
 const TABLE_SIZE_F: f32 = TABLE_SIZE as f32;
 
 #[derive(Debug, Default)]

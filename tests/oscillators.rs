@@ -520,7 +520,7 @@ fn wavetable_oscillator() {
     let frequency = 110.0;
     let duration = 10.0;
 
-    let mut wavetable = [&mi_plaits_dsp::dsp::resources::waves::WAV_INTEGRATED_WAVES[0..260]; 256];
+    let mut wavetable = [&mi_plaits_dsp::dsp::resources::waves::WAV_INTEGRATED_WAVES[0..132]; 128];
 
     for (n, wt) in mi_plaits_dsp::dsp::resources::waves::WAV_INTEGRATED_WAVES
         .chunks(260)
@@ -541,7 +541,7 @@ fn wavetable_oscillator() {
         let modulation = modulation::ramp_up(n, blocks);
         let waveform = modulation;
         out.fill(0.0);
-        osc.render(f, 1.0, waveform, &wavetable, &mut out, 256, 192, true, true);
+        osc.render(f, 1.0, waveform, &wavetable, &mut out, 128, 96, true, true);
         wav_data.extend_from_slice(&out);
     }
 
