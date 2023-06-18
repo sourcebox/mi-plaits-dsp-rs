@@ -7,7 +7,7 @@ use core::alloc::GlobalAlloc;
 use num_traits::float::Float;
 
 use super::delay_line::DelayLine;
-use crate::dsp::resources::LUT_SVF_SHIFT;
+use crate::dsp::resources::svf::LUT_SVF_SHIFT;
 use crate::dsp::{allocate_buffer, SAMPLE_RATE};
 use crate::stmlib::dsp::filter::{DcBlocker, FilterMode, FrequencyApproximation, Svf};
 use crate::stmlib::dsp::parameter_interpolator::ParameterInterpolator;

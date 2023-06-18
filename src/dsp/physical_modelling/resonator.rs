@@ -2,7 +2,7 @@
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-use crate::dsp::resources::LUT_STIFFNESS;
+use crate::dsp::resources::stiffness::LUT_STIFFNESS;
 use crate::stmlib::dsp::cosine_oscillator::{CosineOscillator, CosineOscillatorMode};
 use crate::stmlib::dsp::filter::{FilterMode, FrequencyApproximation, OnePole};
 use crate::stmlib::dsp::interpolate;
