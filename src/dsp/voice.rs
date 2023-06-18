@@ -25,12 +25,14 @@ use super::engine::wavetable_engine::WavetableEngine;
 use super::engine::{note_to_frequency, Engine, EngineParameters, TriggerState};
 use super::engine2::chiptune_engine::{self, ChiptuneEngine};
 use super::engine2::phase_distortion_engine::PhaseDistortionEngine;
+use super::engine2::six_op_engine::SixOpEngine;
 use super::engine2::string_machine_engine::StringMachineEngine;
 use super::engine2::virtual_analog_vcf_engine::VirtualAnalogVcfEngine;
 use super::engine2::wave_terrain_engine::WaveTerrainEngine;
 use super::envelope::{DecayEnvelope, LpgEnvelope};
 use super::fx::low_pass_gate::LowPassGate;
 use super::physical_modelling::delay_line::DelayLine;
+use crate::dsp::resources::sysex::{SYX_BANK_0, SYX_BANK_1, SYX_BANK_2};
 use crate::dsp::{allocate_buffer, SAMPLE_RATE};
 use crate::stmlib::dsp::clip_16;
 use crate::stmlib::dsp::hysteresis_quantizer::HysteresisQuantizer2;
@@ -147,6 +149,7 @@ pub struct Voice<'a> {
     noise_engine: NoiseEngine<'a>,
     particle_engine: ParticleEngine<'a>,
     phase_distortion_engine: PhaseDistortionEngine<'a>,
+    six_op_engine: SixOpEngine<'a>,
     snare_drum_engine: SnareDrumEngine,
     speech_engine: SpeechEngine<'a>,
     string_engine: StringEngine<'a>,
@@ -190,6 +193,7 @@ impl<'a> Voice<'a> {
             noise_engine: NoiseEngine::new(buffer_allocator, block_size),
             particle_engine: ParticleEngine::new(buffer_allocator, block_size),
             phase_distortion_engine: PhaseDistortionEngine::new(buffer_allocator, block_size),
+            six_op_engine: SixOpEngine::new(buffer_allocator, block_size),
             snare_drum_engine: SnareDrumEngine::new(),
             speech_engine: SpeechEngine::new(buffer_allocator, block_size),
             string_engine: StringEngine::new(buffer_allocator, block_size),
@@ -226,10 +230,6 @@ impl<'a> Voice<'a> {
 
     pub fn init(&mut self) {
         for i in 0..NUM_ENGINES {
-            // TODO: remove when all engines are working.
-            if self.get_engine(i).is_none() {
-                continue;
-            }
             self.get_engine(i).unwrap().0.init();
         }
 
@@ -285,12 +285,19 @@ impl<'a> Voice<'a> {
                 .process_with_base(patch.engine as i32, self.engine_cv) as usize;
         engine_index = engine_index.clamp(0, NUM_ENGINES);
 
-        // TODO: remove when all engines are working.
-        if self.get_engine(engine_index).is_none() {
-            return;
-        }
-
         if engine_index != self.previous_engine_index || self.reload_user_data {
+            match engine_index {
+                2 => {
+                    self.six_op_engine.load_syx_bank(&SYX_BANK_0);
+                }
+                3 => {
+                    self.six_op_engine.load_syx_bank(&SYX_BANK_1);
+                }
+                4 => {
+                    self.six_op_engine.load_syx_bank(&SYX_BANK_2);
+                }
+                _ => {}
+            }
             let engine = self.get_engine(engine_index).unwrap().0;
             // TODO: engine.load_user_data(user_data);
             engine.reset();
@@ -468,9 +475,9 @@ impl<'a> Voice<'a> {
         match index {
             0 => Some((&mut self.virtual_analog_vcf_engine, false, 1.0, 1.0)),
             1 => Some((&mut self.phase_distortion_engine, false, 0.7, 0.7)),
-            2 => None,
-            3 => None,
-            4 => None,
+            2 => Some((&mut self.six_op_engine, true, 1.0, 1.0)),
+            3 => Some((&mut self.six_op_engine, true, 1.0, 1.0)),
+            4 => Some((&mut self.six_op_engine, true, 1.0, 1.0)),
             5 => Some((&mut self.waveterrain_engine, false, 0.7, 0.7)),
             6 => Some((&mut self.string_machine_engine, false, 0.8, 0.8)),
             7 => Some((&mut self.chiptune_engine, false, 0.5, 0.5)),
