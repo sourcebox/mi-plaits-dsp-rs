@@ -5,13 +5,10 @@
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-use crate::dsp::resources::LUT_SINE;
+use crate::dsp::resources::sine::{LUT_SINE, LUT_SINE_BITS, LUT_SINE_SIZE};
 use crate::stmlib::dsp::parameter_interpolator::ParameterInterpolator;
 use crate::stmlib::dsp::rsqrt::fast_rsqrt_carmack;
 use crate::stmlib::dsp::{interpolate, interpolate_wrap};
-
-const SINE_LUT_SIZE: f32 = 1024.0;
-const SINE_LUT_BITS: u32 = 10;
 
 #[derive(Debug, Default)]
 pub struct SineOscillator {
@@ -257,12 +254,12 @@ fn fast_2_sin(f: f32) -> f32 {
 
 // Safe for phase >= 0.0f, will wrap.
 pub fn sine(phase: f32) -> f32 {
-    interpolate_wrap(&LUT_SINE, phase, SINE_LUT_SIZE)
+    interpolate_wrap(&LUT_SINE, phase, LUT_SINE_SIZE)
 }
 
 // Potentially unsafe, if phase >= 1.25.
 pub fn sine_no_wrap(phase: f32) -> f32 {
-    interpolate(&LUT_SINE, phase, SINE_LUT_SIZE)
+    interpolate(&LUT_SINE, phase, LUT_SINE_SIZE)
 }
 
 // With positive of negative phase modulation up to an index of 32.
@@ -280,5 +277,5 @@ pub fn sine_pm(mut phase: u32, fm: f32) -> f32 {
 // Direct lookup without interpolation.
 #[inline]
 pub fn sine_raw(phase: u32) -> f32 {
-    LUT_SINE[(phase >> (32 - SINE_LUT_BITS)) as usize]
+    LUT_SINE[(phase >> (32 - LUT_SINE_BITS)) as usize]
 }
