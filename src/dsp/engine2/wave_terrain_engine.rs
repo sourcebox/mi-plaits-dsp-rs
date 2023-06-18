@@ -196,8 +196,8 @@ fn terrain_lookup_wt(x: f32, y: f32, bank: i32) -> f32 {
     let sample = (y + 1.0) * 0.5 * table_size as f32;
     let wt = (x + 1.0) * 0.5 * (num_waves - 1) as f32;
 
+    let waves = &WAV_INTEGRATED_WAVES;
     let mut waves_index = (bank * num_waves * table_size_full) as usize;
-    let waves = &WAV_INTEGRATED_WAVES[waves_index..];
 
     let sample_integral = sample as usize;
     let sample_fractional = sample - (sample_integral as f32);
