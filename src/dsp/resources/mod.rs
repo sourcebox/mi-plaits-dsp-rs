@@ -8,5 +8,6 @@ pub mod lpc;
 pub mod sine;
 pub mod stiffness;
 pub mod svf;
+pub mod sysex;
 pub mod waves;
 pub mod waveshape;
