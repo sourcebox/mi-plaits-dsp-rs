@@ -66,7 +66,7 @@ pub struct Patch {
     /// MORPH modulation amount in the range from `-1.0` to `1.0`. Default is `0.0`.
     pub morph_modulation_amount: f32,
 
-    /// Engine selection in the range from `0` to `15`. Default is `0`.
+    /// Engine selection in the range from `0` to `23`. Default is `0`.
     pub engine: usize,
 
     /// Envelope decay in the range from `0.0` to `1.0`. Default is `0.5`.
