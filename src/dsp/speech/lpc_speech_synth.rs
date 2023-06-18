@@ -2,7 +2,7 @@
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-use crate::dsp::resources::{LUT_LPC_EXCITATION_PULSE, LUT_LPC_EXCITATION_PULSE_SIZE};
+use crate::dsp::resources::lpc::{LUT_LPC_EXCITATION_PULSE, LUT_LPC_EXCITATION_PULSE_SIZE};
 use crate::stmlib::dsp::polyblep::{next_blep_sample, this_blep_sample};
 use crate::stmlib::utils::random;
 
