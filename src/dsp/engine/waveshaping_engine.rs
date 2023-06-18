@@ -16,7 +16,7 @@ use num_traits::float::Float;
 use super::{note_to_frequency, Engine, EngineParameters};
 use crate::dsp::oscillator::oscillator::{Oscillator, OscillatorShape};
 use crate::dsp::oscillator::sine_oscillator::sine;
-use crate::dsp::resources::{LOOKUP_TABLE_I16_TABLE, LUT_FOLD, LUT_FOLD_2};
+use crate::dsp::resources::{fold::LUT_FOLD, fold::LUT_FOLD_2, LOOKUP_TABLE_I16_TABLE};
 use crate::stmlib::dsp::interpolate_hermite;
 use crate::stmlib::dsp::parameter_interpolator::ParameterInterpolator;
 
