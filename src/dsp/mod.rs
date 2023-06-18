@@ -8,6 +8,7 @@ pub mod drums;
 pub mod engine;
 pub mod engine2;
 pub mod envelope;
+pub mod fm;
 pub mod fx;
 pub mod noise;
 pub mod oscillator;

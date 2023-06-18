@@ -11,6 +11,23 @@ pub fn semitones_to_ratio(semitones: f32) -> f32 {
     LUT_PITCH_RATIO_HIGH[pitch_integral] * LUT_PITCH_RATIO_LOW[(pitch_fractional * 256.0) as usize]
 }
 
+#[inline]
+pub fn semitones_to_ratio_safe(mut semitones: f32) -> f32 {
+    let mut scale = 1.0;
+
+    while semitones > 120.0 {
+        semitones -= 120.0;
+        scale *= 1024.0;
+    }
+
+    while semitones < -120.0 {
+        semitones += 120.0;
+        scale *= 1.0 / 1024.0;
+    }
+
+    scale * semitones_to_ratio(semitones)
+}
+
 #[allow(clippy::excessive_precision)]
 const LUT_PITCH_RATIO_HIGH: [f32; 256] = [
     6.151958251e-04,
