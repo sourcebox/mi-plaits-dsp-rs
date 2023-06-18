@@ -15,7 +15,7 @@
 use super::{note_to_frequency, Engine, EngineParameters};
 use crate::dsp::downsampler::Downsampler;
 use crate::dsp::oscillator::sine_oscillator::sine_pm;
-use crate::dsp::resources::LUT_FM_FREQUENCY_QUANTIZER;
+use crate::dsp::resources::fm::LUT_FM_FREQUENCY_QUANTIZER;
 use crate::dsp::A0;
 use crate::stmlib::dsp::parameter_interpolator::ParameterInterpolator;
 use crate::stmlib::dsp::{interpolate, one_pole};

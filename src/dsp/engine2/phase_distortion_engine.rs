@@ -16,7 +16,7 @@ use crate::dsp::allocate_buffer;
 use crate::dsp::engine::{note_to_frequency, Engine, EngineParameters};
 use crate::dsp::oscillator::sine_oscillator::sine;
 use crate::dsp::oscillator::variable_shape_oscillator::VariableShapeOscillator;
-use crate::dsp::resources::LUT_FM_FREQUENCY_QUANTIZER;
+use crate::dsp::resources::fm::LUT_FM_FREQUENCY_QUANTIZER;
 use crate::stmlib::dsp::interpolate;
 use crate::stmlib::dsp::units::semitones_to_ratio;
 
