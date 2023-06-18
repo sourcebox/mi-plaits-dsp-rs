@@ -298,9 +298,10 @@ impl<'a> Voice<'a> {
                 }
                 _ => {}
             }
+
             let engine = self.get_engine(engine_index).unwrap().0;
-            // TODO: engine.load_user_data(user_data);
             engine.reset();
+
             self.out_post_processor.reset();
             self.previous_engine_index = engine_index;
             self.reload_user_data = false;
