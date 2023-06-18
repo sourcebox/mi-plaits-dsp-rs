@@ -35,5 +35,3 @@ pub const LUT_LPC_EXCITATION_PULSE: [i8; 640] = [
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
     -2, -2, -2, -2, -2, -2, -2, -2, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0, 0,
 ];
-
-pub const LOOKUP_TABLE_I8_TABLE: [&[i8]; 1] = [LUT_LPC_EXCITATION_PULSE.as_slice()];
