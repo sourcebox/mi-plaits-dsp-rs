@@ -264,10 +264,15 @@ pub fn sine_no_wrap(phase: f32) -> f32 {
 
 // With positive of negative phase modulation up to an index of 32.
 #[inline]
-pub fn sine_pm(mut phase: u32, fm: f32) -> f32 {
-    phase = phase.wrapping_add((((fm + 4.0) * 536870912.0) as u32) << 3);
-    let integral = phase >> 22;
-    let fractional = (phase << 10) as f32 / 4294967296.0;
+pub fn sine_pm(mut phase: u32, pm: f32) -> f32 {
+    let max_uint32 = 4294967296.0;
+    let max_index = 32;
+    let offset = max_index as f32;
+    let scale = max_uint32 / (max_index * 2) as f32;
+
+    phase = phase.wrapping_add((((pm + offset) * scale) as u32).wrapping_mul(max_index * 2));
+    let integral = phase >> (32 - LUT_SINE_BITS);
+    let fractional = (phase << LUT_SINE_BITS) as f32 / max_uint32;
     let a = LUT_SINE[integral as usize];
     let b = LUT_SINE[integral as usize + 1];
 
