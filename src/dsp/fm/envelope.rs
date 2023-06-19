@@ -16,6 +16,7 @@
 
 // Based on MIT-licensed code (c) 2021 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
+#[allow(unused_imports)]
 use num_traits::float::Float;
 
 use super::dx_units::{
@@ -173,8 +174,8 @@ impl<const NUM_STAGES: usize> OperatorEnvelope<NUM_STAGES> {
     pub fn set(&mut self, rate: &[u8; NUM_STAGES], level: [u8; NUM_STAGES], global_level: u8) {
         // Configure levels.
         for i in 0..NUM_STAGES {
-            let mut level_scaled = operator_level(level[i] as i32);
-            level_scaled = (level_scaled & !1) + global_level as i32 - 133; // 125 ?
+            let mut level_scaled = operator_level(level[i]);
+            level_scaled = (level_scaled & !1) + global_level - 133; // 125 ?
             self.0.level[i] = 0.125
                 * (if level_scaled < 1 {
                     0.5
@@ -222,14 +223,14 @@ impl<const NUM_STAGES: usize> PitchEnvelope<NUM_STAGES> {
     pub fn set(&mut self, rate: [u8; NUM_STAGES], level: [u8; NUM_STAGES]) {
         // Configure levels.
         for i in 0..NUM_STAGES {
-            self.0.level[i] = pitch_envelope_level(level[i] as i32);
+            self.0.level[i] = pitch_envelope_level(level[i]);
         }
 
         // Configure increments.
         for i in 0..NUM_STAGES {
             let from = self.0.level[(i - 1 + NUM_STAGES) % NUM_STAGES];
             let to = self.0.level[i];
-            let mut increment = pitch_envelope_increment(rate[i] as i32);
+            let mut increment = pitch_envelope_increment(rate[i]);
 
             if from != to {
                 increment *= 1.0 / f32::abs(from - to);

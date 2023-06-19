@@ -2,4 +2,5 @@
 
 pub mod dx_units;
 pub mod envelope;
+pub mod lfo;
 pub mod patch;

@@ -2,6 +2,7 @@
 
 // Based on MIT-licensed code (c) 2021 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
+#[allow(unused_imports)]
 use num_traits::float::Float;
 
 use super::patch::{KeyboardScaling, Operator};
@@ -58,7 +59,7 @@ pub fn pow_2_fast(mut x: f32, order: i32) -> f32 {
 //  50 =  78  (TL =  49)
 //  99 = 127  (TL =   0)
 #[inline]
-pub fn operator_level(level: i32) -> i32 {
+pub fn operator_level(level: u8) -> u8 {
     let mut tlc = level;
 
     if level < 20 {
@@ -81,7 +82,7 @@ pub fn operator_level(level: i32) -> i32 {
 // 82 = +1 octave
 // 99 = +4 octave
 #[inline]
-pub fn pitch_envelope_level(level: i32) -> f32 {
+pub fn pitch_envelope_level(level: u8) -> f32 {
     let l = (level as f32 - 50.0) / 32.0;
     let tail = f32::max(f32::abs(l + 0.02) - 1.0, 0.0);
 
@@ -100,7 +101,7 @@ pub fn operator_envelope_increment(rate: i32) -> f32 {
 
 // Convert a pitch envelope rate from 0-99 to a frequency.
 #[inline]
-pub fn pitch_envelope_increment(rate: i32) -> f32 {
+pub fn pitch_envelope_increment(rate: u8) -> f32 {
     let r = rate as f32 * 0.01;
 
     (1.0 + 192.0 * r * (r * r * r * r + 0.3333)) / (21.3 * 44100.0)
@@ -110,7 +111,7 @@ const MIN_LFO_FREQUENCY: f32 = 0.005865;
 
 // Convert an LFO rate from 0-99 to a frequency.
 #[inline]
-pub fn lfo_frequency(rate: i32) -> f32 {
+pub fn lfo_frequency(rate: u8) -> f32 {
     let mut rate_scaled = if rate == 0 { 1 } else { (rate * 165) >> 6 };
     rate_scaled *= if rate_scaled < 160 {
         11
@@ -123,12 +124,12 @@ pub fn lfo_frequency(rate: i32) -> f32 {
 
 // Convert an LFO delay from 0-99 to the two increments.
 #[inline]
-pub fn lfo_delay(delay: i32, increments: &mut [f32; 2]) {
+pub fn lfo_delay(delay: u8, increments: &mut [f32; 2]) {
     if delay == 0 {
         increments[0] = 100000.0;
         increments[1] = increments[0];
     } else {
-        let mut d = 99 - delay;
+        let mut d = (99 - delay) as i32;
         d = (16 + (d & 15)) << (1 + (d >> 4));
         increments[0] = d as f32 * MIN_LFO_FREQUENCY;
         increments[1] = (i32::max(0x80, d & 0xFF80)) as f32 * MIN_LFO_FREQUENCY;
@@ -147,19 +148,19 @@ pub fn normalize_velocity(velocity: f32) -> f32 {
 
 // MIDI note to envelope increment ratio.
 #[inline]
-pub fn rate_scaling(note: f32, rate_scaling: i32) -> f32 {
+pub fn rate_scaling(note: f32, rate_scaling: u8) -> f32 {
     pow_2_fast(rate_scaling as f32 * (note * 0.33333 - 7.0) * 0.03125, 1)
 }
 
 // Operator amplitude modulation sensitivity (0-3).
 #[inline]
-pub fn amp_mod_sensitivity(amp_mod_sensitivity: i32) -> f32 {
+pub fn amp_mod_sensitivity(amp_mod_sensitivity: u8) -> f32 {
     LUT_AMP_MOD_SENSITIVITY[amp_mod_sensitivity as usize]
 }
 
 // Pitch modulation sensitivity (0-7).
 #[inline]
-pub fn pitch_mod_sensitivity(pitch_mod_sensitivity: i32) -> f32 {
+pub fn pitch_mod_sensitivity(pitch_mod_sensitivity: u8) -> f32 {
     LUT_PITCH_MOD_SENSITIVITY[pitch_mod_sensitivity as usize]
 }
 
