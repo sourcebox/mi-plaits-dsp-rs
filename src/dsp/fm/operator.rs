@@ -34,7 +34,7 @@ pub type RenderFn = fn(
 );
 
 #[allow(clippy::too_many_arguments)]
-pub fn render_operators<const N: usize>(
+pub fn render_operators<const N: usize, const MODULATION_SOURCE: i32, const ADDITIVE: bool>(
     ops: &mut [Operator],
     f: &[f32],
     a: &[f32],
@@ -42,13 +42,11 @@ pub fn render_operators<const N: usize>(
     fb_amount: i32,
     modulation: &[f32],
     out: &mut [f32],
-    modulation_source: i32,
-    additive: bool,
 ) {
     let mut previous_0 = 0.0;
     let mut previous_1 = 0.0;
 
-    if modulation_source >= ModulationSource::Feedback as i32 {
+    if MODULATION_SOURCE >= ModulationSource::Feedback as i32 {
         previous_0 = fb_state[0];
         previous_1 = fb_state[1];
     }
@@ -76,9 +74,9 @@ pub fn render_operators<const N: usize>(
     for (out_sample, modulation) in out.iter_mut().zip(modulation.iter()) {
         let mut pm = 0.0;
 
-        if modulation_source >= ModulationSource::Feedback as i32 {
+        if MODULATION_SOURCE >= ModulationSource::Feedback as i32 {
             pm = (previous_0 + previous_1) * fb_scale;
-        } else if modulation_source == ModulationSource::External as i32 {
+        } else if MODULATION_SOURCE == ModulationSource::External as i32 {
             pm = *modulation;
         }
 
@@ -86,13 +84,13 @@ pub fn render_operators<const N: usize>(
             phase[i] += frequency[i];
             pm = sine_pm(phase[i], pm) * amplitude[i];
             amplitude[i] += amplitude_increment[i];
-            if i == modulation_source as usize {
+            if i == MODULATION_SOURCE as usize {
                 previous_1 = previous_0;
                 previous_0 = pm;
             }
         }
 
-        if additive {
+        if ADDITIVE {
             *out_sample += pm;
         } else {
             *out_sample = pm;
@@ -104,7 +102,7 @@ pub fn render_operators<const N: usize>(
         ops[i].amplitude = amplitude[i];
     }
 
-    if modulation_source >= ModulationSource::Feedback as i32 {
+    if MODULATION_SOURCE >= ModulationSource::Feedback as i32 {
         fb_state[0] = previous_0;
         fb_state[1] = previous_1;
     }

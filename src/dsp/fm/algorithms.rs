@@ -2,7 +2,7 @@
 
 // Based on MIT-licensed code (c) 2021 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-use super::operator::RenderFn;
+use super::operator::{render_operators, RenderFn};
 
 // Store information about all FM algorithms, and which functions to call
 // to render them.
@@ -53,7 +53,7 @@ impl<const NUM_OPERATORS: usize, const NUM_ALGORITHMS: usize>
                 && renderer.modulation_source == modulation_source
                 && renderer.additive == additive
             {
-                return Some(renderer.render_fn);
+                return renderer.render_fn;
             }
         }
 
@@ -130,11 +130,19 @@ impl<const NUM_OPERATORS: usize, const NUM_ALGORITHMS: usize>
     }
 
     fn opcode(&self, algorithm: u32, op: u32) -> u8 {
-        todo!()
+        if NUM_OPERATORS == 4 {
+            OPCODES_4_8[algorithm as usize][op as usize]
+        } else {
+            OPCODES_6_32[algorithm as usize][op as usize]
+        }
     }
 
     fn renderers(&self) -> &[RendererSpecs] {
-        todo!()
+        if NUM_OPERATORS == 4 {
+            &RENDERERS_4
+        } else {
+            &RENDERERS_6
+        }
     }
 }
 
@@ -157,5 +165,451 @@ struct RendererSpecs {
     n: u32,
     modulation_source: i32,
     additive: bool,
-    render_fn: RenderFn,
+    render_fn: Option<RenderFn>,
 }
+
+macro_rules! MOD {
+    ($n:expr) => {
+        $n << 4
+    };
+}
+
+macro_rules! ADD {
+    ($n:expr) => {
+        $n | OPCODE_ADDITIVE_FLAG
+    };
+}
+
+macro_rules! OUT {
+    ($n:expr) => {
+        $n
+    };
+}
+
+macro_rules! FB_SRC {
+    () => {
+        OPCODE_FEEDBACK_SOURCE_FLAG
+    };
+}
+
+macro_rules! FB_DST {
+    () => {
+        MOD!(3)
+    };
+}
+
+macro_rules! FB {
+    () => {
+        FB_SRC!() | FB_DST!()
+    };
+}
+
+macro_rules! NO_MOD {
+    () => {
+        MOD!(0)
+    };
+}
+
+macro_rules! OUTPUT {
+    () => {
+        ADD!(0)
+    };
+}
+
+#[allow(clippy::identity_op)]
+const OPCODES_4_8: [[u8; 4]; 8] = [
+    [
+        // Algorithm 1: 4 -> 3 -> 2 -> 1
+        FB!() | OUT!(1),
+        MOD!(1) | OUT!(1),
+        MOD!(1) | OUT!(1),
+        MOD!(1) | OUTPUT!(),
+    ],
+    [
+        // Algorithm 2: 4 + 3 -> 2 -> 1
+        FB!() | OUT!(1),
+        ADD!(1),
+        MOD!(1) | OUT!(1),
+        MOD!(1) | OUTPUT!(),
+    ],
+    [
+        // Algorithm 3: 4 + (3 -> 2) -> 1
+        FB!() | OUT!(1),
+        OUT!(2),
+        MOD!(2) | ADD!(1),
+        MOD!(1) | OUTPUT!(),
+    ],
+    [
+        // Algorithm 4: (4 -> 3) + 2 -> 1
+        FB!() | OUT!(1),
+        MOD!(1) | OUT!(1),
+        ADD!(1),
+        MOD!(1) | OUTPUT!(),
+    ],
+    [
+        // Algorithm 5: (4 -> 3) + (2 -> 1)
+        FB!() | OUT!(1),
+        MOD!(1) | OUTPUT!(),
+        OUT!(1),
+        MOD!(1) | ADD!(0),
+    ],
+    [
+        // Algorithm 6: (4 -> 3) + (4 -> 2) + (4 -> 1)
+        FB!() | OUT!(1),
+        MOD!(1) | OUTPUT!(),
+        MOD!(1) | ADD!(0),
+        MOD!(1) | ADD!(0),
+    ],
+    [
+        // Algorithm 7: (4 -> 3) + 2 + 1
+        FB!() | OUT!(1),
+        MOD!(1) | OUTPUT!(),
+        ADD!(0),
+        ADD!(0),
+    ],
+    [
+        // Algorithm 8: 4 + 3 + 2 + 1
+        FB!() | OUTPUT!(),
+        ADD!(0),
+        ADD!(0),
+        ADD!(0),
+    ],
+];
+
+#[allow(clippy::identity_op)]
+const OPCODES_6_32: [[u8; 6]; 32] = [
+    [
+        // Algorithm 1
+        FB!() | OUT!(1),     // Op 6
+        MOD!(1) | OUT!(1),   // Op 5
+        MOD!(1) | OUT!(1),   // Op 4
+        MOD!(1) | OUTPUT!(), // Op 3
+        NO_MOD!() | OUT!(1), // Op 2
+        MOD!(1) | ADD!(0),   // Op 1
+    ],
+    [
+        // Algorithm 2
+        NO_MOD!() | OUT!(1), // Op 6
+        MOD!(1) | OUT!(1),   // Op 5
+        MOD!(1) | OUT!(1),   // Op 4
+        MOD!(1) | OUTPUT!(), // Op 3
+        FB!() | OUT!(1),     // Op 2
+        MOD!(1) | ADD!(0),   // Op 1
+    ],
+    [
+        // Algorithm 3
+        FB!() | OUT!(1),     // Op 6
+        MOD!(1) | OUT!(1),   // Op 5
+        MOD!(1) | OUTPUT!(), // Op 4
+        NO_MOD!() | OUT!(1), // Op 3
+        MOD!(1) | OUT!(1),   // Op 2
+        MOD!(1) | ADD!(0),   // Op 1
+    ],
+    [
+        // Algorithm 4
+        FB_DST!() | NO_MOD!() | OUT!(1), // Op 6
+        MOD!(1) | OUT!(1),               // Op 5
+        FB_SRC!() | MOD!(1) | OUTPUT!(), // Op 4
+        NO_MOD!() | OUT!(1),             // Op 3
+        MOD!(1) | OUT!(1),               // Op 2
+        MOD!(1) | ADD!(0),               // Op 1
+    ],
+    [
+        // Algorithm 5
+        FB!() | OUT!(1),     // Op 6
+        MOD!(1) | OUTPUT!(), // Op 5
+        NO_MOD!() | OUT!(1), // Op 4
+        MOD!(1) | ADD!(0),   // Op 3
+        NO_MOD!() | OUT!(1), // Op 2
+        MOD!(1) | ADD!(0),   // Op 1
+    ],
+    [
+        // Algorithm 6
+        FB_DST!() | NO_MOD!() | OUT!(1), // Op 6
+        FB_SRC!() | MOD!(1) | OUTPUT!(), // Op 5
+        NO_MOD!() | OUT!(1),             // Op 4
+        MOD!(1) | ADD!(0),               // Op 3
+        NO_MOD!() | OUT!(1),             // Op 2
+        MOD!(1) | ADD!(0),               // Op 1
+    ],
+    [
+        // Algorithm 7
+        FB!() | OUT!(1),     // Op 6
+        MOD!(1) | OUT!(1),   // Op 5
+        NO_MOD!() | ADD!(1), // Op 4
+        MOD!(1) | OUTPUT!(), // Op 3
+        NO_MOD!() | OUT!(1), // Op 2
+        MOD!(1) | ADD!(0),   // Op 1
+    ],
+    [
+        // Algorithm 8
+        NO_MOD!() | OUT!(1), // Op 6
+        MOD!(1) | OUT!(1),   // Op 5
+        FB!() | ADD!(1),     // Op 4
+        MOD!(1) | OUTPUT!(), // Op 3
+        NO_MOD!() | OUT!(1), // Op 2
+        MOD!(1) | ADD!(0),   // Op 1
+    ],
+    [
+        // Algorithm 9
+        NO_MOD!() | OUT!(1), // Op 6
+        MOD!(1) | OUT!(1),   // Op 5
+        NO_MOD!() | ADD!(1), // Op 4
+        MOD!(1) | OUTPUT!(), // Op 3
+        FB!() | OUT!(1),     // Op 2
+        MOD!(1) | ADD!(0),   // Op 1
+    ],
+    [
+        // Algorithm 10
+        NO_MOD!() | OUT!(1), // Op 6
+        NO_MOD!() | ADD!(1), // Op 5
+        MOD!(1) | OUTPUT!(), // Op 4
+        FB!() | OUT!(1),     // Op 3
+        MOD!(1) | OUT!(1),   // Op 2
+        MOD!(1) | ADD!(0),   // Op 1
+    ],
+    [
+        // Algorithm 11
+        FB!() | OUT!(1),     // Op 6
+        NO_MOD!() | ADD!(1), // Op 5
+        MOD!(1) | OUTPUT!(), // Op 4
+        NO_MOD!() | OUT!(1), // Op 3
+        MOD!(1) | OUT!(1),   // Op 2
+        MOD!(1) | ADD!(0),   // Op 1
+    ],
+    [
+        // Algorithm 12
+        NO_MOD!() | OUT!(1), // Op 6
+        NO_MOD!() | ADD!(1), // Op 5
+        NO_MOD!() | ADD!(1), // Op 4
+        MOD!(1) | OUTPUT!(), // Op 3
+        FB!() | OUT!(1),     // Op 2
+        MOD!(1) | ADD!(0),   // Op 1
+    ],
+    [
+        // Algorithm 13
+        FB!() | OUT!(1),     // Op 6
+        NO_MOD!() | ADD!(1), // Op 5
+        NO_MOD!() | ADD!(1), // Op 4
+        MOD!(1) | OUTPUT!(), // Op 3
+        NO_MOD!() | OUT!(1), // Op 2
+        MOD!(1) | ADD!(0),   // Op 1
+    ],
+    [
+        // Algorithm 14
+        FB!() | OUT!(1),     // Op 6
+        NO_MOD!() | ADD!(1), // Op 5
+        MOD!(1) | OUT!(1),   // Op 4
+        MOD!(1) | OUTPUT!(), // Op 3
+        NO_MOD!() | OUT!(1), // Op 2
+        MOD!(1) | ADD!(0),   // Op 1
+    ],
+    [
+        // Algorithm 15
+        NO_MOD!() | OUT!(1), // Op 6
+        NO_MOD!() | ADD!(1), // Op 5
+        MOD!(1) | OUT!(1),   // Op 4
+        MOD!(1) | OUTPUT!(), // Op 3
+        FB!() | OUT!(1),     // Op 2
+        MOD!(1) | ADD!(0),   // Op 1
+    ],
+    [
+        // Algorithm 16
+        FB!() | OUT!(1),     // Op 6
+        MOD!(1) | OUT!(1),   // Op 5
+        NO_MOD!() | OUT!(2), // Op 4
+        MOD!(2) | ADD!(1),   // Op 3
+        NO_MOD!() | ADD!(1), // Op 2
+        MOD!(1) | OUTPUT!(), // Op 1
+    ],
+    [
+        // Algorithm 17
+        NO_MOD!() | OUT!(1), // Op 6
+        MOD!(1) | OUT!(1),   // Op 5
+        NO_MOD!() | OUT!(2), // Op 4
+        MOD!(2) | ADD!(1),   // Op 3
+        FB!() | ADD!(1),     // Op 2
+        MOD!(1) | OUTPUT!(), // Op 1
+    ],
+    [
+        // Algorithm 18
+        NO_MOD!() | OUT!(1), // Op 6
+        MOD!(1) | OUT!(1),   // Op 5
+        MOD!(1) | OUT!(1),   // Op 4
+        FB!() | ADD!(1),     // Op 3
+        NO_MOD!() | ADD!(1), // Op 2
+        MOD!(1) | OUTPUT!(), // Op 1
+    ],
+    [
+        // Algorithm 19
+        FB!() | OUT!(1),     // Op 6
+        MOD!(1) | OUTPUT!(), // Op 5
+        MOD!(1) | ADD!(0),   // Op 4
+        NO_MOD!() | OUT!(1), // Op 3
+        MOD!(1) | OUT!(1),   // Op 2
+        MOD!(1) | ADD!(0),   // Op 1
+    ],
+    [
+        // Algorithm 20
+        NO_MOD!() | OUT!(1), // Op 6
+        NO_MOD!() | ADD!(1), // Op 5
+        MOD!(1) | OUTPUT!(), // Op 4
+        FB!() | OUT!(1),     // Op 3
+        MOD!(1) | ADD!(0),   // Op 2
+        MOD!(1) | ADD!(0),   // Op 1
+    ],
+    [
+        // Algorithm 21
+        NO_MOD!() | OUT!(1), // Op 6
+        MOD!(1) | OUTPUT!(), // Op 5
+        MOD!(1) | ADD!(0),   // Op 4
+        FB!() | OUT!(1),     // Op 3
+        MOD!(1) | ADD!(0),   // Op 2
+        MOD!(1) | ADD!(0),   // Op 1
+    ],
+    [
+        // Algorithm 22
+        FB!() | OUT!(1),     // Op 6
+        MOD!(1) | OUTPUT!(), // Op 5
+        MOD!(1) | ADD!(0),   // Op 4
+        MOD!(1) | ADD!(0),   // Op 3
+        NO_MOD!() | OUT!(1), // Op 2
+        MOD!(1) | ADD!(0),   // Op 1
+    ],
+    [
+        // Algorithm 23
+        FB!() | OUT!(1),     // Op 6
+        MOD!(1) | OUTPUT!(), // Op 5
+        MOD!(1) | ADD!(0),   // Op 4
+        NO_MOD!() | OUT!(1), // Op 3
+        MOD!(1) | ADD!(0),   // Op 2
+        NO_MOD!() | ADD!(0), // Op 1
+    ],
+    [
+        // Algorithm 24
+        FB!() | OUT!(1),     // Op 6
+        MOD!(1) | OUTPUT!(), // Op 5
+        MOD!(1) | ADD!(0),   // Op 4
+        MOD!(1) | ADD!(0),   // Op 3
+        NO_MOD!() | ADD!(0), // Op 2
+        NO_MOD!() | ADD!(0), // Op 1
+    ],
+    [
+        // Algorithm 25
+        FB!() | OUT!(1),     // Op 6
+        MOD!(1) | OUTPUT!(), // Op 5
+        MOD!(1) | ADD!(0),   // Op 4
+        NO_MOD!() | ADD!(0), // Op 3
+        NO_MOD!() | ADD!(0), // Op 2
+        NO_MOD!() | ADD!(0), // Op 1
+    ],
+    [
+        // Algorithm 26
+        FB!() | OUT!(1),     // Op 6
+        NO_MOD!() | ADD!(1), // Op 5
+        MOD!(1) | OUTPUT!(), // Op 4
+        NO_MOD!() | OUT!(1), // Op 3
+        MOD!(1) | ADD!(0),   // Op 2
+        NO_MOD!() | ADD!(0), // Op 1
+    ],
+    [
+        // Algorithm 27
+        NO_MOD!() | OUT!(1), // Op 6
+        NO_MOD!() | ADD!(1), // Op 5
+        MOD!(1) | OUTPUT!(), // Op 4
+        FB!() | OUT!(1),     // Op 3
+        MOD!(1) | ADD!(0),   // Op 2
+        NO_MOD!() | ADD!(0), // Op 1
+    ],
+    [
+        // Algorithm 28
+        NO_MOD!() | OUTPUT!(), // Op 6
+        FB!() | OUT!(1),       // Op 5
+        MOD!(1) | OUT!(1),     // Op 4
+        MOD!(1) | ADD!(0),     // Op 3
+        NO_MOD!() | OUT!(1),   // Op 2
+        MOD!(1) | ADD!(0),     // Op 1
+    ],
+    [
+        // Algorithm 29
+        FB!() | OUT!(1),     // Op 6
+        MOD!(1) | OUTPUT!(), // Op 5
+        NO_MOD!() | OUT!(1), // Op 4
+        MOD!(1) | ADD!(0),   // Op 3
+        NO_MOD!() | ADD!(0), // Op 2
+        NO_MOD!() | ADD!(0), // Op 1
+    ],
+    [
+        // Algorithm 30
+        NO_MOD!() | OUTPUT!(), // Op 6
+        FB!() | OUT!(1),       // Op 5
+        MOD!(1) | OUT!(1),     // Op 4
+        MOD!(1) | ADD!(0),     // Op 3
+        NO_MOD!() | ADD!(0),   // Op 2
+        NO_MOD!() | ADD!(0),   // Op 1
+    ],
+    [
+        // Algorithm 31
+        FB!() | OUT!(1),     // Op 6
+        MOD!(1) | OUTPUT!(), // Op 5
+        NO_MOD!() | ADD!(0), // Op 4
+        NO_MOD!() | ADD!(0), // Op 3
+        NO_MOD!() | ADD!(0), // Op 2
+        NO_MOD!() | ADD!(0), // Op 1
+    ],
+    [
+        // Algorithm 32
+        FB!() | OUTPUT!(),   // Op 6
+        NO_MOD!() | ADD!(0), // Op 5
+        NO_MOD!() | ADD!(0), // Op 4
+        NO_MOD!() | ADD!(0), // Op 3
+        NO_MOD!() | ADD!(0), // Op 2
+        NO_MOD!() | ADD!(0), // Op 1
+    ],
+];
+
+macro_rules! INSTANTIATE_RENDERER {
+    ($n:expr, $m:expr, $a: expr) => {
+        RendererSpecs {
+            n: $n,
+            modulation_source: $m,
+            additive: $a,
+            render_fn: Some(render_operators::<$n, $m, $a>),
+        }
+    };
+}
+
+const RENDERERS_4: [RendererSpecs; 7] = [
+    // Core
+    INSTANTIATE_RENDERER!(1, -2, false),
+    INSTANTIATE_RENDERER!(1, -2, true),
+    INSTANTIATE_RENDERER!(1, -1, false),
+    INSTANTIATE_RENDERER!(1, -1, true),
+    INSTANTIATE_RENDERER!(1, 0, false),
+    INSTANTIATE_RENDERER!(1, 0, true),
+    RendererSpecs {
+        n: 0,
+        modulation_source: 0,
+        additive: false,
+        render_fn: None,
+    },
+];
+
+const RENDERERS_6: [RendererSpecs; 9] = [
+    // Core
+    INSTANTIATE_RENDERER!(1, -2, false),
+    INSTANTIATE_RENDERER!(1, -2, true),
+    INSTANTIATE_RENDERER!(1, -1, false),
+    INSTANTIATE_RENDERER!(1, -1, true),
+    INSTANTIATE_RENDERER!(1, 0, false),
+    INSTANTIATE_RENDERER!(1, 0, true),
+    // Pesky feedback loops spanning several operators
+    INSTANTIATE_RENDERER!(3, 2, true),
+    INSTANTIATE_RENDERER!(2, 1, true),
+    RendererSpecs {
+        n: 0,
+        modulation_source: 0,
+        additive: false,
+        render_fn: None,
+    },
+];
