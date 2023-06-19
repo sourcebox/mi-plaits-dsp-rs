@@ -10,6 +10,7 @@
 
 // Based on MIT-licensed code (c) 2021 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
+#[allow(unused_imports)]
 use num_traits::float::Float;
 
 use crate::dsp::engine::{note_to_frequency, Engine, EngineParameters};

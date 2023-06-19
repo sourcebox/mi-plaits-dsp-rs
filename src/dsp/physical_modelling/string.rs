@@ -4,6 +4,7 @@
 
 use core::alloc::GlobalAlloc;
 
+#[allow(unused_imports)]
 use num_traits::float::Float;
 
 use super::delay_line::DelayLine;

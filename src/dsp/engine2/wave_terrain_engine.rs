@@ -13,7 +13,10 @@
 
 use core::alloc::GlobalAlloc;
 
-use num_traits::{Float, FromPrimitive, Num, ToPrimitive};
+#[allow(unused_imports)]
+use num_traits::float::Float;
+
+use num_traits::{FromPrimitive, Num, ToPrimitive};
 
 use crate::dsp::allocate_buffer;
 use crate::dsp::engine::{note_to_frequency, Engine, EngineParameters};

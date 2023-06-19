@@ -13,6 +13,7 @@ pub mod polyblep;
 pub mod rsqrt;
 pub mod units;
 
+#[allow(unused_imports)]
 use num_traits::float::Float;
 
 #[inline]

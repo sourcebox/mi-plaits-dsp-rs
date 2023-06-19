@@ -2,6 +2,7 @@
 
 // Based on MIT-licensed code (c) 2014 by Olivier Gillet (ol.gillet@gmail.com)
 
+#[allow(unused_imports)]
 use num_traits::float::FloatCore;
 
 #[inline]

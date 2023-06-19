@@ -14,6 +14,7 @@
 
 use core::alloc::GlobalAlloc;
 
+#[allow(unused_imports)]
 use num_traits::float::Float;
 
 use super::{note_to_frequency, Engine, EngineParameters, TriggerState};

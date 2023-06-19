@@ -4,6 +4,7 @@
 
 use core::alloc::GlobalAlloc;
 
+#[allow(unused_imports)]
 use num_traits::float::Float;
 
 use super::engine::additive_engine::AdditiveEngine;
