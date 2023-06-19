@@ -2,6 +2,8 @@
 
 // Based on MIT-licensed code (c) 2021 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
+#![allow(clippy::excessive_precision)]
+
 #[allow(unused_imports)]
 use num_traits::float::Float;
 

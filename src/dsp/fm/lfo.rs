@@ -188,6 +188,6 @@ impl Lfo {
 
     #[inline]
     pub fn amp_mod(&self) -> f32 {
-        return (1.0 - self.value) * self.delay_ramp() * self.amp_mod_depth;
+        (1.0 - self.value) * self.delay_ramp() * self.amp_mod_depth
     }
 }

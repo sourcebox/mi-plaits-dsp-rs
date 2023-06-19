@@ -98,7 +98,7 @@ impl<const NUM_STAGES: usize, const RESHAPE_ASCENDING_SEGMENTS: bool>
             }
         }
 
-        return self.value(stage, t * self.increment[stage], PREVIOUS_LEVEL);
+        self.value(stage, t * self.increment[stage], PREVIOUS_LEVEL)
     }
 
     #[inline]
@@ -114,15 +114,13 @@ impl<const NUM_STAGES: usize, const RESHAPE_ASCENDING_SEGMENTS: bool>
                 self.stage = 0;
                 self.phase = 0.0;
             }
-        } else {
-            if self.stage != NUM_STAGES - 1 {
-                self.start = self.current_value();
-                self.stage = NUM_STAGES - 1;
-                self.phase = 0.0;
-            }
+        } else if self.stage != NUM_STAGES - 1 {
+            self.start = self.current_value();
+            self.stage = NUM_STAGES - 1;
+            self.phase = 0.0;
         }
 
-        self.phase += self.increment[self.stage as usize]
+        self.phase += self.increment[self.stage]
             * rate
             * (if self.stage == NUM_STAGES - 1 {
                 release_scale
@@ -139,7 +137,7 @@ impl<const NUM_STAGES: usize, const RESHAPE_ASCENDING_SEGMENTS: bool>
             self.start = PREVIOUS_LEVEL;
         }
 
-        return self.current_value();
+        self.current_value()
     }
 
     #[inline]
@@ -150,12 +148,12 @@ impl<const NUM_STAGES: usize, const RESHAPE_ASCENDING_SEGMENTS: bool>
     #[inline]
     pub fn value(&self, stage: usize, mut phase: f32, start_level: f32) -> f32 {
         let mut from = if start_level == PREVIOUS_LEVEL {
-            self.level[(stage as usize - 1 + NUM_STAGES) % NUM_STAGES]
+            self.level[(stage - 1 + NUM_STAGES) % NUM_STAGES]
         } else {
             start_level
         };
 
-        let mut to = self.level[stage as usize];
+        let mut to = self.level[stage];
 
         if RESHAPE_ASCENDING_SEGMENTS && from < to {
             from = f32::max(6.7, from);
@@ -173,8 +171,8 @@ pub struct OperatorEnvelope<const NUM_STAGES: usize = 4>(Envelope<NUM_STAGES, tr
 impl<const NUM_STAGES: usize> OperatorEnvelope<NUM_STAGES> {
     pub fn set(&mut self, rate: &[u8; NUM_STAGES], level: [u8; NUM_STAGES], global_level: u8) {
         // Configure levels.
-        for i in 0..NUM_STAGES {
-            let mut level_scaled = operator_level(level[i]);
+        for (i, level) in level.iter().enumerate().take(NUM_STAGES) {
+            let mut level_scaled = operator_level(*level);
             level_scaled = (level_scaled & !1) + global_level - 133; // 125 ?
             self.0.level[i] = 0.125
                 * (if level_scaled < 1 {
@@ -222,15 +220,15 @@ pub struct PitchEnvelope<const NUM_STAGES: usize = 4>(Envelope<NUM_STAGES, true>
 impl<const NUM_STAGES: usize> PitchEnvelope<NUM_STAGES> {
     pub fn set(&mut self, rate: [u8; NUM_STAGES], level: [u8; NUM_STAGES]) {
         // Configure levels.
-        for i in 0..NUM_STAGES {
-            self.0.level[i] = pitch_envelope_level(level[i]);
+        for (i, level) in level.iter().enumerate().take(NUM_STAGES) {
+            self.0.level[i] = pitch_envelope_level(*level);
         }
 
         // Configure increments.
-        for i in 0..NUM_STAGES {
+        for (i, rate) in rate.iter().enumerate().take(NUM_STAGES) {
             let from = self.0.level[(i - 1 + NUM_STAGES) % NUM_STAGES];
             let to = self.0.level[i];
-            let mut increment = pitch_envelope_increment(rate[i]);
+            let mut increment = pitch_envelope_increment(*rate);
 
             if from != to {
                 increment *= 1.0 / f32::abs(from - to);
