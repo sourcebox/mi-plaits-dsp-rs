@@ -11,6 +11,10 @@ pub struct Operator {
 }
 
 impl Operator {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
     pub fn reset(&mut self) {
         self.phase = 0;
         self.amplitude = 0.0;
@@ -24,7 +28,7 @@ pub enum ModulationSource {
 }
 
 pub type RenderFn = fn(
-    ops: &mut [Operator],
+    ops: &mut [&mut Operator],
     f: &[f32],
     a: &[f32],
     fb_state: &mut [f32],
@@ -35,7 +39,7 @@ pub type RenderFn = fn(
 
 #[allow(clippy::too_many_arguments)]
 pub fn render_operators<const N: usize, const MODULATION_SOURCE: i32, const ADDITIVE: bool>(
-    ops: &mut [Operator],
+    ops: &mut [&mut Operator],
     f: &[f32],
     a: &[f32],
     fb_state: &mut [f32],

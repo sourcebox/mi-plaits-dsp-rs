@@ -6,3 +6,4 @@ pub mod envelope;
 pub mod lfo;
 pub mod operator;
 pub mod patch;
+pub mod voice;

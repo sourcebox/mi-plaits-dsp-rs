@@ -154,10 +154,10 @@ const OPCODE_FEEDBACK_SOURCE_FLAG: u8 = 0x40;
 
 #[derive(Debug)]
 pub struct RenderCall {
-    render_fn: RenderFn,
-    n: u32,
-    input_index: u32,
-    output_index: u32,
+    pub render_fn: RenderFn,
+    pub n: u32,
+    pub input_index: u32,
+    pub output_index: u32,
 }
 
 #[derive(Debug)]

@@ -39,6 +39,18 @@ pub struct Envelope<const NUM_STAGES: usize = 4, const RESHAPE_ASCENDING_SEGMENT
 impl<const NUM_STAGES: usize, const RESHAPE_ASCENDING_SEGMENTS: bool>
     Envelope<NUM_STAGES, RESHAPE_ASCENDING_SEGMENTS>
 {
+    pub fn new() -> Self {
+        Self {
+            stage: 0,
+            phase: 0.0,
+            start: 0.0,
+
+            increment: [0.0; NUM_STAGES],
+            level: [0.0; NUM_STAGES],
+            scale: 0.0,
+        }
+    }
+
     #[inline]
     pub fn init(&mut self, scale: f32) {
         self.scale = scale;
@@ -165,10 +177,22 @@ impl<const NUM_STAGES: usize, const RESHAPE_ASCENDING_SEGMENTS: bool>
     }
 }
 
+impl<const NUM_STAGES: usize, const RESHAPE_ASCENDING_SEGMENTS: bool> Default
+    for Envelope<NUM_STAGES, RESHAPE_ASCENDING_SEGMENTS>
+{
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[derive(Debug)]
-pub struct OperatorEnvelope<const NUM_STAGES: usize = 4>(Envelope<NUM_STAGES, true>);
+pub struct OperatorEnvelope<const NUM_STAGES: usize = 4>(pub Envelope<NUM_STAGES, true>);
 
 impl<const NUM_STAGES: usize> OperatorEnvelope<NUM_STAGES> {
+    pub fn new() -> Self {
+        Self(Envelope::<NUM_STAGES, true>::new())
+    }
+
     pub fn set(&mut self, rate: &[u8; NUM_STAGES], level: [u8; NUM_STAGES], global_level: u8) {
         // Configure levels.
         for (i, level) in level.iter().enumerate().take(NUM_STAGES) {
@@ -214,10 +238,20 @@ impl<const NUM_STAGES: usize> OperatorEnvelope<NUM_STAGES> {
     }
 }
 
+impl<const NUM_STAGES: usize> Default for OperatorEnvelope<NUM_STAGES> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[derive(Debug)]
-pub struct PitchEnvelope<const NUM_STAGES: usize = 4>(Envelope<NUM_STAGES, true>);
+pub struct PitchEnvelope<const NUM_STAGES: usize = 4>(pub Envelope<NUM_STAGES, true>);
 
 impl<const NUM_STAGES: usize> PitchEnvelope<NUM_STAGES> {
+    pub fn new() -> Self {
+        Self(Envelope::<NUM_STAGES, true>::new())
+    }
+
     pub fn set(&mut self, rate: [u8; NUM_STAGES], level: [u8; NUM_STAGES]) {
         // Configure levels.
         for (i, level) in level.iter().enumerate().take(NUM_STAGES) {
@@ -238,5 +272,11 @@ impl<const NUM_STAGES: usize> PitchEnvelope<NUM_STAGES> {
 
             self.0.increment[i] = increment * self.0.scale;
         }
+    }
+}
+
+impl<const NUM_STAGES: usize> Default for PitchEnvelope<NUM_STAGES> {
+    fn default() -> Self {
+        Self::new()
     }
 }
