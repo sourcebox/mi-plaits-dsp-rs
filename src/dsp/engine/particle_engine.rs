@@ -37,14 +37,7 @@ pub struct ParticleEngine<'a> {
 impl<'a> ParticleEngine<'a> {
     pub fn new<T: GlobalAlloc>(buffer_allocator: &T, block_size: usize) -> Self {
         Self {
-            particle: [
-                Particle::new(),
-                Particle::new(),
-                Particle::new(),
-                Particle::new(),
-                Particle::new(),
-                Particle::new(),
-            ],
+            particle: core::array::from_fn(|_| Particle::new()),
             diffuser: Diffuser::new(),
             post_filter: Svf::new(),
             temp_buffer: allocate_buffer(buffer_allocator, block_size).unwrap(),

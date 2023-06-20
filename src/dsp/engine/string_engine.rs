@@ -36,11 +36,7 @@ pub struct StringEngine<'a> {
 impl<'a> StringEngine<'a> {
     pub fn new<T: GlobalAlloc>(buffer_allocator: &T, block_size: usize) -> Self {
         Self {
-            voice: [
-                StringVoice::new(buffer_allocator),
-                StringVoice::new(buffer_allocator),
-                StringVoice::new(buffer_allocator),
-            ],
+            voice: core::array::from_fn(|_| StringVoice::new(buffer_allocator)),
             f0: [0.0; NUM_STRINGS],
             f0_delay: DelayLine::<'a, f32, 16>::new(
                 allocate_buffer(buffer_allocator, 16)

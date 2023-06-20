@@ -45,20 +45,8 @@ impl<'a> ChordEngine<'a> {
 impl<'a> Default for ChordEngine<'a> {
     fn default() -> Self {
         Self {
-            divide_down_voice: [
-                StringSynthOscillator::default(),
-                StringSynthOscillator::default(),
-                StringSynthOscillator::default(),
-                StringSynthOscillator::default(),
-                StringSynthOscillator::default(),
-            ],
-            wavetable_voice: [
-                WavetableOscillator::default(),
-                WavetableOscillator::default(),
-                WavetableOscillator::default(),
-                WavetableOscillator::default(),
-                WavetableOscillator::default(),
-            ],
+            divide_down_voice: core::array::from_fn(|_| StringSynthOscillator::default()),
+            wavetable_voice: core::array::from_fn(|_| WavetableOscillator::default()),
             chords: ChordBank::new(),
             morph_lp: 0.0,
             timbre_lp: 0.0,

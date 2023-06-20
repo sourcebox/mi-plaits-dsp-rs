@@ -45,13 +45,7 @@ pub struct ChiptuneEngine {
 impl ChiptuneEngine {
     pub fn new() -> Self {
         Self {
-            voice: [
-                SuperSquareOscillator::new(),
-                SuperSquareOscillator::new(),
-                SuperSquareOscillator::new(),
-                SuperSquareOscillator::new(),
-                SuperSquareOscillator::new(),
-            ],
+            voice: core::array::from_fn(|_| SuperSquareOscillator::new()),
             bass: NesTriangleOscillator::new(),
 
             chords: ChordBank::new(),

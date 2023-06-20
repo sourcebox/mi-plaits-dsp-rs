@@ -31,16 +31,7 @@ pub struct SwarmEngine {
 impl SwarmEngine {
     pub fn new() -> Self {
         Self {
-            swarm_voice: [
-                SwarmVoice::default(),
-                SwarmVoice::default(),
-                SwarmVoice::default(),
-                SwarmVoice::default(),
-                SwarmVoice::default(),
-                SwarmVoice::default(),
-                SwarmVoice::default(),
-                SwarmVoice::default(),
-            ],
+            swarm_voice: core::array::from_fn(|_| SwarmVoice::default()),
         }
     }
 }

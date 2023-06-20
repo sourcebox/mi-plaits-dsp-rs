@@ -36,11 +36,9 @@ pub struct AdditiveEngine {
 impl Default for AdditiveEngine {
     fn default() -> Self {
         Self {
-            harmonic_oscillator: [
-                HarmonicOscillator::<HARMONIC_BATCH_SIZE>::default(),
-                HarmonicOscillator::<HARMONIC_BATCH_SIZE>::default(),
-                HarmonicOscillator::<HARMONIC_BATCH_SIZE>::default(),
-            ],
+            harmonic_oscillator: core::array::from_fn(|_| {
+                HarmonicOscillator::<HARMONIC_BATCH_SIZE>::default()
+            }),
             amplitudes: [0.0; NUM_HARMONICS],
         }
     }

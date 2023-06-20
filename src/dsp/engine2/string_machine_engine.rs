@@ -40,12 +40,7 @@ impl StringMachineEngine {
             chords: ChordBank::new(),
 
             ensemble: Ensemble::new(),
-            divide_down_voice: [
-                StringSynthOscillator::new(),
-                StringSynthOscillator::new(),
-                StringSynthOscillator::new(),
-                StringSynthOscillator::new(),
-            ],
+            divide_down_voice: core::array::from_fn(|_| StringSynthOscillator::new()),
             svf: [NaiveSvf::new(), NaiveSvf::new()],
 
             morph_lp: 0.0,
