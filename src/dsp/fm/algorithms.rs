@@ -130,18 +130,22 @@ impl<const NUM_OPERATORS: usize, const NUM_ALGORITHMS: usize>
     }
 
     fn opcode(&self, algorithm: u32, op: u32) -> u8 {
-        if NUM_OPERATORS == 4 {
+        if NUM_OPERATORS == 4 && NUM_ALGORITHMS == 8 {
             OPCODES_4_8[algorithm as usize][op as usize]
-        } else {
+        } else if NUM_OPERATORS == 6 && NUM_ALGORITHMS == 32 {
             OPCODES_6_32[algorithm as usize][op as usize]
+        } else {
+            panic!("Unsupported configuration of operators and algorithms.");
         }
     }
 
     fn renderers(&self) -> &[RendererSpecs] {
-        if NUM_OPERATORS == 4 {
+        if NUM_OPERATORS == 4 && NUM_ALGORITHMS == 8 {
             &RENDERERS_4
-        } else {
+        } else if NUM_OPERATORS == 6 && NUM_ALGORITHMS == 32 {
             &RENDERERS_6
+        } else {
+            panic!("Unsupported configuration of operators and algorithms.");
         }
     }
 }
