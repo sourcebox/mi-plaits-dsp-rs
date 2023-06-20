@@ -26,6 +26,14 @@ pub struct Algorithms<const NUM_OPERATORS: usize, const NUM_ALGORITHMS: usize> {
     render_call: [[RenderCall; NUM_OPERATORS]; NUM_ALGORITHMS],
 }
 
+impl<const NUM_OPERATORS: usize, const NUM_ALGORITHMS: usize> Default
+    for Algorithms<NUM_OPERATORS, NUM_ALGORITHMS>
+{
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl<const NUM_OPERATORS: usize, const NUM_ALGORITHMS: usize>
     Algorithms<NUM_OPERATORS, NUM_ALGORITHMS>
 {
