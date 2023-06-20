@@ -56,6 +56,10 @@ pub struct Lfo {
 }
 
 impl Lfo {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
     #[inline]
     pub fn init(&mut self, sample_rate: f32) {
         self.phase = 0.0;

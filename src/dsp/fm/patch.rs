@@ -2,7 +2,9 @@
 
 // Based on MIT-licensed code (c) 2021 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-#[derive(Debug, Default)]
+pub const SYX_SIZE: usize = 128;
+
+#[derive(Debug, Default, PartialEq, Eq)]
 pub struct Patch {
     pub op: [Operator; 6],
     pub pitch_envelope: Envelope,
@@ -16,6 +18,10 @@ pub struct Patch {
 }
 
 impl Patch {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
     pub fn unpack(&mut self, data: &[u8]) {
         for (i, op) in self.op.iter_mut().enumerate() {
             let op_data = &data[(i * 17)..];
@@ -80,13 +86,13 @@ impl Patch {
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, PartialEq, Eq)]
 pub struct Envelope {
     pub rate: [u8; 4],
     pub level: [u8; 4],
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, PartialEq, Eq)]
 pub struct KeyboardScaling {
     pub left_depth: u8,
     pub right_depth: u8,
@@ -95,7 +101,7 @@ pub struct KeyboardScaling {
     pub break_point: u8,
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, PartialEq, Eq)]
 pub struct Operator {
     pub envelope: Envelope,
     pub keyboard_scaling: KeyboardScaling,
@@ -111,7 +117,7 @@ pub struct Operator {
     pub detune: u8,
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, PartialEq, Eq)]
 pub struct ModulationParameters {
     pub delay: u8,
     pub rate: u8,

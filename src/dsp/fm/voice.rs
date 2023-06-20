@@ -30,6 +30,12 @@ pub struct VoiceParameters {
     pub amp_mod: f32,
 }
 
+impl VoiceParameters {
+    pub fn new() -> Self {
+        Self::default()
+    }
+}
+
 #[derive(Debug)]
 pub struct Voice<'a, const NUM_OPERATORS: usize, const NUM_ALGORITHMS: usize> {
     algorithms: Option<&'a Algorithms<NUM_OPERATORS, NUM_ALGORITHMS>>,
@@ -177,7 +183,7 @@ impl<'a, const NUM_OPERATORS: usize, const NUM_ALGORITHMS: usize>
     }
 
     #[inline]
-    pub fn render(&mut self, parameters: &VoiceParameters, buffers: [&mut [f32]; 4]) {
+    pub fn render(&mut self, parameters: &VoiceParameters, buffers: &mut [&mut [f32]; 4]) {
         if self.setup() {
             // This prevents a CPU overrun, since there is not enough CPU to perform
             // both a patch setup and a full render in the time alloted for
@@ -284,16 +290,20 @@ impl<'a, const NUM_OPERATORS: usize, const NUM_ALGORITHMS: usize>
                     .algorithms
                     .unwrap()
                     .render_call(patch.algorithm as u32, i as u32);
-                (call.render_fn)(
-                    &mut [&mut self.operator[i]],
-                    &[f[i]],
-                    &[a[i]],
-                    &mut self.feedback_state,
-                    patch.feedback as i32,
-                    buffers[call.input_index as usize],
-                    self.temp_buffer,
-                );
-                buffers[call.output_index as usize].copy_from_slice(self.temp_buffer);
+
+                if let Some(render_fn) = call.render_fn {
+                    render_fn(
+                        &mut [&mut self.operator[i]],
+                        &[f[i]],
+                        &[a[i]],
+                        &mut self.feedback_state,
+                        patch.feedback as i32,
+                        buffers[call.input_index as usize],
+                        self.temp_buffer,
+                    );
+
+                    buffers[call.output_index as usize].copy_from_slice(self.temp_buffer);
+                }
 
                 i += call.n as usize;
             }

@@ -29,6 +29,12 @@ pub struct Algorithms<const NUM_OPERATORS: usize, const NUM_ALGORITHMS: usize> {
 impl<const NUM_OPERATORS: usize, const NUM_ALGORITHMS: usize>
     Algorithms<NUM_OPERATORS, NUM_ALGORITHMS>
 {
+    pub fn new() -> Self {
+        Self {
+            render_call: core::array::from_fn(|_| core::array::from_fn(|_| RenderCall::new())),
+        }
+    }
+
     #[inline]
     pub fn init(&mut self) {
         for i in 0..NUM_ALGORITHMS {
@@ -113,7 +119,7 @@ impl<const NUM_OPERATORS: usize, const NUM_ALGORITHMS: usize>
 
                 if let Some(fn_) = fn_ {
                     let mut call = &mut self.render_call[algorithm as usize][i];
-                    call.render_fn = fn_;
+                    call.render_fn = Some(fn_);
                     call.n = n as u32;
                     call.input_index = ((opcode & OPCODE_SOURCE_MASK) >> 4) as u32;
                     call.output_index = (out_opcode & OPCODE_DESTINATION_MASK) as u32;
@@ -156,12 +162,18 @@ const OPCODE_SOURCE_FEEDBACK: u8 = 0x30;
 const OPCODE_ADDITIVE_FLAG: u8 = 0x04;
 const OPCODE_FEEDBACK_SOURCE_FLAG: u8 = 0x40;
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct RenderCall {
-    pub render_fn: RenderFn,
+    pub render_fn: Option<RenderFn>,
     pub n: u32,
     pub input_index: u32,
     pub output_index: u32,
+}
+
+impl RenderCall {
+    pub fn new() -> Self {
+        Self::default()
+    }
 }
 
 #[derive(Debug)]
