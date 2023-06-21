@@ -2,8 +2,6 @@
 
 // Based on MIT-licensed code (c) 2021 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-use super::operator::{render_operators, RenderFn};
-
 // Store information about all FM algorithms, and which functions to call
 // to render them.
 //
@@ -20,6 +18,8 @@ use super::operator::{render_operators, RenderFn};
 // Different code space and speed trade-off can be obtained by increasing the
 // palette of available renderers (for example by specializing the code for
 // a renderer rendering in a single pass a "tower" of 4 operators).
+
+use super::operator::{render_operators, RenderFn};
 
 #[derive(Debug)]
 pub struct Algorithms<const NUM_OPERATORS: usize, const NUM_ALGORITHMS: usize> {

@@ -293,9 +293,9 @@ impl<'a, const NUM_OPERATORS: usize, const NUM_ALGORITHMS: usize>
 
                 if let Some(render_fn) = call.render_fn {
                     render_fn(
-                        &mut [&mut self.operator[i]],
-                        &[f[i]],
-                        &[a[i]],
+                        &mut self.operator[i..],
+                        &f[i..],
+                        &a[i..],
                         &mut self.feedback_state,
                         patch.feedback as i32,
                         buffers[call.input_index as usize],

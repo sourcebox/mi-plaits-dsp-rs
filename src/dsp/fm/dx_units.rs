@@ -147,7 +147,7 @@ pub fn lfo_delay(delay: u8, increments: &mut [f32; 2]) {
 pub fn normalize_velocity(velocity: f32) -> f32 {
     // float cube_root = stmlib::Sqrt(
     //     0.7f * stmlib::Sqrt(velocity) + 0.3f * velocity);
-    let cube_root = interpolate(&LUT_CUBE_ROOT, velocity, 16.0);
+    let cube_root = interpolate(&LUT_CUBE_ROOT, f32::min(velocity, 0.99), 16.0);
 
     16.0 * (cube_root - 0.918)
 }
