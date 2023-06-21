@@ -62,7 +62,7 @@ pub fn pow_2_fast(mut x: f32, order: i32) -> f32 {
 //  99 = 127  (TL =   0)
 #[inline]
 pub fn operator_level(level: u8) -> u8 {
-    let mut tlc = level;
+    let mut tlc = level as u32;
 
     if level < 20 {
         tlc = if tlc < 15 {
@@ -74,7 +74,7 @@ pub fn operator_level(level: u8) -> u8 {
         tlc += 28;
     }
 
-    tlc
+    tlc as u8
 }
 
 // Convert an envelope level from 0-99 to an octave shift.
@@ -114,7 +114,11 @@ const MIN_LFO_FREQUENCY: f32 = 0.005865;
 // Convert an LFO rate from 0-99 to a frequency.
 #[inline]
 pub fn lfo_frequency(rate: u8) -> f32 {
-    let mut rate_scaled = if rate == 0 { 1 } else { (rate * 165) >> 6 };
+    let mut rate_scaled = if rate == 0 {
+        1
+    } else {
+        (rate as u32 * 165) >> 6
+    };
     rate_scaled *= if rate_scaled < 160 {
         11
     } else {

@@ -9,7 +9,7 @@
 
 use core::alloc::GlobalAlloc;
 
-use crate::dsp::engine::{note_to_frequency, Engine, EngineParameters, TriggerState};
+use crate::dsp::engine::{Engine, EngineParameters, TriggerState};
 use crate::dsp::fm::{
     algorithms::Algorithms,
     lfo::Lfo,
@@ -23,11 +23,13 @@ use crate::stmlib::dsp::soft_clip;
 const NUM_SIX_OP_VOICES: usize = 2;
 const NUM_PATCHES_PER_BANK: usize = 32;
 
+static mut ALGORITHMS: Option<Algorithms<6, 32>> = None;
+
+static mut PATCHES: Option<[Patch; NUM_PATCHES_PER_BANK]> = None;
+
 #[derive(Debug)]
 pub struct SixOpEngine<'a> {
     patch_index_quantizer: HysteresisQuantizer2,
-    algorithms: Algorithms<6, 32>,
-    patches: [Patch; NUM_PATCHES_PER_BANK],
     voice: [FmVoice<'a>; NUM_SIX_OP_VOICES],
 
     temp_buffer_1: &'a mut [f32],
@@ -42,11 +44,16 @@ pub struct SixOpEngine<'a> {
 }
 
 impl<'a> SixOpEngine<'a> {
-    pub fn new<T: GlobalAlloc>(buffer_allocator: &T, block_size: usize) -> Self {
+    pub fn new<A: GlobalAlloc>(buffer_allocator: &A, block_size: usize) -> Self {
+        unsafe {
+            let mut algorithms = Algorithms::<6, 32>::new();
+            algorithms.init();
+            ALGORITHMS = Some(algorithms);
+            let patches: [Patch; NUM_PATCHES_PER_BANK] = core::array::from_fn(|_| Patch::new());
+            PATCHES = Some(patches);
+        }
         Self {
             patch_index_quantizer: HysteresisQuantizer2::new(),
-            algorithms: Algorithms::<6, 32>::new(),
-            patches: core::array::from_fn(|_| Patch::new()),
             voice: core::array::from_fn(|_| FmVoice::new(buffer_allocator, block_size)),
             temp_buffer_1: allocate_buffer(buffer_allocator, block_size).unwrap(),
             temp_buffer_2: allocate_buffer(buffer_allocator, block_size).unwrap(),
@@ -60,7 +67,8 @@ impl<'a> SixOpEngine<'a> {
     }
 
     pub fn load_syx_bank(&mut self, bank: &[u8; 4096]) {
-        for (i, patch) in self.patches.iter_mut().enumerate() {
+        let patches = unsafe { PATCHES.as_mut().unwrap() };
+        for (i, patch) in patches.iter_mut().enumerate() {
             (*patch).unpack(&bank[i * SYX_SIZE..]);
         }
     }
@@ -70,11 +78,10 @@ impl<'a> Engine for SixOpEngine<'a> {
     fn init(&mut self) {
         self.patch_index_quantizer.init(32, 0.005, false);
 
-        self.algorithms.init();
-
         for voice in self.voice.iter_mut() {
-            // TODO: fix lifetime issues
-            // voice.init(&self.algorithms, SAMPLE_RATE);
+            unsafe {
+                voice.init(ALGORITHMS.as_ref().unwrap(), SAMPLE_RATE);
+            }
         }
 
         self.active_voice = (NUM_SIX_OP_VOICES - 1) as i32;
@@ -100,8 +107,8 @@ impl<'a> Engine for SixOpEngine<'a> {
             let amp_mod = self.voice[0].lfo().amp_mod();
 
             for (i, voice) in self.voice.iter_mut().enumerate() {
-                // TODO: fix lifetime issues
-                // voice.load_patch(Some(&self.patches[patch_index as usize]));
+                let patches = unsafe { PATCHES.as_ref().unwrap() };
+                voice.load_patch(Some(&patches[patch_index as usize]));
                 let p = voice.mutable_parameters();
                 p.sustain = i == 0;
                 p.gate = false;
@@ -114,9 +121,9 @@ impl<'a> Engine for SixOpEngine<'a> {
         } else {
             if parameters.trigger == TriggerState::RisingEdge {
                 self.active_voice = (self.active_voice + 1) % NUM_SIX_OP_VOICES as i32;
-                // TODO: fix lifetime issues
-                // self.voice[self.active_voice as usize]
-                //     .load_patch(Some(&self.patches[patch_index as usize]));
+                let patches = unsafe { PATCHES.as_ref().unwrap() };
+                self.voice[self.active_voice as usize]
+                    .load_patch(Some(&patches[patch_index as usize]));
                 self.voice[self.active_voice as usize].mutable_lfo().reset();
             }
             let p = self.voice[self.active_voice as usize].mutable_parameters();

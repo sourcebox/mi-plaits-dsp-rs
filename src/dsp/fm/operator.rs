@@ -85,7 +85,7 @@ pub fn render_operators<const N: usize, const MODULATION_SOURCE: i32, const ADDI
         }
 
         for i in 0..N {
-            phase[i] += frequency[i];
+            phase[i] = phase[i].wrapping_add(frequency[i]);
             pm = sine_pm(phase[i], pm) * amplitude[i];
             amplitude[i] += amplitude_increment[i];
             if i == MODULATION_SOURCE as usize {
