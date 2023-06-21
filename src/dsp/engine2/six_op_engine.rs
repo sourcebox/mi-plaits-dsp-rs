@@ -34,7 +34,8 @@ pub struct SixOpEngine<'a> {
     temp_buffer_2: &'a mut [f32],
     temp_buffer_3: &'a mut [f32],
     temp_buffer_4: &'a mut [f32],
-    acc_buffer: &'a mut [f32],
+    acc_buffer_1: &'a mut [f32],
+    acc_buffer_2: &'a mut [f32],
 
     active_voice: i32,
     rendered_voice: i32,
@@ -51,7 +52,8 @@ impl<'a> SixOpEngine<'a> {
             temp_buffer_2: allocate_buffer(buffer_allocator, block_size).unwrap(),
             temp_buffer_3: allocate_buffer(buffer_allocator, block_size).unwrap(),
             temp_buffer_4: allocate_buffer(buffer_allocator, block_size).unwrap(),
-            acc_buffer: allocate_buffer(buffer_allocator, block_size * NUM_SIX_OP_VOICES).unwrap(),
+            acc_buffer_1: allocate_buffer(buffer_allocator, block_size).unwrap(),
+            acc_buffer_2: allocate_buffer(buffer_allocator, block_size).unwrap(),
             active_voice: 0,
             rendered_voice: 0,
         }
@@ -86,9 +88,6 @@ impl<'a> Engine for SixOpEngine<'a> {
         aux: &mut [f32],
         _already_enveloped: &mut bool,
     ) {
-        // TODO: remove after fixes
-        return;
-
         let patch_index = self
             .patch_index_quantizer
             .process(parameters.harmonics * 1.02);
@@ -97,18 +96,20 @@ impl<'a> Engine for SixOpEngine<'a> {
             let t = parameters.morph;
             self.voice[0].mutable_lfo().scrub(2.0 * SAMPLE_RATE * t);
 
+            let pitch_mod = self.voice[0].lfo().pitch_mod();
+            let amp_mod = self.voice[0].lfo().amp_mod();
+
             for (i, voice) in self.voice.iter_mut().enumerate() {
                 // TODO: fix lifetime issues
                 // voice.load_patch(Some(&self.patches[patch_index as usize]));
                 let p = voice.mutable_parameters();
-                p.sustain = if i == 0 { true } else { false };
+                p.sustain = i == 0;
                 p.gate = false;
                 p.note = parameters.note;
                 p.velocity = parameters.accent;
                 p.brightness = parameters.timbre;
                 p.envelope_control = t;
-                // TODO: fix mutability issues
-                // voice.set_modulations(self.voice[0].lfo());
+                voice.set_modulations(pitch_mod, amp_mod);
             }
         } else {
             if parameters.trigger == TriggerState::RisingEdge {
@@ -126,30 +127,35 @@ impl<'a> Engine for SixOpEngine<'a> {
                 .mutable_lfo()
                 .step(out.len() as f32);
 
+            let active_voice_lfo = self.voice[self.active_voice as usize].lfo();
+            let active_voice_pitch_mod = active_voice_lfo.pitch_mod();
+            let active_voice_amp_mod = active_voice_lfo.amp_mod();
+            let active_voice_patch = self.voice[self.active_voice as usize].patch();
+            let mut voice_patch_changed = [false; NUM_SIX_OP_VOICES];
+
+            for (i, voice) in self.voice.iter().enumerate() {
+                if voice.patch() != active_voice_patch {
+                    voice_patch_changed[i] = true;
+                }
+            }
+
             for (i, voice) in self.voice.iter_mut().enumerate() {
                 let p = voice.mutable_parameters();
                 p.brightness = parameters.timbre;
                 p.sustain = false;
                 p.gate =
                     (parameters.trigger == TriggerState::High) && (i == self.active_voice as usize);
-                // TODO: fix mutability issues
-                // if voice.patch() != self.voice[self.active_voice as usize].patch() {
-                //     voice.mutable_lfo().step(out.len() as f32);
-                //     voice.set_modulations(voice.lfo());
-                // } else {
-                //     voice.set_modulations(self.voice[self.active_voice as usize].lfo());
-                // }
+                if voice_patch_changed[i] {
+                    voice.mutable_lfo().step(out.len() as f32);
+                    voice.set_modulations(voice.lfo().pitch_mod(), voice.lfo().amp_mod());
+                } else {
+                    voice.set_modulations(active_voice_pitch_mod, active_voice_amp_mod);
+                }
             }
         }
 
-        // Naive block rendering.
-        // fill(temp_buffer_[0], temp_buffer_[size], 0.0f);
-        // for (int i = 0; i < kNumSixOpVoices; ++i) {
-        //   voice_[i].Render(temp_buffer_, size);
-        // }
-
         // Staggered rendering.
-        self.temp_buffer_1.copy_from_slice(self.acc_buffer);
+        self.temp_buffer_1.copy_from_slice(self.acc_buffer_1);
         self.temp_buffer_2.fill(0.0);
         self.rendered_voice = (self.rendered_voice + 1) % NUM_SIX_OP_VOICES as i32;
 
@@ -166,7 +172,7 @@ impl<'a> Engine for SixOpEngine<'a> {
             *aux_sample = *out_sample;
         }
 
-        self.acc_buffer.copy_from_slice(self.temp_buffer_2);
+        self.acc_buffer_1.copy_from_slice(self.temp_buffer_2);
     }
 }
 
@@ -252,8 +258,8 @@ impl<'a> FmVoice<'a> {
     }
 
     #[inline]
-    pub fn set_modulations(&mut self, lfo: &Lfo) {
-        self.parameters.pitch_mod = lfo.pitch_mod();
-        self.parameters.amp_mod = lfo.amp_mod();
+    pub fn set_modulations(&mut self, pitch_mod: f32, amp_mod: f32) {
+        self.parameters.pitch_mod = pitch_mod;
+        self.parameters.amp_mod = amp_mod;
     }
 }
