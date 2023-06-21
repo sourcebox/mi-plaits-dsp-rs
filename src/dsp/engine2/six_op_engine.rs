@@ -36,8 +36,7 @@ pub struct SixOpEngine<'a> {
     temp_buffer_2: &'a mut [f32],
     temp_buffer_3: &'a mut [f32],
     temp_buffer_4: &'a mut [f32],
-    acc_buffer_1: &'a mut [f32],
-    acc_buffer_2: &'a mut [f32],
+    acc_buffer: &'a mut [f32],
 
     active_voice: i32,
     rendered_voice: i32,
@@ -59,8 +58,7 @@ impl<'a> SixOpEngine<'a> {
             temp_buffer_2: allocate_buffer(buffer_allocator, block_size).unwrap(),
             temp_buffer_3: allocate_buffer(buffer_allocator, block_size).unwrap(),
             temp_buffer_4: allocate_buffer(buffer_allocator, block_size).unwrap(),
-            acc_buffer_1: allocate_buffer(buffer_allocator, block_size).unwrap(),
-            acc_buffer_2: allocate_buffer(buffer_allocator, block_size).unwrap(),
+            acc_buffer: allocate_buffer(buffer_allocator, block_size).unwrap(),
             active_voice: 0,
             rendered_voice: 0,
         }
@@ -138,6 +136,7 @@ impl<'a> Engine for SixOpEngine<'a> {
             let active_voice_pitch_mod = active_voice_lfo.pitch_mod();
             let active_voice_amp_mod = active_voice_lfo.amp_mod();
             let active_voice_patch = self.voice[self.active_voice as usize].patch();
+
             let mut voice_patch_changed = [false; NUM_SIX_OP_VOICES];
 
             for (i, voice) in self.voice.iter().enumerate() {
@@ -161,25 +160,37 @@ impl<'a> Engine for SixOpEngine<'a> {
             }
         }
 
-        // Staggered rendering.
-        self.temp_buffer_1.copy_from_slice(self.acc_buffer_1);
-        self.temp_buffer_2.fill(0.0);
-        self.rendered_voice = (self.rendered_voice + 1) % NUM_SIX_OP_VOICES as i32;
+        // TODO: change hard-coded 2 voice rendering to generic rendering
 
+        self.temp_buffer_2.fill(0.0);
+
+        #[allow(clippy::useless_asref)]
         let mut buffers = [
             self.temp_buffer_1.as_mut(),
             self.temp_buffer_2.as_mut(),
             self.temp_buffer_3.as_mut(),
             self.temp_buffer_4.as_mut(),
         ];
-        self.voice[self.rendered_voice as usize].render(&mut buffers);
+
+        self.voice[0].render(&mut buffers);
+
+        self.acc_buffer.copy_from_slice(self.temp_buffer_2);
+        self.temp_buffer_2.fill(0.0);
+
+        #[allow(clippy::useless_asref)]
+        let mut buffers = [
+            self.temp_buffer_1.as_mut(),
+            self.temp_buffer_2.as_mut(),
+            self.temp_buffer_3.as_mut(),
+            self.temp_buffer_4.as_mut(),
+        ];
+
+        self.voice[1].render(&mut buffers);
 
         for (i, (out_sample, aux_sample)) in out.iter_mut().zip(aux.iter_mut()).enumerate() {
-            *out_sample = soft_clip(self.temp_buffer_1[i] * 0.25);
+            *out_sample = soft_clip((self.temp_buffer_2[i] + self.acc_buffer[i]) * 0.25);
             *aux_sample = *out_sample;
         }
-
-        self.acc_buffer_1.copy_from_slice(self.temp_buffer_2);
     }
 }
 

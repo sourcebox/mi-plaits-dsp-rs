@@ -208,7 +208,7 @@ impl<const NUM_STAGES: usize> OperatorEnvelope<NUM_STAGES> {
 
         // Configure increments.
         for i in 0..NUM_STAGES {
-            let mut increment = operator_envelope_increment(rate[i] as i32);
+            let mut increment = operator_envelope_increment(rate[i]);
             let mut from = self.0.level[(i + NUM_STAGES - 1) % NUM_STAGES];
             let mut to = self.0.level[i];
 
@@ -245,11 +245,11 @@ impl<const NUM_STAGES: usize> Default for OperatorEnvelope<NUM_STAGES> {
 }
 
 #[derive(Debug)]
-pub struct PitchEnvelope<const NUM_STAGES: usize = 4>(pub Envelope<NUM_STAGES, true>);
+pub struct PitchEnvelope<const NUM_STAGES: usize = 4>(pub Envelope<NUM_STAGES, false>);
 
 impl<const NUM_STAGES: usize> PitchEnvelope<NUM_STAGES> {
     pub fn new() -> Self {
-        Self(Envelope::<NUM_STAGES, true>::new())
+        Self(Envelope::<NUM_STAGES, false>::new())
     }
 
     pub fn set(&mut self, rate: [u8; NUM_STAGES], level: [u8; NUM_STAGES]) {

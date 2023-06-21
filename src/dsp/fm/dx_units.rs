@@ -93,8 +93,8 @@ pub fn pitch_envelope_level(level: u8) -> f32 {
 
 // Convert an operator envelope rate from 0-99 to a frequency.
 #[inline]
-pub fn operator_envelope_increment(rate: i32) -> f32 {
-    let rate_scaled = (rate * 41) >> 6;
+pub fn operator_envelope_increment(rate: u8) -> f32 {
+    let rate_scaled = (rate as i32 * 41) >> 6;
     let mantissa = 4 + (rate_scaled & 3);
     let exponent = 2 + (rate_scaled >> 2);
 
