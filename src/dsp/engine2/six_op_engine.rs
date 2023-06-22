@@ -66,8 +66,13 @@ impl<'a> SixOpEngine<'a> {
 
     pub fn load_syx_bank(&mut self, bank: &[u8; 4096]) {
         let patches = unsafe { PATCHES.as_mut().unwrap() };
+
         for (i, patch) in patches.iter_mut().enumerate() {
             (*patch).unpack(&bank[i * SYX_SIZE..]);
+        }
+
+        for voice in self.voice.iter_mut() {
+            voice.unload_patch();
         }
     }
 }
@@ -95,7 +100,7 @@ impl<'a> Engine for SixOpEngine<'a> {
     ) {
         let patch_index = self
             .patch_index_quantizer
-            .process(parameters.harmonics * 1.02);
+            .process(parameters.harmonics * 1.02) as usize;
 
         if parameters.trigger == TriggerState::Unpatched {
             let t = parameters.morph;
@@ -106,7 +111,7 @@ impl<'a> Engine for SixOpEngine<'a> {
 
             for (i, voice) in self.voice.iter_mut().enumerate() {
                 let patches = unsafe { PATCHES.as_ref().unwrap() };
-                voice.load_patch(Some(&patches[patch_index as usize]));
+                voice.load_patch(Some(&patches[patch_index]));
                 let p = voice.mutable_parameters();
                 p.sustain = i == 0;
                 p.gate = false;
@@ -120,8 +125,7 @@ impl<'a> Engine for SixOpEngine<'a> {
             if parameters.trigger == TriggerState::RisingEdge {
                 self.active_voice = (self.active_voice + 1) % NUM_SIX_OP_VOICES as i32;
                 let patches = unsafe { PATCHES.as_ref().unwrap() };
-                self.voice[self.active_voice as usize]
-                    .load_patch(Some(&patches[patch_index as usize]));
+                self.voice[self.active_voice as usize].load_patch(Some(&patches[patch_index]));
                 self.voice[self.active_voice as usize].mutable_lfo().reset();
             }
             let p = self.voice[self.active_voice as usize].mutable_parameters();
