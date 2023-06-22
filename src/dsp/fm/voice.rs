@@ -152,13 +152,13 @@ impl<'a, const NUM_OPERATORS: usize, const NUM_ALGORITHMS: usize>
 
         if let Some(patch) = self.patch {
             self.pitch_envelope
-                .set(patch.pitch_envelope.rate, patch.pitch_envelope.level);
+                .set(&patch.pitch_envelope.rate, &patch.pitch_envelope.level);
 
             for i in 0..NUM_OPERATORS {
                 let op = &patch.op[i];
 
                 let level = operator_level(op.level);
-                self.operator_envelope[i].set(&op.envelope.rate, op.envelope.level, level);
+                self.operator_envelope[i].set(&op.envelope.rate, &op.envelope.level, level);
 
                 // The level increase caused by keyboard scaling plus velocity
                 // scaling should not exceed this number - otherwise it would be

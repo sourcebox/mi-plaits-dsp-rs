@@ -193,7 +193,7 @@ impl<const NUM_STAGES: usize> OperatorEnvelope<NUM_STAGES> {
         Self(Envelope::<NUM_STAGES, true>::new())
     }
 
-    pub fn set(&mut self, rate: &[u8; NUM_STAGES], level: [u8; NUM_STAGES], global_level: u8) {
+    pub fn set(&mut self, rate: &[u8; NUM_STAGES], level: &[u8; NUM_STAGES], global_level: u8) {
         // Configure levels.
         for (i, level) in level.iter().enumerate().take(NUM_STAGES) {
             let mut level_scaled = operator_level(*level) as i32;
@@ -252,7 +252,7 @@ impl<const NUM_STAGES: usize> PitchEnvelope<NUM_STAGES> {
         Self(Envelope::<NUM_STAGES, false>::new())
     }
 
-    pub fn set(&mut self, rate: [u8; NUM_STAGES], level: [u8; NUM_STAGES]) {
+    pub fn set(&mut self, rate: &[u8; NUM_STAGES], level: &[u8; NUM_STAGES]) {
         // Configure levels.
         for (i, level) in level.iter().enumerate().take(NUM_STAGES) {
             self.0.level[i] = pitch_envelope_level(*level);
