@@ -215,7 +215,7 @@ impl<const NUM_STAGES: usize> OperatorEnvelope<NUM_STAGES> {
             if from == to {
                 // Quirk: for plateaux, the increment is scaled.
                 increment *= 0.6;
-                if i == 0 && level[i] != 0 {
+                if i == 0 && level[i] == 0 {
                     // Quirk: the attack plateau is faster.
                     increment *= 20.0;
                 }
