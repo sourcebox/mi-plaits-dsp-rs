@@ -137,6 +137,34 @@ pub struct Modulations {
     pub level_patched: bool,
 }
 
+/// Resources used by some of the engines. The provided data is loaded when an engine
+/// is selected. Call `Voice::reload_resources` to force an update without changing the engine.
+#[derive(Debug, Clone)]
+pub struct Resources<'a> {
+    /// Sysex bank for six op engine 2. Default is integrated `SYX_BANK_0`.
+    pub syx_bank_a: &'a [u8; 4096],
+
+    /// Sysex bank for six op engine 3. Default is integrated `SYX_BANK_1`.
+    pub syx_bank_b: &'a [u8; 4096],
+
+    /// Sysex bank for six op engine 4. Default is integrated `SYX_BANK_2`.
+    pub syx_bank_c: &'a [u8; 4096],
+
+    /// User terrain for the wave terrain engine. Default is `None`.
+    pub wave_terrain: Option<&'a [i16]>,
+}
+
+impl<'a> Default for Resources<'a> {
+    fn default() -> Self {
+        Self {
+            syx_bank_a: &SYX_BANK_0,
+            syx_bank_b: &SYX_BANK_1,
+            syx_bank_c: &SYX_BANK_2,
+            wave_terrain: None,
+        }
+    }
+}
+
 #[derive(Debug)]
 pub struct Voice<'a> {
     pub additive_engine: AdditiveEngine,
@@ -162,9 +190,11 @@ pub struct Voice<'a> {
     pub wavetable_engine: WavetableEngine,
     pub waveterrain_engine: WaveTerrainEngine<'a>,
 
+    pub resources: Resources<'a>,
+
     engine_quantizer: HysteresisQuantizer2,
 
-    reload_user_data: bool,
+    reload_resources: bool,
     previous_engine_index: usize,
     engine_cv: f32,
 
@@ -206,8 +236,10 @@ impl<'a> Voice<'a> {
             wavetable_engine: WavetableEngine::new(),
             waveterrain_engine: WaveTerrainEngine::new(buffer_allocator, block_size),
 
+            resources: Resources::default(),
+
             engine_quantizer: HysteresisQuantizer2::new(),
-            reload_user_data: false,
+            reload_resources: false,
             previous_engine_index: 0,
             engine_cv: 0.0,
 
@@ -242,8 +274,8 @@ impl<'a> Voice<'a> {
     }
 
     #[inline]
-    pub fn reload_user_data(&mut self) {
-        self.reload_user_data = true;
+    pub fn reload_resources(&mut self) {
+        self.reload_resources = true;
     }
 
     #[inline]
@@ -286,16 +318,20 @@ impl<'a> Voice<'a> {
                 .process_with_base(patch.engine as i32, self.engine_cv) as usize;
         engine_index = engine_index.clamp(0, NUM_ENGINES);
 
-        if engine_index != self.previous_engine_index || self.reload_user_data {
+        if engine_index != self.previous_engine_index || self.reload_resources {
             match engine_index {
                 2 => {
-                    self.six_op_engine.load_syx_bank(&SYX_BANK_0);
+                    self.six_op_engine.load_syx_bank(self.resources.syx_bank_a);
                 }
                 3 => {
-                    self.six_op_engine.load_syx_bank(&SYX_BANK_1);
+                    self.six_op_engine.load_syx_bank(self.resources.syx_bank_b);
                 }
                 4 => {
-                    self.six_op_engine.load_syx_bank(&SYX_BANK_2);
+                    self.six_op_engine.load_syx_bank(self.resources.syx_bank_c);
+                }
+                5 => {
+                    self.waveterrain_engine
+                        .set_user_terrain(self.resources.wave_terrain);
                 }
                 _ => {}
             }
@@ -305,7 +341,7 @@ impl<'a> Voice<'a> {
 
             self.out_post_processor.reset();
             self.previous_engine_index = engine_index;
-            self.reload_user_data = false;
+            self.reload_resources = false;
         }
 
         let mut p = EngineParameters::default();
