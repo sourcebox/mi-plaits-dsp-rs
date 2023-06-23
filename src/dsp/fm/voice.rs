@@ -292,6 +292,10 @@ impl<'a, const NUM_OPERATORS: usize, const NUM_ALGORITHMS: usize>
                     .render_call(patch.algorithm as u32, i as u32);
 
                 if let Some(render_fn) = call.render_fn {
+                    let output_index = call.output_index as usize;
+
+                    self.temp_buffer.copy_from_slice(buffers[output_index]);
+
                     render_fn(
                         &mut self.operator[i..],
                         &f[i..],
@@ -301,8 +305,6 @@ impl<'a, const NUM_OPERATORS: usize, const NUM_ALGORITHMS: usize>
                         buffers[call.input_index as usize],
                         self.temp_buffer,
                     );
-
-                    let output_index = call.output_index as usize;
 
                     buffers[output_index].copy_from_slice(self.temp_buffer);
 

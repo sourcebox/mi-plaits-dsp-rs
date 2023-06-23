@@ -166,7 +166,7 @@ impl<'a> Engine for SixOpEngine<'a> {
 
         // TODO: change hard-coded 2 voice rendering to generic rendering
 
-        self.temp_buffer_2.fill(0.0);
+        self.temp_buffer_1.fill(0.0);
 
         #[allow(clippy::useless_asref)]
         let mut buffers = [
@@ -178,8 +178,8 @@ impl<'a> Engine for SixOpEngine<'a> {
 
         self.voice[0].render(&mut buffers);
 
-        self.acc_buffer.copy_from_slice(self.temp_buffer_2);
-        self.temp_buffer_2.fill(0.0);
+        self.acc_buffer.copy_from_slice(self.temp_buffer_1);
+        self.temp_buffer_1.fill(0.0);
 
         #[allow(clippy::useless_asref)]
         let mut buffers = [
@@ -192,7 +192,7 @@ impl<'a> Engine for SixOpEngine<'a> {
         self.voice[1].render(&mut buffers);
 
         for (i, (out_sample, aux_sample)) in out.iter_mut().zip(aux.iter_mut()).enumerate() {
-            *out_sample = soft_clip((self.temp_buffer_2[i] + self.acc_buffer[i]) * 0.25);
+            *out_sample = soft_clip((self.temp_buffer_1[i] + self.acc_buffer[i]) * 0.25);
             *aux_sample = *out_sample;
         }
     }
