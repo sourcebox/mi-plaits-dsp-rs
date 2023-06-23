@@ -141,9 +141,9 @@ impl<'a, const NUM_OPERATORS: usize, const NUM_ALGORITHMS: usize>
         self.dirty = true;
     }
 
-    // Pre-compute everything that can be pre-computed once a patch is loaded:
-    // - envelope constants
-    // - frequency ratios
+    /// Pre-compute everything that can be pre-computed once a patch is loaded:
+    /// - envelope constants
+    /// - frequency ratios
     #[inline]
     pub fn setup(&mut self) -> bool {
         if !self.dirty {

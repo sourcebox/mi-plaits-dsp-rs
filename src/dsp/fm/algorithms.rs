@@ -1,23 +1,23 @@
 //! FM Algorithms and how to render them.
+//!
+//! Store information about all FM algorithms, and which functions to call
+//! to render them.
+//!
+//! The raw structure of each algorithm is stored as a sequence of "opcodes",
+//! where each opcode indicates, for each operator, from where does it get
+//! its phase modulation signal and to which buffer it writes the result.
+//! This data is compact - 1 byte / algorithm / operator.
+//!
+//! At run time, this data is "compiled" into a sequence of function calls
+//! to pre-compiled renderers. A renderer is specialized to efficiently render
+//! (without any branching, and as much loop unrolling as possible) one
+//! operator or a group of operators.
+//!
+//! Different code space and speed trade-off can be obtained by increasing the
+//! palette of available renderers (for example by specializing the code for
+//! a renderer rendering in a single pass a "tower" of 4 operators).
 
 // Based on MIT-licensed code (c) 2021 by Emilie Gillet (emilie.o.gillet@gmail.com)
-
-// Store information about all FM algorithms, and which functions to call
-// to render them.
-//
-// The raw structure of each algorithm is stored as a sequence of "opcodes",
-// where each opcode indicates, for each operator, from where does it get
-// its phase modulation signal and to which buffer it writes the result.
-// This data is compact - 1 byte / algorithm / operator.
-//
-// At run time, this data is "compiled" into a sequence of function calls
-// to pre-compiled renderers. A renderer is specialized to efficiently render
-// (without any branching, and as much loop unrolling as possible) one
-// operator or a group of operators.
-//
-// Different code space and speed trade-off can be obtained by increasing the
-// palette of available renderers (for example by specializing the code for
-// a renderer rendering in a single pass a "tower" of 4 operators).
 
 use super::operator::{render_operators, RenderFn};
 

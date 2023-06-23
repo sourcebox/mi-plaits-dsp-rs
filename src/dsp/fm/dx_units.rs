@@ -11,10 +11,10 @@ use super::patch::{KeyboardScaling, Operator};
 use crate::stmlib::dsp::interpolate;
 use crate::stmlib::dsp::units::semitones_to_ratio_safe;
 
-// Computes 2^x by using a polynomial approximation of 2^frac(x) and directly
-// incrementing the exponent of the IEEE 754 representation of the result
-// by int(x). Depending on the use case, the order of the polynomial
-// approximation can be chosen.
+/// Computes 2^x by using a polynomial approximation of 2^frac(x) and directly
+/// incrementing the exponent of the IEEE 754 representation of the result
+/// by int(x). Depending on the use case, the order of the polynomial
+/// approximation can be chosen.
 #[inline]
 pub fn pow_2_fast(mut x: f32, order: i32) -> f32 {
     #[repr(C)]
@@ -54,12 +54,14 @@ pub fn pow_2_fast(mut x: f32, order: i32) -> f32 {
     unsafe { r.f }
 }
 
-// Convert an operator (envelope) level from 0-99 to the complement of the
-// "TL" value.
-//   0 =   0  (TL = 127)
-//  20 =  48  (TL =  79)
-//  50 =  78  (TL =  49)
-//  99 = 127  (TL =   0)
+/// Convert an operator (envelope) level from 0-99 to the complement of the "TL" value.
+///
+/// ```norust
+///      0 =   0  (TL = 127)
+///     20 =  48  (TL =  79)
+///     50 =  78  (TL =  49)
+///     99 = 127  (TL =   0)
+/// ```
 #[inline]
 pub fn operator_level(level: u8) -> u8 {
     let mut tlc = level as u32;
@@ -77,12 +79,15 @@ pub fn operator_level(level: u8) -> u8 {
     tlc as u8
 }
 
-// Convert an envelope level from 0-99 to an octave shift.
-//  0 = -4 octave
-// 18 = -1 octave
-// 50 =  0
-// 82 = +1 octave
-// 99 = +4 octave
+/// Convert an envelope level from 0-99 to an octave shift.
+///
+/// ```norust
+///      0 = -4 octave
+///     18 = -1 octave
+///     50 =  0
+///     82 = +1 octave
+///     99 = +4 octave
+/// ```
 #[inline]
 pub fn pitch_envelope_level(level: u8) -> f32 {
     let l = (level as f32 - 50.0) / 32.0;
@@ -91,7 +96,7 @@ pub fn pitch_envelope_level(level: u8) -> f32 {
     l * (1.0 + tail * tail * 5.3056)
 }
 
-// Convert an operator envelope rate from 0-99 to a frequency.
+/// Convert an operator envelope rate from 0-99 to a frequency.
 #[inline]
 pub fn operator_envelope_increment(rate: u8) -> f32 {
     let rate_scaled = (rate as i32 * 41) >> 6;
@@ -101,7 +106,7 @@ pub fn operator_envelope_increment(rate: u8) -> f32 {
     (mantissa << exponent) as f32 / (1 << 24) as f32
 }
 
-// Convert a pitch envelope rate from 0-99 to a frequency.
+/// Convert a pitch envelope rate from 0-99 to a frequency.
 #[inline]
 pub fn pitch_envelope_increment(rate: u8) -> f32 {
     let r = rate as f32 * 0.01;
@@ -111,7 +116,7 @@ pub fn pitch_envelope_increment(rate: u8) -> f32 {
 
 const MIN_LFO_FREQUENCY: f32 = 0.005865;
 
-// Convert an LFO rate from 0-99 to a frequency.
+/// Convert an LFO rate from 0-99 to a frequency.
 #[inline]
 pub fn lfo_frequency(rate: u8) -> f32 {
     let mut rate_scaled = if rate == 0 {
@@ -128,7 +133,7 @@ pub fn lfo_frequency(rate: u8) -> f32 {
     rate_scaled as f32 * MIN_LFO_FREQUENCY
 }
 
-// Convert an LFO delay from 0-99 to the two increments.
+/// Convert an LFO delay from 0-99 to the two increments.
 #[inline]
 pub fn lfo_delay(delay: u8, increments: &mut [f32; 2]) {
     if delay == 0 {
@@ -142,7 +147,7 @@ pub fn lfo_delay(delay: u8, increments: &mut [f32; 2]) {
     }
 }
 
-// Pre-process the velocity to easily compute the velocity scaling.
+/// Pre-process the velocity to easily compute the velocity scaling.
 #[inline]
 pub fn normalize_velocity(velocity: f32) -> f32 {
     // float cube_root = stmlib::Sqrt(
@@ -152,25 +157,25 @@ pub fn normalize_velocity(velocity: f32) -> f32 {
     16.0 * (cube_root - 0.918)
 }
 
-// MIDI note to envelope increment ratio.
+/// MIDI note to envelope increment ratio.
 #[inline]
 pub fn rate_scaling(note: f32, rate_scaling: u8) -> f32 {
     pow_2_fast(rate_scaling as f32 * (note * 0.33333 - 7.0) * 0.03125, 1)
 }
 
-// Operator amplitude modulation sensitivity (0-3).
+/// Operator amplitude modulation sensitivity (0-3).
 #[inline]
 pub fn amp_mod_sensitivity(amp_mod_sensitivity: u8) -> f32 {
     LUT_AMP_MOD_SENSITIVITY[amp_mod_sensitivity as usize]
 }
 
-// Pitch modulation sensitivity (0-7).
+/// Pitch modulation sensitivity (0-7).
 #[inline]
 pub fn pitch_mod_sensitivity(pitch_mod_sensitivity: u8) -> f32 {
     LUT_PITCH_MOD_SENSITIVITY[pitch_mod_sensitivity as usize]
 }
 
-// Keyboard tracking to TL adjustment.
+/// Keyboard tracking to TL adjustment.
 #[inline]
 pub fn keyboard_scaling(note: f32, ks: &KeyboardScaling) -> f32 {
     let x = note - ks.break_point as f32 - 15.0;
