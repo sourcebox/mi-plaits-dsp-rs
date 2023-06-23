@@ -302,7 +302,17 @@ impl<'a, const NUM_OPERATORS: usize, const NUM_ALGORITHMS: usize>
                         self.temp_buffer,
                     );
 
-                    buffers[call.output_index as usize].copy_from_slice(self.temp_buffer);
+                    let output_index = call.output_index as usize;
+
+                    buffers[output_index].copy_from_slice(self.temp_buffer);
+
+                    // Buffers with index 2 and 3 need to have the same content because they
+                    // point to the same memory location in the original code.
+                    if output_index == 2 {
+                        buffers[3].copy_from_slice(self.temp_buffer);
+                    } else if output_index == 3 {
+                        buffers[2].copy_from_slice(self.temp_buffer);
+                    }
                 }
 
                 i += call.n as usize;
