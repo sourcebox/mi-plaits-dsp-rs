@@ -32,11 +32,7 @@ pub struct SixOpEngine<'a> {
     patch_index_quantizer: HysteresisQuantizer2,
     voice: [FmVoice<'a>; NUM_SIX_OP_VOICES],
 
-    temp_buffer_1: &'a mut [f32],
-    temp_buffer_2: &'a mut [f32],
-    temp_buffer_3: &'a mut [f32],
-    temp_buffer_4: &'a mut [f32],
-    acc_buffer: &'a mut [f32],
+    temp_buffer: &'a mut [f32],
 
     active_voice: i32,
     rendered_voice: i32,
@@ -54,11 +50,7 @@ impl<'a> SixOpEngine<'a> {
         Self {
             patch_index_quantizer: HysteresisQuantizer2::new(),
             voice: core::array::from_fn(|_| FmVoice::new(buffer_allocator, block_size)),
-            temp_buffer_1: allocate_buffer(buffer_allocator, block_size).unwrap(),
-            temp_buffer_2: allocate_buffer(buffer_allocator, block_size).unwrap(),
-            temp_buffer_3: allocate_buffer(buffer_allocator, block_size).unwrap(),
-            temp_buffer_4: allocate_buffer(buffer_allocator, block_size).unwrap(),
-            acc_buffer: allocate_buffer(buffer_allocator, block_size).unwrap(),
+            temp_buffer: allocate_buffer(buffer_allocator, block_size).unwrap(),
             active_voice: 0,
             rendered_voice: 0,
         }
@@ -164,37 +156,19 @@ impl<'a> Engine for SixOpEngine<'a> {
             }
         }
 
-        // TODO: change hard-coded 2 voice rendering to generic rendering
+        out.fill(0.0);
 
-        self.temp_buffer_1.fill(0.0);
+        for voice in self.voice.iter_mut() {
+            self.temp_buffer.fill(0.0);
 
-        #[allow(clippy::useless_asref)]
-        let mut buffers = [
-            self.temp_buffer_1.as_mut(),
-            self.temp_buffer_2.as_mut(),
-            self.temp_buffer_3.as_mut(),
-            self.temp_buffer_4.as_mut(),
-        ];
+            voice.render(self.temp_buffer);
 
-        self.voice[0].render(&mut buffers);
-
-        self.acc_buffer.copy_from_slice(self.temp_buffer_1);
-        self.temp_buffer_1.fill(0.0);
-
-        #[allow(clippy::useless_asref)]
-        let mut buffers = [
-            self.temp_buffer_1.as_mut(),
-            self.temp_buffer_2.as_mut(),
-            self.temp_buffer_3.as_mut(),
-            self.temp_buffer_4.as_mut(),
-        ];
-
-        self.voice[1].render(&mut buffers);
-
-        for (i, (out_sample, aux_sample)) in out.iter_mut().zip(aux.iter_mut()).enumerate() {
-            *out_sample = soft_clip((self.temp_buffer_1[i] + self.acc_buffer[i]) * 0.25);
-            *aux_sample = *out_sample;
+            for (out_sample, temp_sample) in out.iter_mut().zip(self.temp_buffer.iter()) {
+                *out_sample = soft_clip(*out_sample + *temp_sample * 0.25);
+            }
         }
+
+        aux.copy_from_slice(out);
     }
 }
 
@@ -205,6 +179,10 @@ pub struct FmVoice<'a> {
     lfo: Lfo,
     voice: Voice<'a, 6, 32>,
     parameters: VoiceParameters,
+
+    temp_buffer_1: &'a mut [f32],
+    temp_buffer_2: &'a mut [f32],
+    temp_buffer_3: &'a mut [f32],
 }
 
 impl<'a> FmVoice<'a> {
@@ -214,6 +192,9 @@ impl<'a> FmVoice<'a> {
             lfo: Lfo::new(),
             voice: Voice::<'a, 6, 32>::new(buffer_allocator, block_size),
             parameters: VoiceParameters::new(),
+            temp_buffer_1: allocate_buffer(buffer_allocator, block_size).unwrap(),
+            temp_buffer_2: allocate_buffer(buffer_allocator, block_size).unwrap(),
+            temp_buffer_3: allocate_buffer(buffer_allocator, block_size).unwrap(),
         }
     }
 
@@ -246,12 +227,19 @@ impl<'a> FmVoice<'a> {
     }
 
     #[inline]
-    pub fn render(&mut self, buffer: &mut [&mut [f32]; 4]) {
+    pub fn render(&mut self, out: &mut [f32]) {
         if self.patch.is_none() {
             return;
         }
 
-        self.voice.render(&self.parameters, buffer);
+        let mut buffers = [
+            out,
+            self.temp_buffer_1,
+            self.temp_buffer_2,
+            self.temp_buffer_3,
+        ];
+
+        self.voice.render(&self.parameters, &mut buffers);
     }
 
     #[inline]
