@@ -8,6 +8,7 @@
 // Based on MIT-licensed code (c) 2021 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
 use core::alloc::GlobalAlloc;
+use core::cell::RefCell;
 
 use crate::dsp::engine::{Engine, EngineParameters, TriggerState};
 use crate::dsp::fm::{
@@ -190,7 +191,7 @@ impl<'a> FmVoice<'a> {
         Self {
             patch: None,
             lfo: Lfo::new(),
-            voice: Voice::<'a, 6, 32>::new(buffer_allocator, block_size),
+            voice: Voice::<'a, 6, 32>::new(),
             parameters: VoiceParameters::new(),
             temp_buffer_1: allocate_buffer(buffer_allocator, block_size).unwrap(),
             temp_buffer_2: allocate_buffer(buffer_allocator, block_size).unwrap(),
@@ -232,14 +233,14 @@ impl<'a> FmVoice<'a> {
             return;
         }
 
-        let mut buffers = [
-            out,
-            self.temp_buffer_1,
-            self.temp_buffer_2,
-            self.temp_buffer_3,
+        let buffers = [
+            RefCell::new(out),
+            RefCell::new(self.temp_buffer_1),
+            RefCell::new(self.temp_buffer_2),
+            RefCell::new(self.temp_buffer_3),
         ];
 
-        self.voice.render(&self.parameters, &mut buffers);
+        self.voice.render(&self.parameters, &buffers);
     }
 
     #[inline]

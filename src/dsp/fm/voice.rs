@@ -2,7 +2,7 @@
 
 // Based on MIT-licensed code (c) 2021 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-use core::alloc::GlobalAlloc;
+use core::cell::RefCell;
 
 #[allow(unused_imports)]
 use num_traits::float::Float;
@@ -15,7 +15,6 @@ use super::dx_units::{
 use super::envelope::{OperatorEnvelope, PitchEnvelope};
 use super::operator::Operator;
 use super::patch::Patch;
-use crate::dsp::allocate_buffer;
 use crate::stmlib::dsp::units::semitones_to_ratio_safe;
 
 #[derive(Debug, Default)]
@@ -61,14 +60,20 @@ pub struct Voice<'a, const NUM_OPERATORS: usize, const NUM_ALGORITHMS: usize> {
     patch: Option<&'a Patch>,
 
     dirty: bool,
+}
 
-    temp_buffer: &'a mut [f32],
+impl<'a, const NUM_OPERATORS: usize, const NUM_ALGORITHMS: usize> Default
+    for Voice<'a, NUM_OPERATORS, NUM_ALGORITHMS>
+{
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl<'a, const NUM_OPERATORS: usize, const NUM_ALGORITHMS: usize>
     Voice<'a, NUM_OPERATORS, NUM_ALGORITHMS>
 {
-    pub fn new<T: GlobalAlloc>(buffer_allocator: &T, block_size: usize) -> Self {
+    pub fn new() -> Self {
         Self {
             algorithms: None,
             sample_rate: 0.0,
@@ -93,8 +98,6 @@ impl<'a, const NUM_OPERATORS: usize, const NUM_ALGORITHMS: usize>
             patch: None,
 
             dirty: false,
-
-            temp_buffer: allocate_buffer(buffer_allocator, block_size).unwrap(),
         }
     }
 
@@ -183,7 +186,7 @@ impl<'a, const NUM_OPERATORS: usize, const NUM_ALGORITHMS: usize>
     }
 
     #[inline]
-    pub fn render(&mut self, parameters: &VoiceParameters, buffers: &mut [&mut [f32]; 4]) {
+    pub fn render(&mut self, parameters: &VoiceParameters, buffers: &[RefCell<&mut [f32]>; 4]) {
         if self.setup() {
             // This prevents a CPU overrun, since there is not enough CPU to perform
             // both a patch setup and a full render in the time alloted for
@@ -193,7 +196,7 @@ impl<'a, const NUM_OPERATORS: usize, const NUM_ALGORITHMS: usize>
             return;
         }
 
-        let envelope_rate = buffers[0].len() as f32 * 4.0;
+        let envelope_rate = buffers[0].borrow().len() as f32 * 4.0;
         let ad_scale = pow_2_fast((0.5 - parameters.envelope_control) * 8.0, 1);
         let r_scale = pow_2_fast(-f32::abs(parameters.envelope_control - 0.3) * 8.0, 1);
         let gate_duration = 1.5 * self.sample_rate;
@@ -292,29 +295,15 @@ impl<'a, const NUM_OPERATORS: usize, const NUM_ALGORITHMS: usize>
                     .render_call(patch.algorithm as u32, i as u32);
 
                 if let Some(render_fn) = call.render_fn {
-                    let output_index = call.output_index as usize;
-
-                    self.temp_buffer.copy_from_slice(buffers[output_index]);
-
                     render_fn(
                         &mut self.operator[i..],
                         &f[i..],
                         &a[i..],
                         &mut self.feedback_state,
                         patch.feedback as i32,
-                        buffers[call.input_index as usize],
-                        self.temp_buffer,
+                        &buffers[call.input_index as usize],
+                        &buffers[call.output_index as usize],
                     );
-
-                    buffers[output_index].copy_from_slice(self.temp_buffer);
-
-                    // Buffers with index 2 and 3 need to have the same content because they
-                    // point to the same memory location in the original code.
-                    if output_index == 2 {
-                        buffers[3].copy_from_slice(self.temp_buffer);
-                    } else if output_index == 3 {
-                        buffers[2].copy_from_slice(self.temp_buffer);
-                    }
                 }
 
                 i += call.n as usize;
