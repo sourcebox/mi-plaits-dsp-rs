@@ -151,7 +151,7 @@ pub struct Resources<'a> {
     pub syx_bank_c: &'a [u8; 4096],
 
     /// User terrain for the wave terrain engine. Default is `None`.
-    pub wave_terrain: Option<&'a [u8; 4096]>,
+    pub user_wave_terrain: Option<&'a [u8; 4096]>,
 }
 
 impl<'a> Default for Resources<'a> {
@@ -160,7 +160,7 @@ impl<'a> Default for Resources<'a> {
             syx_bank_a: &SYX_BANK_0,
             syx_bank_b: &SYX_BANK_1,
             syx_bank_c: &SYX_BANK_2,
-            wave_terrain: None,
+            user_wave_terrain: None,
         }
     }
 }
@@ -331,7 +331,7 @@ impl<'a> Voice<'a> {
                 }
                 5 => {
                     self.waveterrain_engine
-                        .set_user_terrain(self.resources.wave_terrain);
+                        .set_user_terrain(self.resources.user_wave_terrain);
                 }
                 _ => {}
             }
