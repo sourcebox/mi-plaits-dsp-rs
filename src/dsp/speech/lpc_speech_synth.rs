@@ -9,7 +9,7 @@ use crate::stmlib::utils::random;
 pub const LPC_ORDER: usize = 10;
 pub const LPC_SPEECH_SYNTH_DEFAULT_F0: f32 = 100.0;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct LpcSpeechSynthFrame {
     // 14 bytes.
     pub energy: u8,

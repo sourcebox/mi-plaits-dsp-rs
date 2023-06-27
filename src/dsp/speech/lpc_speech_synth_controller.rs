@@ -279,13 +279,14 @@ impl<'a> LpcSpeechSynthWordBank<'a> {
     fn load_next_word(&mut self, data: &[u8]) -> usize {
         let mut bitstream = BitStream::new(data);
 
+        let mut frame = LpcSpeechSynthFrame::default();
+
         loop {
-            let mut frame = LpcSpeechSynthFrame::default();
             let energy = bitstream.get_bits(4);
 
             if energy == 0 {
                 frame.energy = 0;
-            } else if energy == 0xf {
+            } else if energy == 0x0F {
                 bitstream.flush();
                 break;
             } else {
@@ -308,7 +309,7 @@ impl<'a> LpcSpeechSynthWordBank<'a> {
                 }
             }
 
-            self.frames[self.num_frames] = frame;
+            self.frames[self.num_frames] = frame.clone();
             self.num_frames += 1;
         }
 

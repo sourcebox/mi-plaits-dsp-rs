@@ -142,7 +142,7 @@ impl<'a> Engine for SpeechEngine<'a> {
             // Change phonemes/words for LPC.
             let word_bank = self.word_bank_quantizer.process((group - 2.0) * 0.275) - 1;
 
-            let replay_prosody = word_bank >= 0 && !trigger;
+            let replay_prosody = word_bank >= 0 && !sustain;
 
             *already_enveloped = replay_prosody;
 
