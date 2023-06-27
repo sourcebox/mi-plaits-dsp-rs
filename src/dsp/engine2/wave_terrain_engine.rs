@@ -33,7 +33,7 @@ pub struct WaveTerrainEngine<'a> {
 
     temp_buffer_1: &'a mut [f32],
     temp_buffer_2: &'a mut [f32],
-    user_terrain: Option<&'a [i16]>,
+    user_terrain: Option<&'a [u8; 4096]>,
 }
 
 impl<'a> WaveTerrainEngine<'a> {
@@ -48,7 +48,7 @@ impl<'a> WaveTerrainEngine<'a> {
         }
     }
 
-    pub fn set_user_terrain(&mut self, user_terrain: Option<&'a [i16]>) {
+    pub fn set_user_terrain(&mut self, user_terrain: Option<&'a [u8; 4096]>) {
         self.user_terrain = user_terrain;
     }
 
@@ -79,7 +79,7 @@ impl<'a> WaveTerrainEngine<'a> {
                     + k,
             ),
             5 | 6 | 7 => terrain_lookup_wt(x, y, 2 - (terrain_index - 5) as i32),
-            8 => terrain_lookup(x, y, self.user_terrain.unwrap_or_default()),
+            8 => terrain_lookup(x, y, self.user_terrain.unwrap()),
             _ => 0.0,
         }
     }
@@ -155,7 +155,7 @@ impl<'a> Engine for WaveTerrainEngine<'a> {
 }
 
 #[inline]
-fn terrain_lookup(mut x: f32, mut y: f32, terrain: &[i16]) -> f32 {
+fn terrain_lookup(mut x: f32, mut y: f32, terrain: &[u8; 4096]) -> f32 {
     let terrain_size = 64;
     let value_scale = 1.0 / 128.0;
     let coord_scale = (terrain_size - 2) as f32 * 0.5;

@@ -151,7 +151,7 @@ pub struct Resources<'a> {
     pub syx_bank_c: &'a [u8; 4096],
 
     /// User terrain for the wave terrain engine. Default is `None`.
-    pub wave_terrain: Option<&'a [i16]>,
+    pub wave_terrain: Option<&'a [u8; 4096]>,
 }
 
 impl<'a> Default for Resources<'a> {
