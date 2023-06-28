@@ -34,6 +34,7 @@ use super::envelope::{DecayEnvelope, LpgEnvelope};
 use super::fx::low_pass_gate::LowPassGate;
 use super::physical_modelling::delay_line::DelayLine;
 use crate::dsp::resources::sysex::{SYX_BANK_0, SYX_BANK_1, SYX_BANK_2};
+use crate::dsp::resources::waves::WAV_INTEGRATED_WAVES;
 use crate::dsp::{allocate_buffer, SAMPLE_RATE};
 use crate::stmlib::dsp::clip_16;
 use crate::stmlib::dsp::hysteresis_quantizer::HysteresisQuantizer2;
@@ -152,6 +153,9 @@ pub struct Resources<'a> {
 
     /// User terrain for the wave terrain engine. Default is `None`.
     pub user_wave_terrain: Option<&'a [u8; 4096]>,
+
+    /// Wavetables for the wavetable engine. Default is integrated waves.
+    pub wavetables: &'a [i16; 25344],
 }
 
 impl<'a> Default for Resources<'a> {
@@ -161,6 +165,7 @@ impl<'a> Default for Resources<'a> {
             syx_bank_b: &SYX_BANK_1,
             syx_bank_c: &SYX_BANK_2,
             user_wave_terrain: None,
+            wavetables: &WAV_INTEGRATED_WAVES,
         }
     }
 }
@@ -187,7 +192,7 @@ pub struct Voice<'a> {
     pub virtual_analog_engine: VirtualAnalogEngine<'a>,
     pub virtual_analog_vcf_engine: VirtualAnalogVcfEngine,
     pub waveshaping_engine: WaveshapingEngine,
-    pub wavetable_engine: WavetableEngine,
+    pub wavetable_engine: WavetableEngine<'a>,
     pub waveterrain_engine: WaveTerrainEngine<'a>,
 
     pub resources: Resources<'a>,
@@ -332,6 +337,10 @@ impl<'a> Voice<'a> {
                 5 => {
                     self.waveterrain_engine
                         .set_user_terrain(self.resources.user_wave_terrain);
+                }
+                13 => {
+                    self.wavetable_engine
+                        .set_wavetables(self.resources.wavetables);
                 }
                 _ => {}
             }

@@ -26,13 +26,13 @@ use crate::dsp::oscillator::wavetable_oscillator::{interpolate_wave_hermite, Dif
 use crate::dsp::resources::waves::WAV_INTEGRATED_WAVES;
 use crate::dsp::A0;
 use crate::stmlib::dsp::one_pole;
-use crate::stmlib::dsp::parameter_interpolator::ParameterInterpolator;
+use crate::stmlib::dsp::parameter_interpolator::SimpleParameterInterpolator;
 
 const TABLE_SIZE: usize = 128;
 const TABLE_SIZE_F: f32 = TABLE_SIZE as f32;
 
-#[derive(Debug, Default)]
-pub struct WavetableEngine {
+#[derive(Debug)]
+pub struct WavetableEngine<'a> {
     phase: f32,
 
     x_pre_lp: f32,
@@ -49,15 +49,64 @@ pub struct WavetableEngine {
     previous_f0: f32,
 
     diff_out: Differentiator,
+
+    wavetables: &'a [i16; 25344],
 }
 
-impl WavetableEngine {
-    pub fn new() -> Self {
-        Self::default()
+impl<'a> Default for WavetableEngine<'a> {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
-impl Engine for WavetableEngine {
+impl<'a> WavetableEngine<'a> {
+    pub fn new() -> Self {
+        Self {
+            phase: 0.0,
+
+            x_pre_lp: 0.0,
+            y_pre_lp: 0.0,
+            z_pre_lp: 0.0,
+
+            x_lp: 0.0,
+            y_lp: 0.0,
+            z_lp: 0.0,
+
+            previous_x: 0.0,
+            previous_y: 0.0,
+            previous_z: 0.0,
+            previous_f0: 0.0,
+
+            diff_out: Differentiator::new(),
+
+            wavetables: &WAV_INTEGRATED_WAVES,
+        }
+    }
+
+    pub fn set_wavetables(&mut self, wavetables: &'a [i16; 25344]) {
+        self.wavetables = wavetables;
+    }
+
+    #[inline]
+    fn read_wave(
+        &self,
+        x: usize,
+        y: usize,
+        z: usize,
+        randomize: usize,
+        phase_integral: usize,
+        phase_fractional: f32,
+    ) -> f32 {
+        let wave = ((x + y * 8 + z * 64) * randomize) % 192;
+        interpolate_wave_hermite(
+            &WAV_INTEGRATED_WAVES[wave * (TABLE_SIZE + 4)..],
+            phase_integral,
+            phase_fractional,
+        )
+    }
+}
+
+impl<'a> Engine for WavetableEngine<'a> {
     fn init(&mut self) {
         self.phase = 0.0;
 
@@ -109,33 +158,45 @@ impl Engine for WavetableEngine {
         y_fractional += quantization * (clamp(y_fractional, 16.0) - y_fractional);
         z_fractional += quantization * (clamp(z_fractional, 16.0) - z_fractional);
 
-        let mut x_modulation = ParameterInterpolator::new(
-            &mut self.previous_x,
+        let x_modulation = SimpleParameterInterpolator::new(
+            self.previous_x,
             x_integral as f32 + x_fractional,
             out.len(),
         );
-        let mut y_modulation = ParameterInterpolator::new(
-            &mut self.previous_y,
+        let y_modulation = SimpleParameterInterpolator::new(
+            self.previous_y,
             y_integral as f32 + y_fractional,
             out.len(),
         );
-        let mut z_modulation = ParameterInterpolator::new(
-            &mut self.previous_z,
+        let z_modulation = SimpleParameterInterpolator::new(
+            self.previous_z,
             z_integral as f32 + z_fractional,
             out.len(),
         );
 
-        let mut f0_modulation = ParameterInterpolator::new(&mut self.previous_f0, f0, out.len());
+        let f0_modulation = SimpleParameterInterpolator::new(self.previous_f0, f0, out.len());
 
         for (out_sample, aux_sample) in out.iter_mut().zip(aux.iter_mut()) {
-            let f0 = f0_modulation.next();
+            let f0 = f0_modulation.update(&mut self.previous_f0);
 
             let gain = (1.0 / (f0 * 131072.0)) * (0.95 - f0);
             let cutoff = f32::min(TABLE_SIZE_F * f0, 1.0);
 
-            one_pole(&mut self.x_lp, x_modulation.next(), lp_coefficient);
-            one_pole(&mut self.y_lp, y_modulation.next(), lp_coefficient);
-            one_pole(&mut self.z_lp, z_modulation.next(), lp_coefficient);
+            one_pole(
+                &mut self.x_lp,
+                x_modulation.update(&mut self.previous_x),
+                lp_coefficient,
+            );
+            one_pole(
+                &mut self.y_lp,
+                y_modulation.update(&mut self.previous_y),
+                lp_coefficient,
+            );
+            one_pole(
+                &mut self.z_lp,
+                z_modulation.update(&mut self.previous_z),
+                lp_coefficient,
+            );
 
             let x = self.x_lp;
             let y = self.y_lp;
@@ -175,22 +236,22 @@ impl Engine for WavetableEngine {
                 let r0 = if z0 == 3 { 101 } else { 1 };
                 let r1 = if z1 == 3 { 101 } else { 1 };
 
-                let x0y0z0 = read_wave(x0, y0, z0, r0, p_integral, p_fractional);
-                let x1y0z0 = read_wave(x1, y0, z0, r0, p_integral, p_fractional);
+                let x0y0z0 = self.read_wave(x0, y0, z0, r0, p_integral, p_fractional);
+                let x1y0z0 = self.read_wave(x1, y0, z0, r0, p_integral, p_fractional);
                 let xy0z0 = x0y0z0 + (x1y0z0 - x0y0z0) * x_fractional;
 
-                let x0y1z0 = read_wave(x0, y1, z0, r0, p_integral, p_fractional);
-                let x1y1z0 = read_wave(x1, y1, z0, r0, p_integral, p_fractional);
+                let x0y1z0 = self.read_wave(x0, y1, z0, r0, p_integral, p_fractional);
+                let x1y1z0 = self.read_wave(x1, y1, z0, r0, p_integral, p_fractional);
                 let xy1z0 = x0y1z0 + (x1y1z0 - x0y1z0) * x_fractional;
 
                 let xyz0 = xy0z0 + (xy1z0 - xy0z0) * y_fractional;
 
-                let x0y0z1 = read_wave(x0, y0, z1, r1, p_integral, p_fractional);
-                let x1y0z1 = read_wave(x1, y0, z1, r1, p_integral, p_fractional);
+                let x0y0z1 = self.read_wave(x0, y0, z1, r1, p_integral, p_fractional);
+                let x1y0z1 = self.read_wave(x1, y0, z1, r1, p_integral, p_fractional);
                 let xy0z1 = x0y0z1 + (x1y0z1 - x0y0z1) * x_fractional;
 
-                let x0y1z1 = read_wave(x0, y1, z1, r1, p_integral, p_fractional);
-                let x1y1z1 = read_wave(x1, y1, z1, r1, p_integral, p_fractional);
+                let x0y1z1 = self.read_wave(x0, y1, z1, r1, p_integral, p_fractional);
+                let x1y1z1 = self.read_wave(x1, y1, z1, r1, p_integral, p_fractional);
                 let xy1z1 = x0y1z1 + (x1y1z1 - x0y1z1) * x_fractional;
 
                 let xyz1 = xy0z1 + (xy1z1 - xy0z1) * y_fractional;
@@ -212,21 +273,4 @@ fn clamp(mut x: f32, amount: f32) -> f32 {
     x += 0.5;
 
     x
-}
-
-#[inline]
-fn read_wave(
-    x: usize,
-    y: usize,
-    z: usize,
-    randomize: usize,
-    phase_integral: usize,
-    phase_fractional: f32,
-) -> f32 {
-    let wave = ((x + y * 8 + z * 64) * randomize) % 192;
-    interpolate_wave_hermite(
-        &WAV_INTEGRATED_WAVES[wave * (TABLE_SIZE + 4)..],
-        phase_integral,
-        phase_fractional,
-    )
 }
