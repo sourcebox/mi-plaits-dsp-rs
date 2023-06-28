@@ -99,7 +99,7 @@ impl<'a> WavetableEngine<'a> {
     ) -> f32 {
         let wave = ((x + y * 8 + z * 64) * randomize) % 192;
         interpolate_wave_hermite(
-            &WAV_INTEGRATED_WAVES[wave * (TABLE_SIZE + 4)..],
+            &self.wavetables[wave * (TABLE_SIZE + 4)..],
             phase_integral,
             phase_fractional,
         )
