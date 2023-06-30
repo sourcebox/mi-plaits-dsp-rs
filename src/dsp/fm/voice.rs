@@ -196,7 +196,7 @@ impl<'a, const NUM_OPERATORS: usize, const NUM_ALGORITHMS: usize>
             return;
         }
 
-        let envelope_rate = buffers[0].borrow().len() as f32 * 4.0;
+        let envelope_rate = buffers[0].borrow().len() as f32 * 2.0;
         let ad_scale = pow_2_fast((0.5 - parameters.envelope_control) * 8.0, 1);
         let r_scale = pow_2_fast(-f32::abs(parameters.envelope_control - 0.3) * 8.0, 1);
         let gate_duration = 1.5 * self.sample_rate;
