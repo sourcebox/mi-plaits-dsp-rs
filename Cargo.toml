@@ -14,3 +14,6 @@ num-traits = { version = "0.2", default-features = false, features = ["libm"] }
 
 [dev-dependencies]
 wav = "1.0"
+log = "0.4"
+simple_logger = "4.1"
+audio-midi-shell = { git = "https://github.com/sourcebox/audio-midi-shell-rs" }
