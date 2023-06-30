@@ -64,7 +64,7 @@ impl<'a> Engine for SpeechEngine<'a> {
         self.naive_speech_synth.init();
         self.lpc_speech_synth_controller.init();
         self.word_bank_quantizer
-            .init(NUM_WORD_BANKS as i32, 0.1, false);
+            .init(NUM_WORD_BANKS as i32 + 1, 0.1, false);
         self.prosody_amount = 0.0;
         self.speed = 0.0;
         self.reset();
