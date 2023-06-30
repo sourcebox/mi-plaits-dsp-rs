@@ -2,11 +2,11 @@
 
 Native Rust port of the DSP code used by the [Mutable Instruments Plaits](https://mutable-instruments.net/modules/plaits/) Eurorack module.
 
-This port is work in progress and based on <https://github.com/pichenettes/eurorack>
+This port is based on firmware release 1.2 as published at <https://github.com/pichenettes/eurorack>.
 
 ## Background
 
-`Plaits` is a Eurorack module released by Mutable Instruments in 2018. It is a macro oscillator featuring 16 different engines. Please refer to the [original user manual](https://mutable-instruments.net/modules/plaits/manual/) for further details.
+`Plaits` is a Eurorack module released by Mutable Instruments in 2018. It is a macro oscillator featuring 24 different engines. Please refer to the [original user manual](https://mutable-instruments.net/modules/plaits/manual/) for further details.
 
 Since the original firmware as well as other design files like schematics were released under permissive open sources licenses, a number of derivates of this module were made by several people. Also, alternative firmware versions exist for the module and parts of the DSP code were even used in unrelated commercial products.
 
@@ -31,3 +31,9 @@ Published under the MIT license. All contributions to this project must be provi
 
 Author: Oliver Rockstedt <info@sourcebox.de>  
 Original author: Emilie Gillet <emilie.o.gillet@gmail.com>
+
+## Donations
+
+If you like to support my work, you can [buy me a coffee.](https://www.buymeacoffee.com/sourcebox)
+
+<a href="https://www.buymeacoffee.com/sourcebox" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>
