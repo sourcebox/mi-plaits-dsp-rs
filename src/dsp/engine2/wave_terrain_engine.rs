@@ -78,7 +78,7 @@ impl<'a> WaveTerrainEngine<'a> {
                     + 0.477 / (0.350 + f32::abs((x + 0.5) * (y + 1.5)))
                     + k,
             ),
-            5 | 6 | 7 => terrain_lookup_wt(x, y, 2 - (terrain_index - 5) as i32),
+            5..=7 => terrain_lookup_wt(x, y, 2 - (terrain_index - 5) as i32),
             8 => terrain_lookup(x, y, self.user_terrain.unwrap()),
             _ => 0.0,
         }
