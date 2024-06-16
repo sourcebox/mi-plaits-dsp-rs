@@ -144,8 +144,8 @@ impl<'a> Engine for WavetableEngine<'a> {
         let y = self.y_pre_lp;
         let z = self.z_pre_lp;
 
-        let quantization = f32::min(f32::max(z - 3.0, 0.0), 1.0);
-        let lp_coefficient = f32::min(f32::max(2.0 * f0 * (4.0 - 3.0 * quantization), 0.01), 0.1);
+        let quantization = (z - 3.0).clamp(0.0, 1.0);
+        let lp_coefficient = (2.0 * f0 * (4.0 - 3.0 * quantization)).clamp(0.01, 0.1);
 
         let x_integral = x as usize;
         let mut x_fractional = x - (x_integral as f32);

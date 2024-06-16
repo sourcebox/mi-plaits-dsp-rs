@@ -111,13 +111,7 @@ pub fn soft_clip(x: f32) -> f32 {
 
 #[inline]
 pub fn clip_16(x: i32) -> i32 {
-    if x < -32768 {
-        -32768
-    } else if x > 32767 {
-        32767
-    } else {
-        x
-    }
+    x.clamp(-32768, 32767)
 }
 
 #[inline]

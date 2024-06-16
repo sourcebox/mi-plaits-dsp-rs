@@ -53,7 +53,7 @@ impl Engine for BassDrumEngine {
         let f0 = note_to_frequency(parameters.note);
 
         let attack_fm_amount = f32::min(parameters.harmonics * 4.0, 1.0);
-        let self_fm_amount = f32::max(f32::min(parameters.harmonics * 4.0 - 1.0, 1.0), 0.0);
+        let self_fm_amount = (parameters.harmonics * 4.0 - 1.0).clamp(0.0, 1.0);
         let drive =
             f32::max(parameters.harmonics * 2.0 - 1.0, 0.0) * f32::max(1.0 - 16.0 * f0, 0.0);
 
