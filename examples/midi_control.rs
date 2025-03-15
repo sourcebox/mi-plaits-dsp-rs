@@ -6,7 +6,7 @@ use simple_logger::SimpleLogger;
 use mi_plaits_dsp::dsp::voice::{Modulations, Patch, Voice};
 
 const SAMPLE_RATE: u32 = 48000;
-const BLOCK_SIZE: usize = 32;
+const BLOCK_SIZE: usize = 256;
 
 fn main() -> ! {
     SimpleLogger::new()
