@@ -34,7 +34,7 @@ pub struct ParticleEngine<'a> {
     temp_buffer: &'a mut [f32],
 }
 
-impl<'a> ParticleEngine<'a> {
+impl ParticleEngine<'_> {
     pub fn new<T: GlobalAlloc>(buffer_allocator: &T, block_size: usize) -> Self {
         Self {
             particle: core::array::from_fn(|_| Particle::new()),
@@ -45,7 +45,7 @@ impl<'a> ParticleEngine<'a> {
     }
 }
 
-impl<'a> Engine for ParticleEngine<'a> {
+impl Engine for ParticleEngine<'_> {
     fn init(&mut self) {
         for particle in &mut self.particle {
             particle.init();

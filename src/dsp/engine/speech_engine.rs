@@ -43,7 +43,7 @@ pub struct SpeechEngine<'a> {
     speed: f32,
 }
 
-impl<'a> SpeechEngine<'a> {
+impl SpeechEngine<'_> {
     pub fn new<T: GlobalAlloc>(buffer_allocator: &T, block_size: usize) -> Self {
         Self {
             word_bank_quantizer: HysteresisQuantizer2::new(),
@@ -58,7 +58,7 @@ impl<'a> SpeechEngine<'a> {
     }
 }
 
-impl<'a> Engine for SpeechEngine<'a> {
+impl Engine for SpeechEngine<'_> {
     fn init(&mut self) {
         self.sam_speech_synth.init();
         self.naive_speech_synth.init();
@@ -167,7 +167,7 @@ impl<'a> Engine for SpeechEngine<'a> {
     }
 }
 
-impl<'a> SpeechEngine<'a> {
+impl SpeechEngine<'_> {
     pub fn set_prosody_amount(&mut self, prosody_amount: f32) {
         self.prosody_amount = prosody_amount;
     }

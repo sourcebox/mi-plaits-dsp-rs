@@ -194,13 +194,13 @@ struct RendererSpecs {
 
 macro_rules! MOD {
     ($n:expr) => {
-        $n << 4
+        ($n << 4)
     };
 }
 
 macro_rules! ADD {
     ($n:expr) => {
-        $n | OPCODE_ADDITIVE_FLAG
+        ($n | OPCODE_ADDITIVE_FLAG)
     };
 }
 
@@ -224,7 +224,7 @@ macro_rules! FB_DST {
 
 macro_rules! FB {
     () => {
-        FB_SRC!() | FB_DST!()
+        (FB_SRC!() | FB_DST!())
     };
 }
 

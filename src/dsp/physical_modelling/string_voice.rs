@@ -17,7 +17,7 @@ pub struct StringVoice<'a> {
     remaining_noise_samples: usize,
 }
 
-impl<'a> StringVoice<'a> {
+impl StringVoice<'_> {
     pub fn new<T: GlobalAlloc>(buffer_allocator: &T) -> Self {
         Self {
             excitation_filter: Svf::default(),

@@ -41,7 +41,7 @@ pub struct String<'a> {
     out_sample: [f32; 2],
 }
 
-impl<'a> String<'a> {
+impl String<'_> {
     pub fn new<T: GlobalAlloc>(buffer_allocator: &T) -> Self {
         let string_line = allocate_buffer(buffer_allocator, DELAY_LINE_SIZE).unwrap();
         let stretch_line = allocate_buffer(buffer_allocator, DELAY_LINE_SIZE / 4).unwrap();

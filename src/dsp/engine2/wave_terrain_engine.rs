@@ -85,7 +85,7 @@ impl<'a> WaveTerrainEngine<'a> {
     }
 }
 
-impl<'a> Engine for WaveTerrainEngine<'a> {
+impl Engine for WaveTerrainEngine<'_> {
     fn init(&mut self) {
         self.path.init();
         self.offset = 0.0;

@@ -34,7 +34,7 @@ pub struct LpcSpeechSynthController<'a> {
     word_bank: LpcSpeechSynthWordBank<'a>,
 }
 
-impl<'a> LpcSpeechSynthController<'a> {
+impl LpcSpeechSynthController<'_> {
     pub fn new<T: GlobalAlloc>(buffer_allocator: &T) -> Self {
         Self {
             clock_phase: 0.0,
@@ -393,7 +393,7 @@ impl<'a> BitStream<'a> {
 
     #[inline]
     fn reverse(mut b: u8) -> u8 {
-        b = (b >> 4) | (b << 4);
+        b = b.rotate_left(4);
         b = ((b & 0xcc) >> 2) | ((b & 0x33) << 2);
         b = ((b & 0xaa) >> 1) | ((b & 0x55) << 1);
 

@@ -28,7 +28,7 @@ pub struct PhaseDistortionEngine<'a> {
     temp_buffer_2: &'a mut [f32],
 }
 
-impl<'a> PhaseDistortionEngine<'a> {
+impl PhaseDistortionEngine<'_> {
     pub fn new<T: GlobalAlloc>(buffer_allocator: &T, block_size: usize) -> Self {
         Self {
             shaper: VariableShapeOscillator::new(),
@@ -39,7 +39,7 @@ impl<'a> PhaseDistortionEngine<'a> {
     }
 }
 
-impl<'a> Engine for PhaseDistortionEngine<'a> {
+impl Engine for PhaseDistortionEngine<'_> {
     fn init(&mut self) {
         self.shaper.init();
         self.modulator.init();

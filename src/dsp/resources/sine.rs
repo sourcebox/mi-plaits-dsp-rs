@@ -11,7 +11,7 @@ pub const LUT_SINE_SIZE: f32 = 512.0;
 pub const LUT_SINE_BITS: u32 = 9;
 
 /// Sine data.
-pub const LUT_SINE: [f32; 641] = [
+pub static LUT_SINE: [f32; 641] = [
     0.000000000e+00,
     1.227153829e-02,
     2.454122852e-02,

@@ -36,13 +36,13 @@ pub struct ChordEngine<'a> {
     wavetable: [&'a [i16]; 15],
 }
 
-impl<'a> ChordEngine<'a> {
+impl ChordEngine<'_> {
     pub fn new() -> Self {
         Self::default()
     }
 }
 
-impl<'a> Default for ChordEngine<'a> {
+impl Default for ChordEngine<'_> {
     fn default() -> Self {
         Self {
             divide_down_voice: core::array::from_fn(|_| StringSynthOscillator::default()),
@@ -71,7 +71,7 @@ impl<'a> Default for ChordEngine<'a> {
     }
 }
 
-impl<'a> Engine for ChordEngine<'a> {
+impl Engine for ChordEngine<'_> {
     fn init(&mut self) {
         for i in 0..CHORD_NUM_VOICES {
             self.divide_down_voice[i].init();
@@ -186,8 +186,6 @@ impl<'a> Engine for ChordEngine<'a> {
         }
     }
 }
-
-impl<'a> ChordEngine<'a> {}
 
 const fn wt_index(bank: usize, row: usize, column: usize) -> usize {
     (bank * 64 + row * 8 + column) * 132

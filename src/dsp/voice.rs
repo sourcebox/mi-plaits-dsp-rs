@@ -158,7 +158,7 @@ pub struct Resources<'a> {
     pub wavetables: &'a [i16; 25344],
 }
 
-impl<'a> Default for Resources<'a> {
+impl Default for Resources<'_> {
     fn default() -> Self {
         Self {
             syx_bank_a: &SYX_BANK_0,
@@ -215,7 +215,7 @@ pub struct Voice<'a> {
     aux_post_processor: ChannelPostProcessor,
 }
 
-impl<'a> Voice<'a> {
+impl Voice<'_> {
     pub fn new<T: GlobalAlloc>(buffer_allocator: &T, block_size: usize) -> Self {
         Self {
             additive_engine: AdditiveEngine::new(),

@@ -34,7 +34,7 @@ pub struct VirtualAnalogEngine<'a> {
     temp_buffer: &'a mut [f32],
 }
 
-impl<'a> VirtualAnalogEngine<'a> {
+impl VirtualAnalogEngine<'_> {
     pub fn new<T: GlobalAlloc>(buffer_allocator: &T, block_size: usize) -> Self {
         Self {
             primary: VariableShapeOscillator::new(),
@@ -48,7 +48,7 @@ impl<'a> VirtualAnalogEngine<'a> {
     }
 }
 
-impl<'a> Engine for VirtualAnalogEngine<'a> {
+impl Engine for VirtualAnalogEngine<'_> {
     fn init(&mut self) {
         self.primary.init();
         self.auxiliary.init();

@@ -49,7 +49,7 @@ impl<'a> ParameterInterpolator<'a> {
     }
 }
 
-impl<'a> Drop for ParameterInterpolator<'a> {
+impl Drop for ParameterInterpolator<'_> {
     fn drop(&mut self) {
         *self.state = self.value;
     }

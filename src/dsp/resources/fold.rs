@@ -4,7 +4,7 @@
 
 #![allow(clippy::excessive_precision)]
 
-pub const LUT_FOLD: [f32; 516] = [
+pub static LUT_FOLD: [f32; 516] = [
     -9.980545825e-01,
     -9.970653772e-01,
     -9.960649692e-01,
@@ -523,7 +523,7 @@ pub const LUT_FOLD: [f32; 516] = [
     1.000000000e+00,
 ];
 
-pub const LUT_FOLD_2: [f32; 516] = [
+pub static LUT_FOLD_2: [f32; 516] = [
     1.000000000e+00,
     9.992967758e-01,
     9.985815484e-01,

@@ -51,7 +51,7 @@ impl<'a> StringEngine<'a> {
     }
 }
 
-impl<'a> Engine for StringEngine<'a> {
+impl Engine for StringEngine<'_> {
     fn init(&mut self) {
         for voice in &mut self.voice {
             voice.init();

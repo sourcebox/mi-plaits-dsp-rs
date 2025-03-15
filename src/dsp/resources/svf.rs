@@ -4,7 +4,7 @@
 
 #![allow(clippy::excessive_precision)]
 
-pub const LUT_SVF_SHIFT: [f32; 257] = [
+pub static LUT_SVF_SHIFT: [f32; 257] = [
     7.500000000e-01,
     7.591880421e-01,
     7.683455389e-01,

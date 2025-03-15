@@ -62,8 +62,8 @@ pub struct Voice<'a, const NUM_OPERATORS: usize, const NUM_ALGORITHMS: usize> {
     dirty: bool,
 }
 
-impl<'a, const NUM_OPERATORS: usize, const NUM_ALGORITHMS: usize> Default
-    for Voice<'a, NUM_OPERATORS, NUM_ALGORITHMS>
+impl<const NUM_OPERATORS: usize, const NUM_ALGORITHMS: usize> Default
+    for Voice<'_, NUM_OPERATORS, NUM_ALGORITHMS>
 {
     fn default() -> Self {
         Self::new()

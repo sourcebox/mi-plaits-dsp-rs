@@ -39,7 +39,7 @@ pub struct SixOpEngine<'a> {
     rendered_voice: i32,
 }
 
-impl<'a> SixOpEngine<'a> {
+impl SixOpEngine<'_> {
     pub fn new<A: GlobalAlloc>(buffer_allocator: &A, block_size: usize) -> Self {
         unsafe {
             let mut algorithms = Algorithms::<6, 32>::new();
@@ -70,7 +70,7 @@ impl<'a> SixOpEngine<'a> {
     }
 }
 
-impl<'a> Engine for SixOpEngine<'a> {
+impl Engine for SixOpEngine<'_> {
     fn init(&mut self) {
         self.patch_index_quantizer.init(32, 0.005, false);
 

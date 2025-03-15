@@ -4,7 +4,7 @@
 
 #![allow(clippy::excessive_precision)]
 
-pub const LUT_STIFFNESS: [f32; 65] = [
+pub static LUT_STIFFNESS: [f32; 65] = [
     -6.250000000e-02,
     -5.859375000e-02,
     -5.468750000e-02,

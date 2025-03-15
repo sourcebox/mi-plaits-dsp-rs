@@ -29,7 +29,7 @@ pub struct HihatEngine<'a> {
     temp_buffer_2: &'a mut [f32],
 }
 
-impl<'a> HihatEngine<'a> {
+impl HihatEngine<'_> {
     pub fn new<T: GlobalAlloc>(buffer_allocator: &T, block_size: usize) -> Self {
         Self {
             hi_hat_1: Hihat::default(),
@@ -40,7 +40,7 @@ impl<'a> HihatEngine<'a> {
     }
 }
 
-impl<'a> Engine for HihatEngine<'a> {
+impl Engine for HihatEngine<'_> {
     fn init(&mut self) {
         self.hi_hat_1.init();
         self.hi_hat_2.init();

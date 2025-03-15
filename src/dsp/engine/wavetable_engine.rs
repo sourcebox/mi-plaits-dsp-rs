@@ -53,7 +53,7 @@ pub struct WavetableEngine<'a> {
     wavetables: &'a [i16; 25344],
 }
 
-impl<'a> Default for WavetableEngine<'a> {
+impl Default for WavetableEngine<'_> {
     fn default() -> Self {
         Self::new()
     }
@@ -106,7 +106,7 @@ impl<'a> WavetableEngine<'a> {
     }
 }
 
-impl<'a> Engine for WavetableEngine<'a> {
+impl Engine for WavetableEngine<'_> {
     fn init(&mut self) {
         self.phase = 0.0;
 

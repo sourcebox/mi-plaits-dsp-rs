@@ -37,7 +37,7 @@ impl<'a> Downsampler<'a> {
     }
 }
 
-impl<'a> Drop for Downsampler<'a> {
+impl Drop for Downsampler<'_> {
     fn drop(&mut self) {
         *self.state = self.head;
     }

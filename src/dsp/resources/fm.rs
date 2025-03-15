@@ -4,7 +4,7 @@
 
 #![allow(clippy::excessive_precision)]
 
-pub const LUT_FM_FREQUENCY_QUANTIZER: [f32; 130] = [
+pub static LUT_FM_FREQUENCY_QUANTIZER: [f32; 130] = [
     -1.200000000e+01,
     -1.200000000e+01,
     -1.200000000e+01,
