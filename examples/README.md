@@ -2,7 +2,7 @@
 
 ## midi_control
 
-Receives messages from all available MIDI inputs and plays a single monophonic voice having its parameters controlled via control change.
+Receives messages from all available MIDI inputs and plays up to 8 voices having its parameters controlled via control change.
 
 | CC# | Parameter                       |
 |-----|---------------------------------|

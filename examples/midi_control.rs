@@ -7,6 +7,7 @@ use mi_plaits_dsp::dsp::voice::{Modulations, Patch, Voice};
 
 const SAMPLE_RATE: u32 = 48000;
 const BLOCK_SIZE: usize = 256;
+const VOICE_COUNT: usize = 8;
 
 fn main() -> ! {
     SimpleLogger::new()
@@ -19,48 +20,53 @@ fn main() -> ! {
 
 #[derive(Debug)]
 struct App<'a> {
-    voice: Voice<'a>,
-    patch: Patch,
-    modulations: Modulations,
+    voices: [Voice<'a>; VOICE_COUNT],
+    patches: [Patch; VOICE_COUNT],
+    modulations: [Modulations; VOICE_COUNT],
     volume: f32,
     balance: f32,
+    note_map: [Option<u8>; VOICE_COUNT],
 }
 
 impl<'a> App<'a> {
     pub fn new() -> Self {
         Self {
-            voice: Voice::new(&std::alloc::System, BLOCK_SIZE),
-            patch: Patch::default(),
-            modulations: Modulations::default(),
+            voices: core::array::from_fn(|_| Voice::new(&std::alloc::System, BLOCK_SIZE)),
+            patches: core::array::from_fn(|_| Patch::default()),
+            modulations: core::array::from_fn(|_| Modulations::default()),
             volume: 1.0,
             balance: 0.0,
+            note_map: [None; VOICE_COUNT],
         }
     }
 }
 
 impl<'a> AudioGenerator for App<'a> {
     fn init(&mut self, _block_size: usize) {
-        self.patch.engine = 0;
-        self.patch.harmonics = 0.5;
-        self.patch.timbre = 0.5;
-        self.patch.morph = 0.5;
-        self.modulations.trigger_patched = true;
-        self.modulations.level_patched = true;
-        self.voice.init();
+        for (n, voice) in self.voices.iter_mut().enumerate() {
+            self.patches[n].engine = 0;
+            self.patches[n].harmonics = 0.5;
+            self.patches[n].timbre = 0.5;
+            self.patches[n].morph = 0.5;
+            self.modulations[n].trigger_patched = true;
+            self.modulations[n].level_patched = true;
+            voice.init();
+        }
     }
 
     fn process(&mut self, samples_left: &mut [f32], samples_right: &mut [f32]) {
-        let mut out = vec![0.0; BLOCK_SIZE];
-        let mut aux = vec![0.0; BLOCK_SIZE];
-
-        self.voice
-            .render(&self.patch, &self.modulations, &mut out, &mut aux);
-
         let mut mix = vec![0.0; BLOCK_SIZE];
 
-        for frame in 0..BLOCK_SIZE {
-            mix[frame] =
-                (out[frame] * (1.0 - self.balance) + aux[frame] * self.balance) * self.volume;
+        for (n, voice) in self.voices.iter_mut().enumerate() {
+            let mut out = vec![0.0; BLOCK_SIZE];
+            let mut aux = vec![0.0; BLOCK_SIZE];
+
+            voice.render(&self.patches[n], &self.modulations[n], &mut out, &mut aux);
+
+            for frame in 0..BLOCK_SIZE {
+                mix[frame] +=
+                    (out[frame] * (1.0 - self.balance) + aux[frame] * self.balance) * self.volume;
+            }
         }
 
         samples_left.clone_from_slice(&mix);
@@ -71,48 +77,76 @@ impl<'a> AudioGenerator for App<'a> {
         match message[0] & 0xF0 {
             0x80 => {
                 // Note off
-                self.modulations.trigger = 0.0;
-                self.modulations.level = 0.0;
-                log::info!("Note off: {}", message[1]);
+                let note = message[1];
+                while let Some(voice_no) = self
+                    .note_map
+                    .iter()
+                    .position(|n| n.is_some() && n.unwrap() == note)
+                {
+                    self.modulations[voice_no].trigger = 0.0;
+                    self.modulations[voice_no].level = 0.0;
+                    self.note_map[voice_no] = None;
+                    log::info!("Note off: {} on voice {}", note, voice_no);
+                }
             }
             0x90 if message[2] != 0 => {
                 // Note on
-                self.patch.note = message[1] as f32;
-                self.modulations.trigger = 1.0;
-                self.modulations.level = message[2] as f32 / 127.0;
-                log::info!("Note on: {}", message[1]);
+                let note = message[1];
+                let voice_no = self
+                    .note_map
+                    .iter()
+                    .position(|n| n.is_none())
+                    .unwrap_or_default();
+                self.patches[voice_no].note = note as f32;
+                self.modulations[voice_no].trigger = 1.0;
+                self.modulations[voice_no].level = message[2] as f32 / 127.0;
+                self.note_map[voice_no] = Some(note);
+                log::info!("Note on: {} on voice {}", note, voice_no);
             }
             0xB0 => {
                 // Control change
                 let value = message[2] as f32 / 127.0;
                 match message[1] {
                     21 => {
-                        self.patch.engine = (value * 23.0) as usize;
-                        log::info!("Engine: {}", self.patch.engine);
+                        let engine = (value * 23.0) as usize;
+                        log::info!("Engine: {}", engine);
+                        for patch in self.patches.iter_mut() {
+                            patch.engine = engine;
+                        }
                     }
                     22 => {
-                        self.patch.harmonics = value;
-                        log::info!("Harmonics: {}", self.patch.harmonics);
+                        log::info!("Harmonics: {}", value);
+                        for patch in self.patches.iter_mut() {
+                            patch.harmonics = value;
+                        }
                     }
                     23 => {
-                        self.patch.timbre = value;
-                        log::info!("Timbre: {}", self.patch.timbre);
+                        log::info!("Timbre: {}", value);
+                        for patch in self.patches.iter_mut() {
+                            patch.timbre = value;
+                        }
                     }
                     24 => {
-                        self.patch.morph = value;
-                        log::info!("Morph: {}", self.patch.morph);
+                        log::info!("Morph: {}", value);
+                        for patch in self.patches.iter_mut() {
+                            patch.morph = value;
+                        }
                     }
                     25 => {
                         self.balance = value;
                         log::info!("Blend OUT/AUX: {}", self.balance);
                     }
                     26 => {
-                        self.patch.decay = value;
-                        log::info!("Env Decay: {}", self.patch.decay);
+                        log::info!("Env Decay: {}", value);
+                        for patch in self.patches.iter_mut() {
+                            patch.decay = value;
+                        }
                     }
                     27 => {
-                        self.patch.lpg_colour = value;
-                        log::info!("LPG Color: {}", self.patch.lpg_colour);
+                        log::info!("LPG Color: {}", value);
+                        for patch in self.patches.iter_mut() {
+                            patch.lpg_colour = value;
+                        }
                     }
                     28 => {
                         self.volume = value;
