@@ -10,6 +10,8 @@
 use core::alloc::GlobalAlloc;
 use core::cell::RefCell;
 
+use spin::Once;
+
 use crate::dsp::engine::{Engine, EngineParameters, TriggerState};
 use crate::dsp::fm::{
     algorithms::Algorithms,
@@ -24,7 +26,7 @@ use crate::stmlib::dsp::soft_clip;
 const NUM_SIX_OP_VOICES: usize = 2;
 const NUM_PATCHES_PER_BANK: usize = 32;
 
-static mut ALGORITHMS: Option<Algorithms<6, 32>> = None;
+static ALGORITHMS: Once<Algorithms<6, 32>> = Once::new();
 
 static mut PATCHES: Option<[Patch; NUM_PATCHES_PER_BANK]> = None;
 
@@ -42,9 +44,6 @@ pub struct SixOpEngine<'a> {
 impl SixOpEngine<'_> {
     pub fn new<A: GlobalAlloc>(buffer_allocator: &A, block_size: usize) -> Self {
         unsafe {
-            let mut algorithms = Algorithms::<6, 32>::new();
-            algorithms.init();
-            ALGORITHMS = Some(algorithms);
             let patches: [Patch; NUM_PATCHES_PER_BANK] = core::array::from_fn(|_| Patch::new());
             PATCHES = Some(patches);
         }
@@ -75,9 +74,14 @@ impl Engine for SixOpEngine<'_> {
         self.patch_index_quantizer.init(32, 0.005, false);
 
         for voice in self.voice.iter_mut() {
-            unsafe {
-                voice.init(ALGORITHMS.as_ref().unwrap(), SAMPLE_RATE);
-            }
+            voice.init(
+                ALGORITHMS.call_once(|| {
+                    let mut algo = Algorithms::<6, 32>::new();
+                    algo.init();
+                    algo
+                }),
+                SAMPLE_RATE,
+            );
         }
 
         self.active_voice = (NUM_SIX_OP_VOICES - 1) as i32;
