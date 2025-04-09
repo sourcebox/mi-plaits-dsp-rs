@@ -4,7 +4,7 @@
 
 pub const SYX_SIZE: usize = 128;
 
-#[derive(Debug, Default, PartialEq, Eq)]
+#[derive(Debug, Default, Clone, PartialEq, Eq)]
 pub struct Patch {
     pub op: [Operator; 6],
     pub pitch_envelope: Envelope,
@@ -86,13 +86,13 @@ impl Patch {
     }
 }
 
-#[derive(Debug, Default, PartialEq, Eq)]
+#[derive(Debug, Default, Clone, PartialEq, Eq)]
 pub struct Envelope {
     pub rate: [u8; 4],
     pub level: [u8; 4],
 }
 
-#[derive(Debug, Default, PartialEq, Eq)]
+#[derive(Debug, Default, Clone, PartialEq, Eq)]
 pub struct KeyboardScaling {
     pub left_depth: u8,
     pub right_depth: u8,
@@ -101,7 +101,7 @@ pub struct KeyboardScaling {
     pub break_point: u8,
 }
 
-#[derive(Debug, Default, PartialEq, Eq)]
+#[derive(Debug, Default, Clone, PartialEq, Eq)]
 pub struct Operator {
     pub envelope: Envelope,
     pub keyboard_scaling: KeyboardScaling,
@@ -117,7 +117,7 @@ pub struct Operator {
     pub detune: u8,
 }
 
-#[derive(Debug, Default, PartialEq, Eq)]
+#[derive(Debug, Default, Clone, PartialEq, Eq)]
 pub struct ModulationParameters {
     pub delay: u8,
     pub rate: u8,
