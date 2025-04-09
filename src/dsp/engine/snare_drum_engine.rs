@@ -7,7 +7,7 @@
 //!
 //! Outputs:
 //! - *OUT* signal: bunch of bridged T-networks, one for each mode of
-//!    the shell, excited by a nicely shaped pulse; plus some band-pass filtered noise.
+//!   the shell, excited by a nicely shaped pulse; plus some band-pass filtered noise.
 //! - *AUX* signal: pair of frequency-modulated sine VCO, mixed with high-pass filtered noise.
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
