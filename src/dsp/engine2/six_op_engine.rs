@@ -29,10 +29,9 @@ const NUM_PATCHES_PER_BANK: usize = 32;
 
 static ALGORITHMS: Once<Algorithms<6, 32>> = Once::new();
 
-static mut PATCHES: Option<[Patch; NUM_PATCHES_PER_BANK]> = None;
-
 #[derive(Debug)]
 pub struct SixOpEngine<'a> {
+    patches: [Patch; NUM_PATCHES_PER_BANK],
     patch_index_quantizer: HysteresisQuantizer2,
     voice: [FmVoice<'a>; NUM_SIX_OP_VOICES],
 
@@ -44,11 +43,8 @@ pub struct SixOpEngine<'a> {
 
 impl SixOpEngine<'_> {
     pub fn new(block_size: usize) -> Self {
-        unsafe {
-            let patches: [Patch; NUM_PATCHES_PER_BANK] = core::array::from_fn(|_| Patch::new());
-            PATCHES = Some(patches);
-        }
         Self {
+            patches: core::array::from_fn(|_| Patch::new()),
             patch_index_quantizer: HysteresisQuantizer2::new(),
             voice: core::array::from_fn(|_| FmVoice::new(block_size)),
             temp_buffer: vec![0.0; block_size].into_boxed_slice(),
@@ -58,9 +54,7 @@ impl SixOpEngine<'_> {
     }
 
     pub fn load_syx_bank(&mut self, bank: &[u8; 4096]) {
-        let patches = unsafe { PATCHES.as_mut().unwrap() };
-
-        for (i, patch) in patches.iter_mut().enumerate() {
+        for (i, patch) in self.patches.iter_mut().enumerate() {
             (*patch).unpack(&bank[i * SYX_SIZE..]);
         }
 
@@ -108,8 +102,7 @@ impl Engine for SixOpEngine<'_> {
             let amp_mod = self.voice[0].lfo().amp_mod();
 
             for (i, voice) in self.voice.iter_mut().enumerate() {
-                let patches = unsafe { PATCHES.as_ref().unwrap() };
-                voice.load_patch(Some(&patches[patch_index]));
+                voice.load_patch(Some(self.patches[patch_index].clone()));
                 let p = voice.mutable_parameters();
                 p.sustain = i == 0;
                 p.gate = false;
@@ -122,8 +115,8 @@ impl Engine for SixOpEngine<'_> {
         } else {
             if parameters.trigger == TriggerState::RisingEdge {
                 self.active_voice = (self.active_voice + 1) % NUM_SIX_OP_VOICES as i32;
-                let patches = unsafe { PATCHES.as_ref().unwrap() };
-                self.voice[self.active_voice as usize].load_patch(Some(&patches[patch_index]));
+                self.voice[self.active_voice as usize]
+                    .load_patch(Some(self.patches[patch_index].clone()));
                 self.voice[self.active_voice as usize].mutable_lfo().reset();
             }
             let p = self.voice[self.active_voice as usize].mutable_parameters();
@@ -180,8 +173,6 @@ impl Engine for SixOpEngine<'_> {
 
 #[derive(Debug)]
 pub struct FmVoice<'a> {
-    patch: Option<&'a Patch>,
-
     lfo: Lfo,
     voice: Voice<'a, 6, 32>,
     parameters: VoiceParameters,
@@ -194,7 +185,6 @@ pub struct FmVoice<'a> {
 impl<'a> FmVoice<'a> {
     pub fn new(block_size: usize) -> Self {
         Self {
-            patch: None,
             lfo: Lfo::new(),
             voice: Voice::<'a, 6, 32>::new(),
             parameters: VoiceParameters::new(),
@@ -215,26 +205,23 @@ impl<'a> FmVoice<'a> {
         self.parameters.envelope_control = 0.5;
         self.parameters.pitch_mod = 0.0;
         self.parameters.amp_mod = 0.0;
-
-        self.patch = None;
     }
 
-    pub fn load_patch(&mut self, patch: Option<&'a Patch>) {
-        if patch == self.patch {
+    pub fn load_patch(&mut self, patch: Option<Patch>) {
+        if patch.as_ref() == self.voice.patch() {
             return;
         }
 
-        self.patch = patch;
-        self.voice.set_patch(self.patch);
+        self.voice.set_patch(patch);
 
-        if let Some(patch) = patch {
+        if let Some(patch) = self.voice.patch() {
             self.lfo.set(&patch.modulations);
         }
     }
 
     #[inline]
     pub fn render(&mut self, out: &mut [f32]) {
-        if self.patch.is_none() {
+        if self.patch().is_none() {
             return;
         }
 
@@ -250,12 +237,12 @@ impl<'a> FmVoice<'a> {
 
     #[inline]
     pub fn unload_patch(&mut self) {
-        self.patch = None;
+        self.voice.set_patch(None);
     }
 
     #[inline]
     pub fn patch(&self) -> Option<&Patch> {
-        self.patch
+        self.voice.patch()
     }
 
     #[inline]

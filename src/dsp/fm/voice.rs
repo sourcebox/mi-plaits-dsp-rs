@@ -57,7 +57,7 @@ pub struct Voice<'a, const NUM_OPERATORS: usize, const NUM_ALGORITHMS: usize> {
 
     feedback_state: [f32; 2],
 
-    patch: Option<&'a Patch>,
+    patch: Option<Patch>,
 
     dirty: bool,
 }
@@ -139,9 +139,14 @@ impl<'a, const NUM_OPERATORS: usize, const NUM_ALGORITHMS: usize>
     }
 
     #[inline]
-    pub fn set_patch(&mut self, patch: Option<&'a Patch>) {
+    pub fn set_patch(&mut self, patch: Option<Patch>) {
         self.patch = patch;
         self.dirty = true;
+    }
+
+    /// Returns the current patch.
+    pub fn patch(&self) -> Option<&Patch> {
+        self.patch.as_ref()
     }
 
     /// Pre-compute everything that can be pre-computed once a patch is loaded:
@@ -153,7 +158,7 @@ impl<'a, const NUM_OPERATORS: usize, const NUM_ALGORITHMS: usize>
             return false;
         }
 
-        if let Some(patch) = self.patch {
+        if let Some(ref patch) = self.patch {
             self.pitch_envelope
                 .set(&patch.pitch_envelope.rate, &patch.pitch_envelope.level);
 
@@ -225,7 +230,7 @@ impl<'a, const NUM_OPERATORS: usize, const NUM_ALGORITHMS: usize>
             self.note = parameters.note;
         }
 
-        if let Some(patch) = self.patch {
+        if let Some(ref patch) = self.patch {
             // Reset operator phase if a note on is detected & if the patch requires it.
             if note_on && patch.reset_phase != 0 {
                 for i in 0..NUM_OPERATORS {
