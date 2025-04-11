@@ -1,5 +1,5 @@
 //! Wave terrain synthesis - a 2D function evaluated along an elliptical path of
-//! adjustable center and excentricity.
+//! adjustable center and eccentricity.
 //!
 //! Engine parameters:
 //! - *HARMONICS:* terrain.

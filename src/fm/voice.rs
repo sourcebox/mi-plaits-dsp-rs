@@ -194,7 +194,7 @@ impl<'a, const NUM_OPERATORS: usize, const NUM_ALGORITHMS: usize>
     pub fn render(&mut self, parameters: &VoiceParameters, buffers: &[RefCell<&mut [f32]>; 4]) {
         if self.setup() {
             // This prevents a CPU overrun, since there is not enough CPU to perform
-            // both a patch setup and a full render in the time alloted for
+            // both a patch setup and a full render in the time allotted for
             // a render. As a drawback, this causes a 0.5ms blank before a new
             // patch starts playing. But this is a clean blank, as opposed to a
             // glitchy overrun.
