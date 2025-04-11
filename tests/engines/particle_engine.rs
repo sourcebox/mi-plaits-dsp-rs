@@ -1,7 +1,7 @@
 //! Tests for noise engine
 
-use mi_plaits_dsp::dsp::engine::*;
-use mi_plaits_dsp::dsp::SAMPLE_RATE;
+use mi_plaits_dsp::engine::*;
+use mi_plaits_dsp::SAMPLE_RATE;
 
 use crate::modulation;
 use crate::wav_writer;

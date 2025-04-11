@@ -2,8 +2,8 @@
 
 mod wav_writer;
 
-use mi_plaits_dsp::dsp::drums::*;
-use mi_plaits_dsp::dsp::SAMPLE_RATE;
+use mi_plaits_dsp::drums::*;
+use mi_plaits_dsp::SAMPLE_RATE;
 
 const BLOCK_SIZE: usize = 24;
 

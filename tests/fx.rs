@@ -3,10 +3,10 @@
 mod modulation;
 mod wav_writer;
 
-use mi_plaits_dsp::dsp::oscillator::sine_oscillator::SineOscillator;
+use mi_plaits_dsp::oscillator::sine_oscillator::SineOscillator;
 
-use mi_plaits_dsp::dsp::fx::*;
-use mi_plaits_dsp::dsp::SAMPLE_RATE;
+use mi_plaits_dsp::fx::*;
+use mi_plaits_dsp::SAMPLE_RATE;
 
 const BLOCK_SIZE: usize = 24;
 

@@ -1,8 +1,8 @@
 //! Tests for virtual analog vcf engine
 
-use mi_plaits_dsp::dsp::engine::*;
-use mi_plaits_dsp::dsp::engine2::*;
-use mi_plaits_dsp::dsp::SAMPLE_RATE;
+use mi_plaits_dsp::engine::*;
+use mi_plaits_dsp::engine2::*;
+use mi_plaits_dsp::SAMPLE_RATE;
 
 use crate::modulation;
 use crate::wav_writer;

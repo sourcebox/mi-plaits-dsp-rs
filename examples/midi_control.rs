@@ -3,7 +3,7 @@
 use audio_midi_shell::{AudioGenerator, AudioMidiShell};
 use simple_logger::SimpleLogger;
 
-use mi_plaits_dsp::dsp::voice::{Modulations, Patch, Voice};
+use mi_plaits_dsp::voice::{Modulations, Patch, Voice};
 
 const SAMPLE_RATE: u32 = 48000;
 const BLOCK_SIZE: usize = 256;
