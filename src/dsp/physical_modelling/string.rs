@@ -39,6 +39,12 @@ pub struct String {
     out_sample: [f32; 2],
 }
 
+impl Default for String {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl String {
     pub fn new() -> Self {
         Self {

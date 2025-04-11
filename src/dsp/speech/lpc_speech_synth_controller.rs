@@ -35,6 +35,12 @@ pub struct LpcSpeechSynthController<'a> {
     word_bank: LpcSpeechSynthWordBank<'a>,
 }
 
+impl Default for LpcSpeechSynthController<'_> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl LpcSpeechSynthController<'_> {
     pub fn new() -> Self {
         Self {

@@ -15,6 +15,12 @@ pub struct StringVoice {
     remaining_noise_samples: usize,
 }
 
+impl Default for StringVoice {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl StringVoice {
     pub fn new() -> Self {
         Self {
