@@ -19,10 +19,10 @@
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-use core::alloc::GlobalAlloc;
+use alloc::boxed::Box;
+use alloc::vec;
 
 use super::{note_to_frequency, Engine, EngineParameters, TriggerState};
-use crate::dsp::allocate_buffer;
 use crate::dsp::speech::lpc_speech_synth_controller::LpcSpeechSynthController;
 use crate::dsp::speech::lpc_speech_synth_words::NUM_WORD_BANKS;
 use crate::dsp::speech::naive_speech_synth::NaiveSpeechSynth;
@@ -37,21 +37,21 @@ pub struct SpeechEngine<'a> {
     sam_speech_synth: SamSpeechSynth,
 
     lpc_speech_synth_controller: LpcSpeechSynthController<'a>,
-    temp_buffer_1: &'a mut [f32],
-    temp_buffer_2: &'a mut [f32],
+    temp_buffer_1: Box<[f32]>,
+    temp_buffer_2: Box<[f32]>,
     prosody_amount: f32,
     speed: f32,
 }
 
 impl SpeechEngine<'_> {
-    pub fn new<T: GlobalAlloc>(buffer_allocator: &T, block_size: usize) -> Self {
+    pub fn new(block_size: usize) -> Self {
         Self {
             word_bank_quantizer: HysteresisQuantizer2::new(),
             naive_speech_synth: NaiveSpeechSynth::new(),
             sam_speech_synth: SamSpeechSynth::new(),
-            lpc_speech_synth_controller: LpcSpeechSynthController::new(buffer_allocator),
-            temp_buffer_1: allocate_buffer(buffer_allocator, block_size).unwrap(),
-            temp_buffer_2: allocate_buffer(buffer_allocator, block_size).unwrap(),
+            lpc_speech_synth_controller: LpcSpeechSynthController::new(),
+            temp_buffer_1: vec![0.0; block_size].into_boxed_slice(),
+            temp_buffer_2: vec![0.0; block_size].into_boxed_slice(),
             prosody_amount: 0.0,
             speed: 1.0,
         }
@@ -101,7 +101,7 @@ impl Engine for SpeechEngine<'_> {
                     f0,
                     parameters.morph,
                     parameters.timbre,
-                    self.temp_buffer_1,
+                    &mut self.temp_buffer_1,
                     aux,
                     out,
                 );
@@ -127,8 +127,8 @@ impl Engine for SpeechEngine<'_> {
                 f0,
                 parameters.morph,
                 parameters.timbre,
-                self.temp_buffer_1,
-                self.temp_buffer_2,
+                &mut self.temp_buffer_1,
+                &mut self.temp_buffer_2,
             );
 
             blend = blend * blend * (3.0 - 2.0 * blend);

@@ -31,7 +31,7 @@ struct App<'a> {
 impl<'a> App<'a> {
     pub fn new() -> Self {
         Self {
-            voices: core::array::from_fn(|_| Voice::new(&std::alloc::System, BLOCK_SIZE)),
+            voices: core::array::from_fn(|_| Voice::new(BLOCK_SIZE)),
             patches: core::array::from_fn(|_| Patch::default()),
             modulations: core::array::from_fn(|_| Modulations::default()),
             volume: 1.0,

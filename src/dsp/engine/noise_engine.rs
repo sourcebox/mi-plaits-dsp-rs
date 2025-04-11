@@ -12,10 +12,10 @@
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-use core::alloc::GlobalAlloc;
+use alloc::boxed::Box;
+use alloc::vec;
 
 use super::{note_to_frequency, Engine, EngineParameters, TriggerState};
-use crate::dsp::allocate_buffer;
 use crate::dsp::noise::clocked_noise::ClockedNoise;
 use crate::stmlib::dsp::filter::{FilterMode, FrequencyApproximation, Svf};
 use crate::stmlib::dsp::parameter_interpolator::ParameterInterpolator;
@@ -23,7 +23,7 @@ use crate::stmlib::dsp::sqrt;
 use crate::stmlib::dsp::units::semitones_to_ratio;
 
 #[derive(Debug)]
-pub struct NoiseEngine<'a> {
+pub struct NoiseEngine {
     clocked_noise: [ClockedNoise; 2],
     lp_hp_filter: Svf,
     bp_filter: [Svf; 2],
@@ -33,11 +33,11 @@ pub struct NoiseEngine<'a> {
     previous_q: f32,
     previous_mode: f32,
 
-    temp_buffer: &'a mut [f32],
+    temp_buffer: Box<[f32]>,
 }
 
-impl NoiseEngine<'_> {
-    pub fn new<T: GlobalAlloc>(buffer_allocator: &T, block_size: usize) -> Self {
+impl NoiseEngine {
+    pub fn new(block_size: usize) -> Self {
         Self {
             clocked_noise: [ClockedNoise::default(), ClockedNoise::default()],
             lp_hp_filter: Svf::default(),
@@ -46,12 +46,12 @@ impl NoiseEngine<'_> {
             previous_f1: 0.0,
             previous_q: 0.0,
             previous_mode: 0.0,
-            temp_buffer: allocate_buffer(buffer_allocator, block_size).unwrap(),
+            temp_buffer: vec![0.0; block_size].into_boxed_slice(),
         }
     }
 }
 
-impl Engine for NoiseEngine<'_> {
+impl Engine for NoiseEngine {
     fn init(&mut self) {
         self.clocked_noise[0].init();
         self.clocked_noise[1].init();
@@ -84,7 +84,7 @@ impl Engine for NoiseEngine<'_> {
         let q = 0.5 * semitones_to_ratio(parameters.morph * 120.0);
         let sync = trigger;
         self.clocked_noise[0].render(sync, clock_f, aux);
-        self.clocked_noise[1].render(sync, clock_f * f1 / f0, self.temp_buffer);
+        self.clocked_noise[1].render(sync, clock_f * f1 / f0, &mut self.temp_buffer);
 
         let mut f0_modulation = ParameterInterpolator::new(&mut self.previous_f0, f0, out.len());
         let mut f1_modulation = ParameterInterpolator::new(&mut self.previous_f1, f1, out.len());

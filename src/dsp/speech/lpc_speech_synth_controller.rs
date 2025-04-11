@@ -2,7 +2,8 @@
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-use core::alloc::{GlobalAlloc, Layout};
+use alloc::boxed::Box;
+use alloc::vec;
 
 use super::lpc_speech_synth::{LpcSpeechSynth, LpcSpeechSynthFrame, LPC_SPEECH_SYNTH_DEFAULT_F0};
 use super::lpc_speech_synth_phonemes::PHONEMES;
@@ -35,7 +36,7 @@ pub struct LpcSpeechSynthController<'a> {
 }
 
 impl LpcSpeechSynthController<'_> {
-    pub fn new<T: GlobalAlloc>(buffer_allocator: &T) -> Self {
+    pub fn new() -> Self {
         Self {
             clock_phase: 0.0,
             sample: [0.0; 2],
@@ -45,11 +46,7 @@ impl LpcSpeechSynthController<'_> {
             playback_frame: -1,
             last_playback_frame: -1,
             remaining_frame_samples: 0,
-            word_bank: LpcSpeechSynthWordBank::new(
-                buffer_allocator,
-                WORD_BANKS.as_slice(),
-                NUM_WORD_BANKS,
-            ),
+            word_bank: LpcSpeechSynthWordBank::new(WORD_BANKS.as_slice(), NUM_WORD_BANKS),
         }
     }
 
@@ -209,15 +206,11 @@ pub struct LpcSpeechSynthWordBank<'a> {
     num_words: usize,
     word_boundaries: [usize; MAX_WORDS],
 
-    frames: &'a mut [LpcSpeechSynthFrame],
+    frames: Box<[LpcSpeechSynthFrame]>,
 }
 
 impl<'a> LpcSpeechSynthWordBank<'a> {
-    pub fn new<T: GlobalAlloc>(
-        buffer_allocator: &T,
-        word_banks: &'a [LpcSpeechSynthWordBankData<'a>],
-        num_banks: usize,
-    ) -> Self {
+    pub fn new(word_banks: &'a [LpcSpeechSynthWordBankData<'a>], num_banks: usize) -> Self {
         Self {
             word_banks,
             num_banks,
@@ -225,7 +218,7 @@ impl<'a> LpcSpeechSynthWordBank<'a> {
             num_frames: 0,
             num_words: 0,
             word_boundaries: [0; MAX_WORDS],
-            frames: allocate_buffer(buffer_allocator, MAX_FRAMES),
+            frames: vec![LpcSpeechSynthFrame::default(); MAX_FRAMES].into_boxed_slice(),
         }
     }
 
@@ -323,7 +316,7 @@ impl<'a> LpcSpeechSynthWordBank<'a> {
 
     #[inline]
     pub fn frames(&mut self) -> &mut [LpcSpeechSynthFrame] {
-        self.frames
+        &mut self.frames
     }
 
     #[inline]
@@ -448,18 +441,3 @@ const K7_LUT: [i8; 8] = [-64, -40, -16, 7, 31, 55, 79, 102];
 const K8_LUT: [i8; 8] = [-64, -44, -24, -4, 16, 37, 57, 77];
 
 const K9_LUT: [i8; 8] = [-51, -33, -15, 4, 22, 32, 59, 77];
-
-pub fn allocate_buffer<T: GlobalAlloc>(
-    buffer_allocator: &T,
-    buffer_length: usize,
-) -> &'static mut [LpcSpeechSynthFrame] {
-    let size = buffer_length * core::mem::size_of::<LpcSpeechSynthFrame>();
-    let buffer = unsafe {
-        buffer_allocator.alloc_zeroed(Layout::from_size_align(size, 8).unwrap())
-            as *mut LpcSpeechSynthFrame
-    };
-    let buffer: &mut [LpcSpeechSynthFrame] =
-        unsafe { core::slice::from_raw_parts_mut(buffer, buffer_length) };
-
-    buffer
-}

@@ -13,34 +13,34 @@
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-use core::alloc::GlobalAlloc;
+use alloc::boxed::Box;
+use alloc::vec;
 
 use super::{note_to_frequency, Engine, EngineParameters, TriggerState};
-use crate::dsp::allocate_buffer;
 use crate::dsp::physical_modelling::modal_voice::ModalVoice;
 use crate::stmlib::dsp::one_pole;
 
 #[derive(Debug)]
-pub struct ModalEngine<'a> {
+pub struct ModalEngine {
     voice: ModalVoice,
     harmonics_lp: f32,
 
-    temp_buffer_1: &'a mut [f32],
-    temp_buffer_2: &'a mut [f32],
+    temp_buffer_1: Box<[f32]>,
+    temp_buffer_2: Box<[f32]>,
 }
 
-impl ModalEngine<'_> {
-    pub fn new<T: GlobalAlloc>(buffer_allocator: &T, block_size: usize) -> Self {
+impl ModalEngine {
+    pub fn new(block_size: usize) -> Self {
         Self {
             voice: ModalVoice::default(),
             harmonics_lp: 0.0,
-            temp_buffer_1: allocate_buffer(buffer_allocator, block_size).unwrap(),
-            temp_buffer_2: allocate_buffer(buffer_allocator, block_size).unwrap(),
+            temp_buffer_1: vec![0.0; block_size].into_boxed_slice(),
+            temp_buffer_2: vec![0.0; block_size].into_boxed_slice(),
         }
     }
 }
 
-impl Engine for ModalEngine<'_> {
+impl Engine for ModalEngine {
     fn init(&mut self) {
         self.harmonics_lp = 0.0;
         self.reset();
@@ -74,8 +74,8 @@ impl Engine for ModalEngine<'_> {
             self.harmonics_lp,
             parameters.timbre,
             parameters.morph,
-            self.temp_buffer_1,
-            self.temp_buffer_2,
+            &mut self.temp_buffer_1,
+            &mut self.temp_buffer_2,
             out,
             aux,
         );

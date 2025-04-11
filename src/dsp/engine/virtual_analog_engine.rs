@@ -13,16 +13,16 @@
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-use core::alloc::GlobalAlloc;
+use alloc::boxed::Box;
+use alloc::vec;
 
 use super::{note_to_frequency, Engine, EngineParameters};
-use crate::dsp::allocate_buffer;
 use crate::dsp::oscillator::variable_saw_oscillator::VariableSawOscillator;
 use crate::dsp::oscillator::variable_shape_oscillator::VariableShapeOscillator;
 use crate::stmlib::dsp::parameter_interpolator::ParameterInterpolator;
 
 #[derive(Debug)]
-pub struct VirtualAnalogEngine<'a> {
+pub struct VirtualAnalogEngine {
     primary: VariableShapeOscillator,
     auxiliary: VariableShapeOscillator,
 
@@ -31,11 +31,12 @@ pub struct VirtualAnalogEngine<'a> {
 
     auxiliary_amount: f32,
     xmod_amount: f32,
-    temp_buffer: &'a mut [f32],
+
+    temp_buffer: Box<[f32]>,
 }
 
-impl VirtualAnalogEngine<'_> {
-    pub fn new<T: GlobalAlloc>(buffer_allocator: &T, block_size: usize) -> Self {
+impl VirtualAnalogEngine {
+    pub fn new(block_size: usize) -> Self {
         Self {
             primary: VariableShapeOscillator::new(),
             auxiliary: VariableShapeOscillator::new(),
@@ -43,12 +44,12 @@ impl VirtualAnalogEngine<'_> {
             variable_saw: VariableSawOscillator::new(),
             auxiliary_amount: 0.0,
             xmod_amount: 0.0,
-            temp_buffer: allocate_buffer(buffer_allocator, block_size).unwrap(),
+            temp_buffer: vec![0.0; block_size].into_boxed_slice(),
         }
     }
 }
 
-impl Engine for VirtualAnalogEngine<'_> {
+impl Engine for VirtualAnalogEngine {
     fn init(&mut self) {
         self.primary.init();
         self.auxiliary.init();
@@ -138,7 +139,7 @@ impl Engine for VirtualAnalogEngine<'_> {
             square_pw,
             1.0,
             0.0,
-            self.temp_buffer,
+            &mut self.temp_buffer,
             true,
             false,
         );

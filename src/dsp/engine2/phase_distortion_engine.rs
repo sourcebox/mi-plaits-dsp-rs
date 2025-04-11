@@ -10,9 +10,9 @@
 
 // Based on MIT-licensed code (c) 2021 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-use core::alloc::GlobalAlloc;
+use alloc::boxed::Box;
+use alloc::vec;
 
-use crate::dsp::allocate_buffer;
 use crate::dsp::engine::{note_to_frequency, Engine, EngineParameters};
 use crate::dsp::oscillator::sine_oscillator::sine;
 use crate::dsp::oscillator::variable_shape_oscillator::VariableShapeOscillator;
@@ -21,25 +21,26 @@ use crate::stmlib::dsp::interpolate;
 use crate::stmlib::dsp::units::semitones_to_ratio;
 
 #[derive(Debug)]
-pub struct PhaseDistortionEngine<'a> {
+pub struct PhaseDistortionEngine {
     shaper: VariableShapeOscillator,
     modulator: VariableShapeOscillator,
-    temp_buffer_1: &'a mut [f32],
-    temp_buffer_2: &'a mut [f32],
+
+    temp_buffer_1: Box<[f32]>,
+    temp_buffer_2: Box<[f32]>,
 }
 
-impl PhaseDistortionEngine<'_> {
-    pub fn new<T: GlobalAlloc>(buffer_allocator: &T, block_size: usize) -> Self {
+impl PhaseDistortionEngine {
+    pub fn new(block_size: usize) -> Self {
         Self {
             shaper: VariableShapeOscillator::new(),
             modulator: VariableShapeOscillator::new(),
-            temp_buffer_1: allocate_buffer(buffer_allocator, block_size * 2).unwrap(),
-            temp_buffer_2: allocate_buffer(buffer_allocator, block_size * 2).unwrap(),
+            temp_buffer_1: vec![0.0; block_size * 2].into_boxed_slice(),
+            temp_buffer_2: vec![0.0; block_size * 2].into_boxed_slice(),
         }
     }
 }
 
-impl Engine for PhaseDistortionEngine<'_> {
+impl Engine for PhaseDistortionEngine {
     fn init(&mut self) {
         self.shaper.init();
         self.modulator.init();

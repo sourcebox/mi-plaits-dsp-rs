@@ -13,45 +13,41 @@
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-use core::alloc::GlobalAlloc;
+use alloc::boxed::Box;
+use alloc::vec;
 
 use super::{note_to_frequency, Engine, EngineParameters, TriggerState};
-use crate::dsp::allocate_buffer;
-use crate::dsp::physical_modelling::delay_line::DelayLine;
 use crate::dsp::physical_modelling::string_voice::StringVoice;
+use crate::stmlib::dsp::delay_line::DelayLine;
 
 const NUM_STRINGS: usize = 3;
 
 #[derive(Debug)]
-pub struct StringEngine<'a> {
-    voice: [StringVoice<'a>; NUM_STRINGS],
+pub struct StringEngine {
+    voice: [StringVoice; NUM_STRINGS],
 
     f0: [f32; NUM_STRINGS],
-    f0_delay: DelayLine<'a, f32, 16>,
+    f0_delay: DelayLine<f32, 16>,
     active_string: usize,
-    temp_buffer_1: &'a mut [f32],
-    temp_buffer_2: &'a mut [f32],
+
+    temp_buffer_1: Box<[f32]>,
+    temp_buffer_2: Box<[f32]>,
 }
 
-impl<'a> StringEngine<'a> {
-    pub fn new<T: GlobalAlloc>(buffer_allocator: &T, block_size: usize) -> Self {
+impl StringEngine {
+    pub fn new(block_size: usize) -> Self {
         Self {
-            voice: core::array::from_fn(|_| StringVoice::new(buffer_allocator)),
+            voice: core::array::from_fn(|_| StringVoice::new()),
             f0: [0.0; NUM_STRINGS],
-            f0_delay: DelayLine::<'a, f32, 16>::new(
-                allocate_buffer(buffer_allocator, 16)
-                    .unwrap()
-                    .try_into()
-                    .unwrap(),
-            ),
+            f0_delay: DelayLine::<f32, 16>::new(),
             active_string: 0,
-            temp_buffer_1: allocate_buffer(buffer_allocator, block_size).unwrap(),
-            temp_buffer_2: allocate_buffer(buffer_allocator, block_size).unwrap(),
+            temp_buffer_1: vec![0.0; block_size].into_boxed_slice(),
+            temp_buffer_2: vec![0.0; block_size].into_boxed_slice(),
         }
     }
 }
 
-impl Engine for StringEngine<'_> {
+impl Engine for StringEngine {
     fn init(&mut self) {
         for voice in &mut self.voice {
             voice.init();
@@ -102,8 +98,8 @@ impl Engine for StringEngine<'_> {
                 parameters.harmonics,
                 parameters.timbre * parameters.timbre,
                 parameters.morph,
-                self.temp_buffer_1,
-                self.temp_buffer_2,
+                &mut self.temp_buffer_1,
+                &mut self.temp_buffer_2,
                 out,
                 aux,
             );

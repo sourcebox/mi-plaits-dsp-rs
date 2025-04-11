@@ -2,8 +2,6 @@
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-use core::alloc::GlobalAlloc;
-
 use super::string::String;
 use crate::dsp::noise::dust::dust;
 use crate::stmlib::dsp::filter::{FilterMode, FrequencyApproximation, Svf};
@@ -11,17 +9,17 @@ use crate::stmlib::dsp::units::semitones_to_ratio;
 use crate::stmlib::utils::random;
 
 #[derive(Debug)]
-pub struct StringVoice<'a> {
+pub struct StringVoice {
     excitation_filter: Svf,
-    string: String<'a>,
+    string: String,
     remaining_noise_samples: usize,
 }
 
-impl StringVoice<'_> {
-    pub fn new<T: GlobalAlloc>(buffer_allocator: &T) -> Self {
+impl StringVoice {
+    pub fn new() -> Self {
         Self {
             excitation_filter: Svf::default(),
-            string: String::new(buffer_allocator),
+            string: String::new(),
             remaining_noise_samples: 0,
         }
     }

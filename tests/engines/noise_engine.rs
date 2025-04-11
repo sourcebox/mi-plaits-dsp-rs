@@ -10,7 +10,7 @@ const BLOCK_SIZE: usize = 24;
 
 #[test]
 fn noise_engine_harmonics() {
-    let mut engine = noise_engine::NoiseEngine::new(&std::alloc::System, BLOCK_SIZE);
+    let mut engine = noise_engine::NoiseEngine::new(BLOCK_SIZE);
     let mut out = [0.0; BLOCK_SIZE];
     let mut aux = [0.0; BLOCK_SIZE];
     let mut wav_data = Vec::new();
@@ -47,7 +47,7 @@ fn noise_engine_harmonics() {
 
 #[test]
 fn noise_engine_timbre() {
-    let mut engine = noise_engine::NoiseEngine::new(&std::alloc::System, BLOCK_SIZE);
+    let mut engine = noise_engine::NoiseEngine::new(BLOCK_SIZE);
     let mut out = [0.0; BLOCK_SIZE];
     let mut aux = [0.0; BLOCK_SIZE];
     let mut wav_data = Vec::new();
@@ -84,7 +84,7 @@ fn noise_engine_timbre() {
 
 #[test]
 fn noise_engine_morph() {
-    let mut engine = noise_engine::NoiseEngine::new(&std::alloc::System, BLOCK_SIZE);
+    let mut engine = noise_engine::NoiseEngine::new(BLOCK_SIZE);
     let mut out = [0.0; BLOCK_SIZE];
     let mut aux = [0.0; BLOCK_SIZE];
     let mut wav_data = Vec::new();

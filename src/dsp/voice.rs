@@ -2,8 +2,6 @@
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-use core::alloc::GlobalAlloc;
-
 #[allow(unused_imports)]
 use num_traits::float::Float;
 
@@ -32,11 +30,11 @@ use super::engine2::virtual_analog_vcf_engine::VirtualAnalogVcfEngine;
 use super::engine2::wave_terrain_engine::WaveTerrainEngine;
 use super::envelope::{DecayEnvelope, LpgEnvelope};
 use super::fx::low_pass_gate::LowPassGate;
-use super::physical_modelling::delay_line::DelayLine;
 use crate::dsp::resources::sysex::{SYX_BANK_0, SYX_BANK_1, SYX_BANK_2};
 use crate::dsp::resources::waves::WAV_INTEGRATED_WAVES;
-use crate::dsp::{allocate_buffer, SAMPLE_RATE};
+use crate::dsp::SAMPLE_RATE;
 use crate::stmlib::dsp::clip_16;
+use crate::stmlib::dsp::delay_line::DelayLine;
 use crate::stmlib::dsp::hysteresis_quantizer::HysteresisQuantizer2;
 use crate::stmlib::dsp::limiter::Limiter;
 use crate::stmlib::dsp::units::semitones_to_ratio;
@@ -178,18 +176,18 @@ pub struct Voice<'a> {
     pub chord_engine: ChordEngine<'a>,
     pub fm_engine: FmEngine,
     pub grain_engine: GrainEngine,
-    pub hihat_engine: HihatEngine<'a>,
-    pub modal_engine: ModalEngine<'a>,
-    pub noise_engine: NoiseEngine<'a>,
-    pub particle_engine: ParticleEngine<'a>,
-    pub phase_distortion_engine: PhaseDistortionEngine<'a>,
+    pub hihat_engine: HihatEngine,
+    pub modal_engine: ModalEngine,
+    pub noise_engine: NoiseEngine,
+    pub particle_engine: ParticleEngine,
+    pub phase_distortion_engine: PhaseDistortionEngine,
     pub six_op_engine: SixOpEngine<'a>,
     pub snare_drum_engine: SnareDrumEngine,
     pub speech_engine: SpeechEngine<'a>,
-    pub string_engine: StringEngine<'a>,
+    pub string_engine: StringEngine,
     pub string_machine_engine: StringMachineEngine,
     pub swarm_engine: SwarmEngine,
-    pub virtual_analog_engine: VirtualAnalogEngine<'a>,
+    pub virtual_analog_engine: VirtualAnalogEngine,
     pub virtual_analog_vcf_engine: VirtualAnalogVcfEngine,
     pub waveshaping_engine: WaveshapingEngine,
     pub wavetable_engine: WavetableEngine<'a>,
@@ -209,14 +207,14 @@ pub struct Voice<'a> {
     decay_envelope: DecayEnvelope,
     lpg_envelope: LpgEnvelope,
 
-    trigger_delay: DelayLine<'a, f32, MAX_TRIGGER_DELAY>,
+    trigger_delay: DelayLine<f32, MAX_TRIGGER_DELAY>,
 
     out_post_processor: ChannelPostProcessor,
     aux_post_processor: ChannelPostProcessor,
 }
 
 impl Voice<'_> {
-    pub fn new<T: GlobalAlloc>(buffer_allocator: &T, block_size: usize) -> Self {
+    pub fn new(block_size: usize) -> Self {
         Self {
             additive_engine: AdditiveEngine::new(),
             bass_drum_engine: BassDrumEngine::new(),
@@ -224,22 +222,22 @@ impl Voice<'_> {
             chord_engine: ChordEngine::new(),
             fm_engine: FmEngine::new(),
             grain_engine: GrainEngine::new(),
-            hihat_engine: HihatEngine::new(buffer_allocator, block_size),
-            modal_engine: ModalEngine::new(buffer_allocator, block_size),
-            noise_engine: NoiseEngine::new(buffer_allocator, block_size),
-            particle_engine: ParticleEngine::new(buffer_allocator, block_size),
-            phase_distortion_engine: PhaseDistortionEngine::new(buffer_allocator, block_size),
-            six_op_engine: SixOpEngine::new(buffer_allocator, block_size),
+            hihat_engine: HihatEngine::new(block_size),
+            modal_engine: ModalEngine::new(block_size),
+            noise_engine: NoiseEngine::new(block_size),
+            particle_engine: ParticleEngine::new(block_size),
+            phase_distortion_engine: PhaseDistortionEngine::new(block_size),
+            six_op_engine: SixOpEngine::new(block_size),
             snare_drum_engine: SnareDrumEngine::new(),
-            speech_engine: SpeechEngine::new(buffer_allocator, block_size),
-            string_engine: StringEngine::new(buffer_allocator, block_size),
+            speech_engine: SpeechEngine::new(block_size),
+            string_engine: StringEngine::new(block_size),
             string_machine_engine: StringMachineEngine::new(),
             swarm_engine: SwarmEngine::new(),
-            virtual_analog_engine: VirtualAnalogEngine::new(buffer_allocator, block_size),
+            virtual_analog_engine: VirtualAnalogEngine::new(block_size),
             virtual_analog_vcf_engine: VirtualAnalogVcfEngine::new(),
             waveshaping_engine: WaveshapingEngine::new(),
             wavetable_engine: WavetableEngine::new(),
-            waveterrain_engine: WaveTerrainEngine::new(buffer_allocator, block_size),
+            waveterrain_engine: WaveTerrainEngine::new(block_size),
 
             resources: Resources::default(),
 
@@ -254,12 +252,7 @@ impl Voice<'_> {
             decay_envelope: DecayEnvelope::new(),
             lpg_envelope: LpgEnvelope::new(),
 
-            trigger_delay: DelayLine::new(
-                allocate_buffer(buffer_allocator, MAX_TRIGGER_DELAY)
-                    .unwrap()
-                    .try_into()
-                    .unwrap(),
-            ),
+            trigger_delay: DelayLine::new(),
 
             out_post_processor: ChannelPostProcessor::new(),
             aux_post_processor: ChannelPostProcessor::new(),

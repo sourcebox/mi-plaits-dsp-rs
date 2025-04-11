@@ -11,8 +11,7 @@ const BLOCK_SIZE: usize = 24;
 
 #[test]
 fn phase_distortion_engine_harmonics() {
-    let mut engine =
-        phase_distortion_engine::PhaseDistortionEngine::new(&std::alloc::System, BLOCK_SIZE);
+    let mut engine = phase_distortion_engine::PhaseDistortionEngine::new(BLOCK_SIZE);
     let mut out = [0.0; BLOCK_SIZE];
     let mut aux = [0.0; BLOCK_SIZE];
     let mut wav_data = Vec::new();
@@ -57,8 +56,7 @@ fn phase_distortion_engine_harmonics() {
 
 #[test]
 fn phase_distortion_engine_timbre() {
-    let mut engine =
-        phase_distortion_engine::PhaseDistortionEngine::new(&std::alloc::System, BLOCK_SIZE);
+    let mut engine = phase_distortion_engine::PhaseDistortionEngine::new(BLOCK_SIZE);
     let mut out = [0.0; BLOCK_SIZE];
     let mut aux = [0.0; BLOCK_SIZE];
     let mut wav_data = Vec::new();
@@ -103,8 +101,7 @@ fn phase_distortion_engine_timbre() {
 
 #[test]
 fn phase_distortion_engine_morph() {
-    let mut engine =
-        phase_distortion_engine::PhaseDistortionEngine::new(&std::alloc::System, BLOCK_SIZE);
+    let mut engine = phase_distortion_engine::PhaseDistortionEngine::new(BLOCK_SIZE);
     let mut out = [0.0; BLOCK_SIZE];
     let mut aux = [0.0; BLOCK_SIZE];
     let mut wav_data = Vec::new();

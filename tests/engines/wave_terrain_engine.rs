@@ -11,7 +11,7 @@ const BLOCK_SIZE: usize = 24;
 
 #[test]
 fn wave_terrain_engine_harmonics() {
-    let mut engine = wave_terrain_engine::WaveTerrainEngine::new(&std::alloc::System, BLOCK_SIZE);
+    let mut engine = wave_terrain_engine::WaveTerrainEngine::new(BLOCK_SIZE);
     let mut out = [0.0; BLOCK_SIZE];
     let mut aux = [0.0; BLOCK_SIZE];
     let mut wav_data = Vec::new();
@@ -52,7 +52,7 @@ fn wave_terrain_engine_harmonics() {
 
 #[test]
 fn wave_terrain_engine_timbre() {
-    let mut engine = wave_terrain_engine::WaveTerrainEngine::new(&std::alloc::System, BLOCK_SIZE);
+    let mut engine = wave_terrain_engine::WaveTerrainEngine::new(BLOCK_SIZE);
     let mut out = [0.0; BLOCK_SIZE];
     let mut aux = [0.0; BLOCK_SIZE];
     let mut wav_data = Vec::new();
@@ -93,7 +93,7 @@ fn wave_terrain_engine_timbre() {
 
 #[test]
 fn wave_terrain_engine_morph() {
-    let mut engine = wave_terrain_engine::WaveTerrainEngine::new(&std::alloc::System, BLOCK_SIZE);
+    let mut engine = wave_terrain_engine::WaveTerrainEngine::new(BLOCK_SIZE);
     let mut out = [0.0; BLOCK_SIZE];
     let mut aux = [0.0; BLOCK_SIZE];
     let mut wav_data = Vec::new();

@@ -94,7 +94,7 @@ fn string() {
     let damping = 0.7;
     let duration = 2.0;
 
-    let mut model = string::String::new(&std::alloc::System);
+    let mut model = string::String::new();
     let mut out = [0.0; BLOCK_SIZE];
     let mut wav_data = Vec::new();
     model.reset();
@@ -131,7 +131,7 @@ fn string_voice() {
     let damping = 0.7;
     let duration = 2.0;
 
-    let mut model = string_voice::StringVoice::new(&std::alloc::System);
+    let mut model = string_voice::StringVoice::new();
     let mut out = [0.0; BLOCK_SIZE];
     let mut aux = [0.0; BLOCK_SIZE];
     let mut temp = [0.0; BLOCK_SIZE];

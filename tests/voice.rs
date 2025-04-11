@@ -9,7 +9,7 @@ const BLOCK_SIZE: usize = 24;
 
 #[test]
 fn all_engines() {
-    let mut voice = Voice::new(&std::alloc::System, BLOCK_SIZE);
+    let mut voice = Voice::new(BLOCK_SIZE);
     let mut out = [0.0; BLOCK_SIZE];
     let mut aux = [0.0; BLOCK_SIZE];
     let mut wav_data = Vec::new();
@@ -65,7 +65,7 @@ fn all_engines() {
 
 #[test]
 fn all_engines_trigger() {
-    let mut voice = Voice::new(&std::alloc::System, BLOCK_SIZE);
+    let mut voice = Voice::new(BLOCK_SIZE);
     let mut out = [0.0; BLOCK_SIZE];
     let mut aux = [0.0; BLOCK_SIZE];
     let mut wav_data = Vec::new();

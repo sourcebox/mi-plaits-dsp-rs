@@ -7,7 +7,8 @@
 
 // Based on MIT-licensed code (c) 2021 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-use core::alloc::GlobalAlloc;
+use alloc::boxed::Box;
+use alloc::vec;
 use core::cell::RefCell;
 
 use spin::Once;
@@ -19,7 +20,7 @@ use crate::dsp::fm::{
     patch::{Patch, SYX_SIZE},
     voice::{Voice, VoiceParameters},
 };
-use crate::dsp::{allocate_buffer, SAMPLE_RATE};
+use crate::dsp::SAMPLE_RATE;
 use crate::stmlib::dsp::hysteresis_quantizer::HysteresisQuantizer2;
 use crate::stmlib::dsp::soft_clip;
 
@@ -35,22 +36,22 @@ pub struct SixOpEngine<'a> {
     patch_index_quantizer: HysteresisQuantizer2,
     voice: [FmVoice<'a>; NUM_SIX_OP_VOICES],
 
-    temp_buffer: &'a mut [f32],
+    temp_buffer: Box<[f32]>,
 
     active_voice: i32,
     rendered_voice: i32,
 }
 
 impl SixOpEngine<'_> {
-    pub fn new<A: GlobalAlloc>(buffer_allocator: &A, block_size: usize) -> Self {
+    pub fn new(block_size: usize) -> Self {
         unsafe {
             let patches: [Patch; NUM_PATCHES_PER_BANK] = core::array::from_fn(|_| Patch::new());
             PATCHES = Some(patches);
         }
         Self {
             patch_index_quantizer: HysteresisQuantizer2::new(),
-            voice: core::array::from_fn(|_| FmVoice::new(buffer_allocator, block_size)),
-            temp_buffer: allocate_buffer(buffer_allocator, block_size).unwrap(),
+            voice: core::array::from_fn(|_| FmVoice::new(block_size)),
+            temp_buffer: vec![0.0; block_size].into_boxed_slice(),
             active_voice: 0,
             rendered_voice: 0,
         }
@@ -166,7 +167,7 @@ impl Engine for SixOpEngine<'_> {
         for voice in self.voice.iter_mut() {
             self.temp_buffer.fill(0.0);
 
-            voice.render(self.temp_buffer);
+            voice.render(&mut self.temp_buffer);
 
             for (out_sample, temp_sample) in out.iter_mut().zip(self.temp_buffer.iter()) {
                 *out_sample = soft_clip(*out_sample + *temp_sample * 0.25);
@@ -185,21 +186,21 @@ pub struct FmVoice<'a> {
     voice: Voice<'a, 6, 32>,
     parameters: VoiceParameters,
 
-    temp_buffer_1: &'a mut [f32],
-    temp_buffer_2: &'a mut [f32],
-    temp_buffer_3: &'a mut [f32],
+    temp_buffer_1: Box<[f32]>,
+    temp_buffer_2: Box<[f32]>,
+    temp_buffer_3: Box<[f32]>,
 }
 
 impl<'a> FmVoice<'a> {
-    pub fn new<T: GlobalAlloc>(buffer_allocator: &T, block_size: usize) -> Self {
+    pub fn new(block_size: usize) -> Self {
         Self {
             patch: None,
             lfo: Lfo::new(),
             voice: Voice::<'a, 6, 32>::new(),
             parameters: VoiceParameters::new(),
-            temp_buffer_1: allocate_buffer(buffer_allocator, block_size).unwrap(),
-            temp_buffer_2: allocate_buffer(buffer_allocator, block_size).unwrap(),
-            temp_buffer_3: allocate_buffer(buffer_allocator, block_size).unwrap(),
+            temp_buffer_1: vec![0.0; block_size].into_boxed_slice(),
+            temp_buffer_2: vec![0.0; block_size].into_boxed_slice(),
+            temp_buffer_3: vec![0.0; block_size].into_boxed_slice(),
         }
     }
 
@@ -239,9 +240,9 @@ impl<'a> FmVoice<'a> {
 
         let buffers = [
             RefCell::new(out),
-            RefCell::new(self.temp_buffer_1),
-            RefCell::new(self.temp_buffer_2),
-            RefCell::new(self.temp_buffer_3),
+            RefCell::new(&mut self.temp_buffer_1),
+            RefCell::new(&mut self.temp_buffer_2),
+            RefCell::new(&mut self.temp_buffer_3),
         ];
 
         self.voice.render(&self.parameters, &buffers);

@@ -12,13 +12,13 @@
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-use core::alloc::GlobalAlloc;
+use alloc::boxed::Box;
+use alloc::vec;
 
 #[allow(unused_imports)]
 use num_traits::float::Float;
 
 use super::{note_to_frequency, Engine, EngineParameters, TriggerState};
-use crate::dsp::allocate_buffer;
 use crate::dsp::fx::diffuser::Diffuser;
 use crate::dsp::noise::particle::Particle;
 use crate::stmlib::dsp::filter::{FilterMode, FrequencyApproximation, Svf};
@@ -27,25 +27,26 @@ use crate::stmlib::dsp::units::semitones_to_ratio;
 const NUM_PARTICLES: usize = 6;
 
 #[derive(Debug)]
-pub struct ParticleEngine<'a> {
+pub struct ParticleEngine {
     particle: [Particle; NUM_PARTICLES],
     diffuser: Diffuser,
     post_filter: Svf,
-    temp_buffer: &'a mut [f32],
+
+    temp_buffer: Box<[f32]>,
 }
 
-impl ParticleEngine<'_> {
-    pub fn new<T: GlobalAlloc>(buffer_allocator: &T, block_size: usize) -> Self {
+impl ParticleEngine {
+    pub fn new(block_size: usize) -> Self {
         Self {
             particle: core::array::from_fn(|_| Particle::new()),
             diffuser: Diffuser::new(),
             post_filter: Svf::new(),
-            temp_buffer: allocate_buffer(buffer_allocator, block_size).unwrap(),
+            temp_buffer: vec![0.0; block_size].into_boxed_slice(),
         }
     }
 }
 
-impl Engine for ParticleEngine<'_> {
+impl Engine for ParticleEngine {
     fn init(&mut self) {
         for particle in &mut self.particle {
             particle.init();
@@ -97,9 +98,9 @@ impl Engine for ParticleEngine<'_> {
         self.post_filter
             .set_f_q(f32::min(f0, 0.49), 0.5, FrequencyApproximation::Dirty);
         self.post_filter
-            .process_buffer(out, self.temp_buffer, FilterMode::LowPass);
+            .process_buffer(out, &mut self.temp_buffer, FilterMode::LowPass);
 
-        out.copy_from_slice(self.temp_buffer);
+        out.copy_from_slice(&self.temp_buffer);
 
         self.diffuser
             .process(0.8 * diffusion * diffusion, 0.5 * diffusion + 0.25, out);

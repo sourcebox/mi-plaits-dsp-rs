@@ -2,14 +2,12 @@
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-use core::alloc::GlobalAlloc;
-
 #[allow(unused_imports)]
 use num_traits::float::Float;
 
-use super::delay_line::DelayLine;
 use crate::dsp::resources::svf::LUT_SVF_SHIFT;
-use crate::dsp::{allocate_buffer, SAMPLE_RATE};
+use crate::dsp::SAMPLE_RATE;
+use crate::stmlib::dsp::delay_line::DelayLine;
 use crate::stmlib::dsp::filter::{DcBlocker, FilterMode, FrequencyApproximation, Svf};
 use crate::stmlib::dsp::parameter_interpolator::ParameterInterpolator;
 use crate::stmlib::dsp::units::semitones_to_ratio;
@@ -24,9 +22,9 @@ pub enum StringNonLinearity {
 }
 
 #[derive(Debug)]
-pub struct String<'a> {
-    string: DelayLine<'a, f32, DELAY_LINE_SIZE>,
-    stretch: DelayLine<'a, f32, { DELAY_LINE_SIZE / 4 }>,
+pub struct String {
+    string: DelayLine<f32, DELAY_LINE_SIZE>,
+    stretch: DelayLine<f32, { DELAY_LINE_SIZE / 4 }>,
 
     iir_damping_filter: Svf,
     dc_blocker: DcBlocker,
@@ -41,13 +39,11 @@ pub struct String<'a> {
     out_sample: [f32; 2],
 }
 
-impl String<'_> {
-    pub fn new<T: GlobalAlloc>(buffer_allocator: &T) -> Self {
-        let string_line = allocate_buffer(buffer_allocator, DELAY_LINE_SIZE).unwrap();
-        let stretch_line = allocate_buffer(buffer_allocator, DELAY_LINE_SIZE / 4).unwrap();
+impl String {
+    pub fn new() -> Self {
         Self {
-            string: DelayLine::new(string_line.try_into().unwrap()),
-            stretch: DelayLine::new(stretch_line.try_into().unwrap()),
+            string: DelayLine::new(),
+            stretch: DelayLine::new(),
             iir_damping_filter: Svf::default(),
             dc_blocker: DcBlocker::default(),
             delay: 0.0,

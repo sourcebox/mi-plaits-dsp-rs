@@ -11,14 +11,14 @@
 
 // Based on MIT-licensed code (c) 2021 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-use core::alloc::GlobalAlloc;
+use alloc::boxed::Box;
+use alloc::vec;
 
 #[allow(unused_imports)]
 use num_traits::float::Float;
 
 use num_traits::{FromPrimitive, Num, ToPrimitive};
 
-use crate::dsp::allocate_buffer;
 use crate::dsp::engine::{note_to_frequency, Engine, EngineParameters};
 use crate::dsp::oscillator::sine_oscillator::{sine, FastSineOscillator};
 use crate::dsp::oscillator::wavetable_oscillator::interpolate_wave;
@@ -31,19 +31,20 @@ pub struct WaveTerrainEngine<'a> {
     offset: f32,
     terrain_idx: f32,
 
-    temp_buffer_1: &'a mut [f32],
-    temp_buffer_2: &'a mut [f32],
+    temp_buffer_1: Box<[f32]>,
+    temp_buffer_2: Box<[f32]>,
+
     user_terrain: Option<&'a [u8; 4096]>,
 }
 
 impl<'a> WaveTerrainEngine<'a> {
-    pub fn new<T: GlobalAlloc>(buffer_allocator: &T, block_size: usize) -> Self {
+    pub fn new(block_size: usize) -> Self {
         Self {
             path: FastSineOscillator::new(),
             offset: 0.0,
             terrain_idx: 0.0,
-            temp_buffer_1: allocate_buffer(buffer_allocator, block_size * 2).unwrap(),
-            temp_buffer_2: allocate_buffer(buffer_allocator, block_size * 2).unwrap(),
+            temp_buffer_1: vec![0.0; block_size * 2].into_boxed_slice(),
+            temp_buffer_2: vec![0.0; block_size * 2].into_boxed_slice(),
             user_terrain: None,
         }
     }
@@ -109,8 +110,12 @@ impl Engine for WaveTerrainEngine<'_> {
 
         // Use the "magic sine" algorithm to generate sin and cos functions for the
         // trajectory coordinates.
-        self.path
-            .render_quadrature(f0 * SCALE, radius, self.temp_buffer_1, self.temp_buffer_2);
+        self.path.render_quadrature(
+            f0 * SCALE,
+            radius,
+            &mut self.temp_buffer_1,
+            &mut self.temp_buffer_2,
+        );
 
         let offset =
             SimpleParameterInterpolator::new(self.offset, 1.9 * parameters.morph - 1.0, out.len());
