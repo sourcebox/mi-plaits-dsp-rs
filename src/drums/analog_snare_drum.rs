@@ -3,11 +3,11 @@
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
 use crate::oscillator::sine_oscillator::SineOscillator;
-use crate::stmlib::dsp::filter::{FilterMode, FrequencyApproximation, Svf};
-use crate::stmlib::dsp::parameter_interpolator::ParameterInterpolator;
-use crate::stmlib::dsp::units::semitones_to_ratio;
-use crate::stmlib::dsp::{one_pole, soft_clip};
-use crate::stmlib::utils::random;
+use crate::utils::filter::{FilterMode, FrequencyApproximation, Svf};
+use crate::utils::parameter_interpolator::ParameterInterpolator;
+use crate::utils::random;
+use crate::utils::units::semitones_to_ratio;
+use crate::utils::{one_pole, soft_clip};
 use crate::SAMPLE_RATE;
 
 const NUM_MODES: usize = 5;

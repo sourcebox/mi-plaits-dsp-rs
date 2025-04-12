@@ -15,11 +15,11 @@
 use super::{note_to_frequency, Engine, EngineParameters, TriggerState};
 use crate::oscillator::oscillator::MAX_FREQUENCY;
 use crate::oscillator::sine_oscillator::{sine, FastSineOscillator};
-use crate::stmlib::dsp::one_pole;
-use crate::stmlib::dsp::parameter_interpolator::ParameterInterpolator;
-use crate::stmlib::dsp::polyblep::{next_blep_sample, this_blep_sample};
-use crate::stmlib::dsp::units::semitones_to_ratio;
-use crate::stmlib::utils::random;
+use crate::utils::one_pole;
+use crate::utils::parameter_interpolator::ParameterInterpolator;
+use crate::utils::polyblep::{next_blep_sample, this_blep_sample};
+use crate::utils::random;
+use crate::utils::units::semitones_to_ratio;
 
 const NUM_SWARM_VOICES: usize = 8;
 

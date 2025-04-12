@@ -8,8 +8,8 @@
 use num_traits::float::Float;
 
 use super::patch::{KeyboardScaling, Operator};
-use crate::stmlib::dsp::interpolate;
-use crate::stmlib::dsp::units::semitones_to_ratio_safe;
+use crate::utils::interpolate;
+use crate::utils::units::semitones_to_ratio_safe;
 
 /// Computes 2^x by using a polynomial approximation of 2^frac(x) and directly
 /// incrementing the exponent of the IEEE 754 representation of the result

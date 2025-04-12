@@ -2,7 +2,7 @@
 
 // Based on MIT-licensed code (c) 2021 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-use crate::stmlib::utils::random;
+use crate::utils::random;
 
 #[derive(Debug, Default, PartialEq, Eq)]
 pub enum ArpeggiatorMode {

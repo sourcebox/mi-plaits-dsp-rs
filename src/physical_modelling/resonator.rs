@@ -3,10 +3,10 @@
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
 use crate::resources::stiffness::LUT_STIFFNESS;
-use crate::stmlib::dsp::cosine_oscillator::{CosineOscillator, CosineOscillatorMode};
-use crate::stmlib::dsp::filter::{FilterMode, FrequencyApproximation, OnePole};
-use crate::stmlib::dsp::interpolate;
-use crate::stmlib::dsp::units::semitones_to_ratio;
+use crate::utils::cosine_oscillator::{CosineOscillator, CosineOscillatorMode};
+use crate::utils::filter::{FilterMode, FrequencyApproximation, OnePole};
+use crate::utils::interpolate;
+use crate::utils::units::semitones_to_ratio;
 
 pub const MAX_NUM_MODES: usize = 24;
 pub const MODE_BATCH_SIZE: usize = 4;

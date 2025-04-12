@@ -10,11 +10,11 @@
 #[allow(unused_imports)]
 use num_traits::float::Float;
 
-use crate::stmlib::dsp::filter::{FilterMode, FrequencyApproximation, OnePole, Svf};
-use crate::stmlib::dsp::parameter_interpolator::ParameterInterpolator;
-use crate::stmlib::dsp::sqrt;
-use crate::stmlib::dsp::units::semitones_to_ratio;
-use crate::stmlib::utils::random;
+use crate::utils::filter::{FilterMode, FrequencyApproximation, OnePole, Svf};
+use crate::utils::parameter_interpolator::ParameterInterpolator;
+use crate::utils::random;
+use crate::utils::sqrt;
+use crate::utils::units::semitones_to_ratio;
 use crate::SAMPLE_RATE;
 
 #[derive(Debug, Default)]

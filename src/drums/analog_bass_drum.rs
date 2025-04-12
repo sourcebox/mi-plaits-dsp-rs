@@ -6,10 +6,10 @@
 use num_traits::float::Float;
 
 use crate::oscillator::sine_oscillator::SineOscillator;
-use crate::stmlib::dsp::filter::{FilterMode, FrequencyApproximation, Svf};
-use crate::stmlib::dsp::one_pole;
-use crate::stmlib::dsp::parameter_interpolator::ParameterInterpolator;
-use crate::stmlib::dsp::units::semitones_to_ratio;
+use crate::utils::filter::{FilterMode, FrequencyApproximation, Svf};
+use crate::utils::one_pole;
+use crate::utils::parameter_interpolator::ParameterInterpolator;
+use crate::utils::units::semitones_to_ratio;
 use crate::SAMPLE_RATE;
 
 #[derive(Debug, Default)]

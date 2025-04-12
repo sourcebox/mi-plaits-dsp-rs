@@ -2,9 +2,9 @@
 
 // Based on MIT-licensed code (c) 2014 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-use crate::stmlib::dsp::clip_16;
-use crate::stmlib::dsp::filter::{FilterMode, FrequencyApproximation, Svf};
-use crate::stmlib::dsp::parameter_interpolator::ParameterInterpolator;
+use crate::utils::clip_16;
+use crate::utils::filter::{FilterMode, FrequencyApproximation, Svf};
+use crate::utils::parameter_interpolator::ParameterInterpolator;
 
 #[derive(Debug, Default)]
 pub struct LowPassGate {

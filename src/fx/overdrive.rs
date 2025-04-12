@@ -2,8 +2,8 @@
 
 // Based on MIT-licensed code (c) 2014 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-use crate::stmlib::dsp::parameter_interpolator::ParameterInterpolator;
-use crate::stmlib::dsp::soft_clip;
+use crate::utils::parameter_interpolator::ParameterInterpolator;
+use crate::utils::soft_clip;
 
 #[derive(Debug, Default)]
 pub struct Overdrive {

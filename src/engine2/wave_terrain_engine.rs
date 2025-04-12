@@ -23,7 +23,7 @@ use crate::engine::{note_to_frequency, Engine, EngineParameters};
 use crate::oscillator::sine_oscillator::{sine, FastSineOscillator};
 use crate::oscillator::wavetable_oscillator::interpolate_wave;
 use crate::resources::waves::WAV_INTEGRATED_WAVES;
-use crate::stmlib::dsp::parameter_interpolator::SimpleParameterInterpolator;
+use crate::utils::parameter_interpolator::SimpleParameterInterpolator;
 
 #[derive(Debug)]
 pub struct WaveTerrainEngine<'a> {

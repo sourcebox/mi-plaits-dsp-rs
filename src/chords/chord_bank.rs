@@ -2,8 +2,8 @@
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-use crate::stmlib::dsp::hysteresis_quantizer::HysteresisQuantizer2;
-use crate::stmlib::dsp::units::semitones_to_ratio;
+use crate::utils::hysteresis_quantizer::HysteresisQuantizer2;
+use crate::utils::units::semitones_to_ratio;
 
 pub const CHORD_NUM_NOTES: usize = 4;
 pub const CHORD_NUM_VOICES: usize = 5;

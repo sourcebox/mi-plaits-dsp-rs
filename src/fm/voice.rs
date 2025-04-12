@@ -15,7 +15,7 @@ use super::dx_units::{
 use super::envelope::{OperatorEnvelope, PitchEnvelope};
 use super::operator::Operator;
 use super::patch::Patch;
-use crate::stmlib::dsp::units::semitones_to_ratio_safe;
+use crate::utils::units::semitones_to_ratio_safe;
 
 #[derive(Debug, Default)]
 pub struct VoiceParameters {

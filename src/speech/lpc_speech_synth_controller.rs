@@ -8,9 +8,9 @@ use alloc::vec;
 use super::lpc_speech_synth::{LpcSpeechSynth, LpcSpeechSynthFrame, LPC_SPEECH_SYNTH_DEFAULT_F0};
 use super::lpc_speech_synth_phonemes::PHONEMES;
 use super::lpc_speech_synth_words::{NUM_WORD_BANKS, WORD_BANKS};
-use crate::stmlib::dsp::parameter_interpolator::ParameterInterpolator;
-use crate::stmlib::dsp::polyblep::{next_blep_sample, this_blep_sample};
-use crate::stmlib::dsp::units::semitones_to_ratio;
+use crate::utils::parameter_interpolator::ParameterInterpolator;
+use crate::utils::polyblep::{next_blep_sample, this_blep_sample};
+use crate::utils::units::semitones_to_ratio;
 use crate::SAMPLE_RATE;
 
 const MAX_WORDS: usize = 32;

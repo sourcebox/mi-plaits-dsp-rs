@@ -2,9 +2,9 @@
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-use crate::stmlib::dsp::parameter_interpolator::ParameterInterpolator;
-use crate::stmlib::dsp::polyblep::{next_blep_sample, this_blep_sample};
-use crate::stmlib::utils::random;
+use crate::utils::parameter_interpolator::ParameterInterpolator;
+use crate::utils::polyblep::{next_blep_sample, this_blep_sample};
+use crate::utils::random;
 
 #[derive(Debug, Default)]
 pub struct ClockedNoise {

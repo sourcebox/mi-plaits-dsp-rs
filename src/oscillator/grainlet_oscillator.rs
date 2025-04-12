@@ -7,8 +7,8 @@
 
 use crate::oscillator::oscillator::MAX_FREQUENCY;
 use crate::oscillator::sine_oscillator::sine;
-use crate::stmlib::dsp::parameter_interpolator::ParameterInterpolator;
-use crate::stmlib::dsp::polyblep::this_blep_sample;
+use crate::utils::parameter_interpolator::ParameterInterpolator;
+use crate::utils::polyblep::this_blep_sample;
 
 #[derive(Debug, Default)]
 pub struct GrainletOscillator {

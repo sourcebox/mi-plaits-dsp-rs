@@ -6,12 +6,12 @@
 use num_traits::float::Float;
 
 use crate::resources::svf::LUT_SVF_SHIFT;
-use crate::stmlib::dsp::delay_line::DelayLine;
-use crate::stmlib::dsp::filter::{DcBlocker, FilterMode, FrequencyApproximation, Svf};
-use crate::stmlib::dsp::parameter_interpolator::ParameterInterpolator;
-use crate::stmlib::dsp::units::semitones_to_ratio;
-use crate::stmlib::dsp::{crossfade, interpolate, one_pole};
-use crate::stmlib::utils::random;
+use crate::utils::delay_line::DelayLine;
+use crate::utils::filter::{DcBlocker, FilterMode, FrequencyApproximation, Svf};
+use crate::utils::parameter_interpolator::ParameterInterpolator;
+use crate::utils::random;
+use crate::utils::units::semitones_to_ratio;
+use crate::utils::{crossfade, interpolate, one_pole};
 use crate::SAMPLE_RATE;
 
 pub const DELAY_LINE_SIZE: usize = 1024;

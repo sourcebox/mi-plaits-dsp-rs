@@ -21,7 +21,7 @@ use num_traits::float::Float;
 use super::{note_to_frequency, Engine, EngineParameters};
 use crate::oscillator::harmonic_oscillator::HarmonicOscillator;
 use crate::oscillator::sine_oscillator::sine;
-use crate::stmlib::dsp::one_pole;
+use crate::utils::one_pole;
 
 const HARMONIC_BATCH_SIZE: usize = 12;
 const NUM_HARMONICS: usize = 36;

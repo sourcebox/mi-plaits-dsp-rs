@@ -21,9 +21,9 @@ use crate::chords::chord_bank::{ChordBank, CHORD_NUM_VOICES};
 use crate::engine::{note_to_frequency, Engine, EngineParameters, TriggerState};
 use crate::oscillator::nes_triangle_oscillator::NesTriangleOscillator;
 use crate::oscillator::super_square_oscillator::SuperSquareOscillator;
-use crate::stmlib::dsp::hysteresis_quantizer::HysteresisQuantizer2;
-use crate::stmlib::dsp::one_pole;
-use crate::stmlib::dsp::units::semitones_to_ratio;
+use crate::utils::hysteresis_quantizer::HysteresisQuantizer2;
+use crate::utils::one_pole;
+use crate::utils::units::semitones_to_ratio;
 use crate::SAMPLE_RATE;
 
 pub const NO_ENVELOPE: f32 = 2.0;

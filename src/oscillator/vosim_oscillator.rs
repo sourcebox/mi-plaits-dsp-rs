@@ -4,7 +4,7 @@
 
 use crate::oscillator::oscillator::MAX_FREQUENCY;
 use crate::oscillator::sine_oscillator::sine;
-use crate::stmlib::dsp::parameter_interpolator::ParameterInterpolator;
+use crate::utils::parameter_interpolator::ParameterInterpolator;
 
 #[derive(Debug, Default)]
 pub struct VosimOscillator {

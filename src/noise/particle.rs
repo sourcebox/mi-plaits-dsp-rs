@@ -2,10 +2,10 @@
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-use crate::stmlib::dsp::filter::{FilterMode, FrequencyApproximation, Svf};
-use crate::stmlib::dsp::sqrt;
-use crate::stmlib::dsp::units::semitones_to_ratio;
-use crate::stmlib::utils::random;
+use crate::utils::filter::{FilterMode, FrequencyApproximation, Svf};
+use crate::utils::random;
+use crate::utils::sqrt;
+use crate::utils::units::semitones_to_ratio;
 
 #[derive(Debug, Default)]
 pub struct Particle {

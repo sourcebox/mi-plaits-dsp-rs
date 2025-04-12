@@ -4,8 +4,8 @@
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
 use crate::oscillator::oscillator::{Oscillator, OscillatorShape};
-use crate::stmlib::dsp::filter::{FilterMode, FrequencyApproximation, Svf};
-use crate::stmlib::dsp::units::semitones_to_ratio;
+use crate::utils::filter::{FilterMode, FrequencyApproximation, Svf};
+use crate::utils::units::semitones_to_ratio;
 use crate::{A0, SAMPLE_RATE};
 
 const NUM_FORMANTS: usize = 5;

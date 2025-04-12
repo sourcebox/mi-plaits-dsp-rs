@@ -2,7 +2,7 @@
 
 // Based on MIT-licensed code (c) 2014 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-use crate::stmlib::dsp::polyblep::{next_blep_sample, this_blep_sample};
+use crate::utils::polyblep::{next_blep_sample, this_blep_sample};
 
 #[derive(Debug, Default)]
 pub struct SampleRateReducer {

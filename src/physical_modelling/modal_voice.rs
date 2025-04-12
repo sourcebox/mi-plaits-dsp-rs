@@ -7,8 +7,8 @@
 
 use super::resonator::{Resonator, ResonatorSvf, MAX_NUM_MODES};
 use crate::noise::dust::dust;
-use crate::stmlib::dsp::filter::FilterMode;
-use crate::stmlib::dsp::units::semitones_to_ratio;
+use crate::utils::filter::FilterMode;
+use crate::utils::units::semitones_to_ratio;
 
 #[derive(Debug, Default)]
 pub struct ModalVoice {

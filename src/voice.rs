@@ -32,11 +32,11 @@ use super::envelope::{DecayEnvelope, LpgEnvelope};
 use super::fx::low_pass_gate::LowPassGate;
 use crate::resources::sysex::{SYX_BANK_0, SYX_BANK_1, SYX_BANK_2};
 use crate::resources::waves::WAV_INTEGRATED_WAVES;
-use crate::stmlib::dsp::clip_16;
-use crate::stmlib::dsp::delay_line::DelayLine;
-use crate::stmlib::dsp::hysteresis_quantizer::HysteresisQuantizer2;
-use crate::stmlib::dsp::limiter::Limiter;
-use crate::stmlib::dsp::units::semitones_to_ratio;
+use crate::utils::clip_16;
+use crate::utils::delay_line::DelayLine;
+use crate::utils::hysteresis_quantizer::HysteresisQuantizer2;
+use crate::utils::limiter::Limiter;
+use crate::utils::units::semitones_to_ratio;
 use crate::SAMPLE_RATE;
 
 const MAX_TRIGGER_DELAY: usize = 8;

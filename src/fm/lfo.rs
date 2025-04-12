@@ -5,7 +5,7 @@
 use super::dx_units::{lfo_delay, lfo_frequency, pitch_mod_sensitivity};
 use super::patch::ModulationParameters;
 use crate::oscillator::sine_oscillator::sine;
-use crate::stmlib::utils::random;
+use crate::utils::random;
 
 #[derive(Debug, Default)]
 pub enum Waveform {

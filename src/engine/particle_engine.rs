@@ -21,8 +21,8 @@ use num_traits::float::Float;
 use super::{note_to_frequency, Engine, EngineParameters, TriggerState};
 use crate::fx::diffuser::Diffuser;
 use crate::noise::particle::Particle;
-use crate::stmlib::dsp::filter::{FilterMode, FrequencyApproximation, Svf};
-use crate::stmlib::dsp::units::semitones_to_ratio;
+use crate::utils::filter::{FilterMode, FrequencyApproximation, Svf};
+use crate::utils::units::semitones_to_ratio;
 
 const NUM_PARTICLES: usize = 6;
 

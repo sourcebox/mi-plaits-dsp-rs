@@ -18,7 +18,7 @@ use alloc::vec;
 
 use super::{note_to_frequency, Engine, EngineParameters, TriggerState};
 use crate::physical_modelling::string_voice::StringVoice;
-use crate::stmlib::dsp::delay_line::DelayLine;
+use crate::utils::delay_line::DelayLine;
 
 const NUM_STRINGS: usize = 3;
 

@@ -6,9 +6,9 @@
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
 use crate::resources::sine::{LUT_SINE, LUT_SINE_BITS, LUT_SINE_SIZE};
-use crate::stmlib::dsp::parameter_interpolator::ParameterInterpolator;
-use crate::stmlib::dsp::rsqrt::fast_rsqrt_carmack;
-use crate::stmlib::dsp::{interpolate, interpolate_wrap};
+use crate::utils::parameter_interpolator::ParameterInterpolator;
+use crate::utils::rsqrt::fast_rsqrt_carmack;
+use crate::utils::{interpolate, interpolate_wrap};
 
 #[derive(Debug, Default)]
 pub struct SineOscillator {

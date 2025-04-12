@@ -15,10 +15,10 @@ use num_traits::float::Float;
 
 use crate::engine::{note_to_frequency, Engine, EngineParameters};
 use crate::oscillator::variable_shape_oscillator::VariableShapeOscillator;
-use crate::stmlib::dsp::filter::{FilterMode, FrequencyApproximation, Svf};
-use crate::stmlib::dsp::parameter_interpolator::ParameterInterpolator;
-use crate::stmlib::dsp::soft_clip;
-use crate::stmlib::dsp::units::semitones_to_ratio;
+use crate::utils::filter::{FilterMode, FrequencyApproximation, Svf};
+use crate::utils::parameter_interpolator::ParameterInterpolator;
+use crate::utils::soft_clip;
+use crate::utils::units::semitones_to_ratio;
 
 #[derive(Debug, Default)]
 pub struct VirtualAnalogVcfEngine {

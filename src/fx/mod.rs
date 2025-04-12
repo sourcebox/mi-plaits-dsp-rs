@@ -8,9 +8,9 @@ pub mod sample_rate_reducer;
 
 use core::marker::PhantomData;
 
-use crate::stmlib::dsp::clip_16;
-use crate::stmlib::dsp::cosine_oscillator::{CosineOscillator, CosineOscillatorMode};
-use crate::stmlib::dsp::delay_line::DelayLine;
+use crate::utils::clip_16;
+use crate::utils::cosine_oscillator::{CosineOscillator, CosineOscillatorMode};
+use crate::utils::delay_line::DelayLine;
 use num_traits::{FromPrimitive, Num, Signed, ToPrimitive};
 
 pub trait DataType {}

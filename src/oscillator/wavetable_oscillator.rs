@@ -5,8 +5,8 @@
 use num_traits::{FromPrimitive, Num, ToPrimitive};
 
 use crate::oscillator::oscillator::MAX_FREQUENCY;
-use crate::stmlib::dsp::one_pole;
-use crate::stmlib::dsp::parameter_interpolator::ParameterInterpolator;
+use crate::utils::one_pole;
+use crate::utils::parameter_interpolator::ParameterInterpolator;
 
 #[derive(Debug, Default)]
 pub struct WavetableOscillator {

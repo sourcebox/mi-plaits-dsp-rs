@@ -10,10 +10,10 @@
 use num_traits::float::Float;
 
 use crate::oscillator::oscillator::{Oscillator, OscillatorShape};
-use crate::stmlib::dsp::filter::{FilterMode, FrequencyApproximation, Svf};
-use crate::stmlib::dsp::parameter_interpolator::ParameterInterpolator;
-use crate::stmlib::dsp::units::semitones_to_ratio;
-use crate::stmlib::utils::random;
+use crate::utils::filter::{FilterMode, FrequencyApproximation, Svf};
+use crate::utils::parameter_interpolator::ParameterInterpolator;
+use crate::utils::random;
+use crate::utils::units::semitones_to_ratio;
 use crate::SAMPLE_RATE;
 
 pub enum NoiseType {

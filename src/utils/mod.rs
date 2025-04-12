@@ -1,6 +1,7 @@
-//! DSP utility routines.
-
-// Based on MIT-licensed code (c) 2012 by Olivier Gillet (ol.gillet@gmail.com)
+//! Utility functions.
+//!
+//! This module contains ports of functions that were used in several Mutable Instruments
+//! devices in common and were made for the STM32 platform.
 
 pub mod atan;
 pub mod cosine_oscillator;
@@ -10,6 +11,7 @@ pub mod hysteresis_quantizer;
 pub mod limiter;
 pub mod parameter_interpolator;
 pub mod polyblep;
+pub mod random;
 pub mod rsqrt;
 pub mod units;
 

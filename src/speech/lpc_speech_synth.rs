@@ -3,8 +3,8 @@
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
 use crate::resources::lpc::{LUT_LPC_EXCITATION_PULSE, LUT_LPC_EXCITATION_PULSE_SIZE};
-use crate::stmlib::dsp::polyblep::{next_blep_sample, this_blep_sample};
-use crate::stmlib::utils::random;
+use crate::utils::polyblep::{next_blep_sample, this_blep_sample};
+use crate::utils::random;
 
 pub const LPC_ORDER: usize = 10;
 pub const LPC_SPEECH_SYNTH_DEFAULT_F0: f32 = 100.0;

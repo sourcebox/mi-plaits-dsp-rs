@@ -18,7 +18,7 @@ use alloc::vec;
 
 use super::{note_to_frequency, Engine, EngineParameters, TriggerState};
 use crate::physical_modelling::modal_voice::ModalVoice;
-use crate::stmlib::dsp::one_pole;
+use crate::utils::one_pole;
 
 #[derive(Debug)]
 pub struct ModalEngine {

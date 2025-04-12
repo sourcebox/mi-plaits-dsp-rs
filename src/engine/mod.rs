@@ -19,7 +19,7 @@ pub mod virtual_analog_engine;
 pub mod waveshaping_engine;
 pub mod wavetable_engine;
 
-use crate::stmlib::dsp::units::semitones_to_ratio;
+use crate::utils::units::semitones_to_ratio;
 use crate::A0;
 
 pub trait Engine {

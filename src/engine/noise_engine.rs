@@ -17,10 +17,10 @@ use alloc::vec;
 
 use super::{note_to_frequency, Engine, EngineParameters, TriggerState};
 use crate::noise::clocked_noise::ClockedNoise;
-use crate::stmlib::dsp::filter::{FilterMode, FrequencyApproximation, Svf};
-use crate::stmlib::dsp::parameter_interpolator::ParameterInterpolator;
-use crate::stmlib::dsp::sqrt;
-use crate::stmlib::dsp::units::semitones_to_ratio;
+use crate::utils::filter::{FilterMode, FrequencyApproximation, Svf};
+use crate::utils::parameter_interpolator::ParameterInterpolator;
+use crate::utils::sqrt;
+use crate::utils::units::semitones_to_ratio;
 
 #[derive(Debug)]
 pub struct NoiseEngine {

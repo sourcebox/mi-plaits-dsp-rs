@@ -6,9 +6,7 @@
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
 use crate::oscillator::sine_oscillator::{sine, sine_no_wrap};
-use crate::stmlib::dsp::parameter_interpolator::{
-    ParameterInterpolator, SimpleParameterInterpolator,
-};
+use crate::utils::parameter_interpolator::{ParameterInterpolator, SimpleParameterInterpolator};
 
 #[derive(Debug)]
 pub struct HarmonicOscillator<const NUM_HARMONICS: usize> {

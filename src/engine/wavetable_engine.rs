@@ -24,8 +24,8 @@
 use super::{note_to_frequency, Engine, EngineParameters};
 use crate::oscillator::wavetable_oscillator::{interpolate_wave_hermite, Differentiator};
 use crate::resources::waves::WAV_INTEGRATED_WAVES;
-use crate::stmlib::dsp::one_pole;
-use crate::stmlib::dsp::parameter_interpolator::SimpleParameterInterpolator;
+use crate::utils::one_pole;
+use crate::utils::parameter_interpolator::SimpleParameterInterpolator;
 use crate::A0;
 
 const TABLE_SIZE: usize = 128;

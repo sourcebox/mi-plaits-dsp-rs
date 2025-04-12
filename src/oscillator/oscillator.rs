@@ -7,8 +7,8 @@
 #[allow(unused_imports)]
 use num_traits::float::Float;
 
-use crate::stmlib::dsp::parameter_interpolator::ParameterInterpolator;
-use crate::stmlib::dsp::polyblep::{
+use crate::utils::parameter_interpolator::ParameterInterpolator;
+use crate::utils::polyblep::{
     next_blep_sample, next_integrated_blep_sample, this_blep_sample, this_integrated_blep_sample,
 };
 

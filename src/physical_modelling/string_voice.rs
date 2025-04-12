@@ -4,9 +4,9 @@
 
 use super::string::String;
 use crate::noise::dust::dust;
-use crate::stmlib::dsp::filter::{FilterMode, FrequencyApproximation, Svf};
-use crate::stmlib::dsp::units::semitones_to_ratio;
-use crate::stmlib::utils::random;
+use crate::utils::filter::{FilterMode, FrequencyApproximation, Svf};
+use crate::utils::random;
+use crate::utils::units::semitones_to_ratio;
 
 #[derive(Debug)]
 pub struct StringVoice {

@@ -27,7 +27,7 @@ use crate::speech::lpc_speech_synth_controller::LpcSpeechSynthController;
 use crate::speech::lpc_speech_synth_words::NUM_WORD_BANKS;
 use crate::speech::naive_speech_synth::NaiveSpeechSynth;
 use crate::speech::sam_speech_synth::SamSpeechSynth;
-use crate::stmlib::dsp::hysteresis_quantizer::HysteresisQuantizer2;
+use crate::utils::hysteresis_quantizer::HysteresisQuantizer2;
 
 #[derive(Debug)]
 pub struct SpeechEngine<'a> {

@@ -3,7 +3,7 @@
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
 use super::{DataFormat12Bit, FxContext, FxEngine};
-use crate::stmlib::dsp::delay_line::DelayLine;
+use crate::utils::delay_line::DelayLine;
 use crate::SAMPLE_RATE;
 
 #[derive(Debug, Default)]

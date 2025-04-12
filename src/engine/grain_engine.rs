@@ -18,8 +18,8 @@
 use super::{note_to_frequency, Engine, EngineParameters};
 use crate::oscillator::grainlet_oscillator::GrainletOscillator;
 use crate::oscillator::z_oscillator::ZOscillator;
-use crate::stmlib::dsp::filter::{FilterMode, FrequencyApproximation, OnePole};
-use crate::stmlib::dsp::units::semitones_to_ratio;
+use crate::utils::filter::{FilterMode, FrequencyApproximation, OnePole};
+use crate::utils::units::semitones_to_ratio;
 
 #[derive(Debug, Default)]
 pub struct GrainEngine {

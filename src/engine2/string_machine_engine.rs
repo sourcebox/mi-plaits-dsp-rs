@@ -18,9 +18,9 @@ use crate::engine::chord_engine::CHORD_NUM_HARMONICS;
 use crate::engine::{note_to_frequency, Engine, EngineParameters};
 use crate::fx::ensemble::Ensemble;
 use crate::oscillator::string_synth_oscillator::StringSynthOscillator;
-use crate::stmlib::dsp::filter::{FilterMode, FrequencyApproximation, NaiveSvf};
-use crate::stmlib::dsp::one_pole;
-use crate::stmlib::dsp::units::semitones_to_ratio;
+use crate::utils::filter::{FilterMode, FrequencyApproximation, NaiveSvf};
+use crate::utils::one_pole;
+use crate::utils::units::semitones_to_ratio;
 
 #[derive(Debug, Default)]
 pub struct StringMachineEngine {

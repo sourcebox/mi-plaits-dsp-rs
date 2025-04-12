@@ -20,7 +20,7 @@ use crate::chords::chord_bank::{ChordBank, CHORD_NUM_VOICES};
 use crate::oscillator::string_synth_oscillator::StringSynthOscillator;
 use crate::oscillator::wavetable_oscillator::WavetableOscillator;
 use crate::resources::waves::WAV_INTEGRATED_WAVES;
-use crate::stmlib::dsp::one_pole;
+use crate::utils::one_pole;
 
 pub const CHORD_NUM_HARMONICS: usize = 3;
 

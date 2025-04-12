@@ -20,8 +20,8 @@ use crate::fm::{
     patch::{Patch, SYX_SIZE},
     voice::{Voice, VoiceParameters},
 };
-use crate::stmlib::dsp::hysteresis_quantizer::HysteresisQuantizer2;
-use crate::stmlib::dsp::soft_clip;
+use crate::utils::hysteresis_quantizer::HysteresisQuantizer2;
+use crate::utils::soft_clip;
 use crate::SAMPLE_RATE;
 
 const NUM_SIX_OP_VOICES: usize = 2;
