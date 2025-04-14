@@ -11,7 +11,7 @@ categories = ["no-std", "multimedia::audio"]
 
 [dependencies]
 num-traits = { version = "0.2", default-features = false, features = ["libm"] }
-spin = { version = "0.9.8", features = ["once"] }
+spin = { version = "0.10.0", features = ["once"] }
 
 [dev-dependencies]
 hound = "3.5.1"
