@@ -1,4 +1,4 @@
-//! Single voice with MIDI parameter control.
+//! Multiple voices with MIDI parameter control.
 
 use audio_midi_shell::{AudioGenerator, AudioMidiShell};
 use simple_logger::SimpleLogger;
@@ -6,7 +6,8 @@ use simple_logger::SimpleLogger;
 use mi_plaits_dsp::voice::{Modulations, Patch, Voice};
 
 const SAMPLE_RATE: u32 = 48000;
-const BLOCK_SIZE: usize = 256;
+const BUFFER_SIZE: usize = 512;
+const CHUNK_SIZE: usize = 24;
 const VOICE_COUNT: usize = 8;
 
 fn main() -> ! {
@@ -15,7 +16,7 @@ fn main() -> ! {
         .init()
         .unwrap();
 
-    AudioMidiShell::run_forever(SAMPLE_RATE, BLOCK_SIZE, App::new());
+    AudioMidiShell::run_forever(SAMPLE_RATE, BUFFER_SIZE, CHUNK_SIZE, App::new());
 }
 
 #[derive(Debug)]
@@ -31,7 +32,7 @@ struct App<'a> {
 impl<'a> App<'a> {
     pub fn new() -> Self {
         Self {
-            voices: core::array::from_fn(|_| Voice::new(BLOCK_SIZE)),
+            voices: core::array::from_fn(|_| Voice::new(CHUNK_SIZE)),
             patches: core::array::from_fn(|_| Patch::default()),
             modulations: core::array::from_fn(|_| Modulations::default()),
             volume: 1.0,
@@ -55,15 +56,15 @@ impl<'a> AudioGenerator for App<'a> {
     }
 
     fn process(&mut self, samples_left: &mut [f32], samples_right: &mut [f32]) {
-        let mut mix = vec![0.0; BLOCK_SIZE];
+        let mut mix = vec![0.0; CHUNK_SIZE];
 
         for (n, voice) in self.voices.iter_mut().enumerate() {
-            let mut out = vec![0.0; BLOCK_SIZE];
-            let mut aux = vec![0.0; BLOCK_SIZE];
+            let mut out = vec![0.0; CHUNK_SIZE];
+            let mut aux = vec![0.0; CHUNK_SIZE];
 
             voice.render(&self.patches[n], &self.modulations[n], &mut out, &mut aux);
 
-            for frame in 0..BLOCK_SIZE {
+            for frame in 0..CHUNK_SIZE {
                 mix[frame] +=
                     (out[frame] * (1.0 - self.balance) + aux[frame] * self.balance) * self.volume;
             }
