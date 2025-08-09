@@ -38,6 +38,8 @@ pub trait Engine: Send + Sync + DynClone {
     );
 }
 
+dyn_clone::clone_trait_object!(Engine);
+
 #[derive(Debug, Default, Clone)]
 pub struct EngineParameters {
     /// Trigger signal state
