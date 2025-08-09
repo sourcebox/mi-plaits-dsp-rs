@@ -17,7 +17,7 @@ use crate::utils::sqrt;
 use crate::utils::units::semitones_to_ratio;
 use crate::SAMPLE_RATE;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct SyntheticSnareDrum {
     phase: [f32; 2],
     drum_amplitude: f32,

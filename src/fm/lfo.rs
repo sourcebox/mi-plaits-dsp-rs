@@ -7,7 +7,7 @@ use super::patch::ModulationParameters;
 use crate::oscillator::sine_oscillator::sine;
 use crate::utils::random;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub enum Waveform {
     #[default]
     Triangle,
@@ -35,7 +35,7 @@ where
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct Lfo {
     phase: f32,
     frequency: f32,

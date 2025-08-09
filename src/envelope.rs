@@ -2,7 +2,7 @@
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct LpgEnvelope {
     vactrol_state: f32,
     gain: f32,
@@ -85,7 +85,7 @@ impl LpgEnvelope {
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct DecayEnvelope {
     value: f32,
 }

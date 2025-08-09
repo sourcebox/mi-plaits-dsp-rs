@@ -21,7 +21,7 @@ use crate::resources::{fold::LUT_FOLD, fold::LUT_FOLD_2, waveshape::LOOKUP_TABLE
 use crate::utils::interpolate_hermite;
 use crate::utils::parameter_interpolator::ParameterInterpolator;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct WaveshapingEngine {
     slope: Oscillator,
     triangle: Oscillator,

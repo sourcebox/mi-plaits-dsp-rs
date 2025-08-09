@@ -5,7 +5,7 @@
 
 // Based on MIT-licensed code (c) 2015 by Olivier Gillet (ol.gillet@gmail.com)
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct HysteresisQuantizer {
     quantized_value: i32,
 }
@@ -50,7 +50,7 @@ impl HysteresisQuantizer {
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct HysteresisQuantizer2 {
     num_steps: i32,
     hysteresis: f32,

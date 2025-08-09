@@ -21,7 +21,7 @@ use crate::oscillator::z_oscillator::ZOscillator;
 use crate::utils::filter::{FilterMode, FrequencyApproximation, OnePole};
 use crate::utils::units::semitones_to_ratio;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct GrainEngine {
     grainlet: [GrainletOscillator; 2],
     z_oscillator: ZOscillator,

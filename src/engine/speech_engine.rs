@@ -29,7 +29,7 @@ use crate::speech::naive_speech_synth::NaiveSpeechSynth;
 use crate::speech::sam_speech_synth::SamSpeechSynth;
 use crate::utils::hysteresis_quantizer::HysteresisQuantizer2;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SpeechEngine<'a> {
     word_bank_quantizer: HysteresisQuantizer2,
 

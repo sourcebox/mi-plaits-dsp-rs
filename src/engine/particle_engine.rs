@@ -26,7 +26,7 @@ use crate::utils::units::semitones_to_ratio;
 
 const NUM_PARTICLES: usize = 6;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ParticleEngine {
     particle: [Particle; NUM_PARTICLES],
     diffuser: Diffuser,

@@ -23,7 +23,7 @@ use crate::utils::units::semitones_to_ratio;
 
 const NUM_SWARM_VOICES: usize = 8;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct SwarmEngine {
     swarm_voice: [SwarmVoice; NUM_SWARM_VOICES],
 }
@@ -89,7 +89,7 @@ impl Engine for SwarmEngine {
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct SwarmVoice {
     rank: f32,
 
@@ -139,7 +139,7 @@ impl SwarmVoice {
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct AdditiveSawOscillator {
     // Oscillator state.
     phase: f32,
@@ -196,7 +196,7 @@ impl AdditiveSawOscillator {
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct GrainEnvelope {
     from: f32,
     interval: f32,

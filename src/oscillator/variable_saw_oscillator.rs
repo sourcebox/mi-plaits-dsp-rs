@@ -10,7 +10,7 @@ use crate::utils::polyblep::{
 
 const VARIABLE_SAW_NOTCH_DEPTH: f32 = 0.2;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct VariableSawOscillator {
     // Oscillator state.
     phase: f32,

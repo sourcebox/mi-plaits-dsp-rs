@@ -12,7 +12,7 @@ const NUM_FORMANTS: usize = 5;
 const NUM_PHONEMES: usize = 5;
 const NUM_REGISTERS: usize = 5;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct NaiveSpeechSynth {
     pulse: Oscillator,
     frequency: f32,

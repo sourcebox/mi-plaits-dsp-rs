@@ -27,7 +27,7 @@ const HARMONIC_BATCH_SIZE: usize = 12;
 const NUM_HARMONICS: usize = 36;
 const NUM_HARMONIC_OSCILLATORS: usize = NUM_HARMONICS / HARMONIC_BATCH_SIZE;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct AdditiveEngine {
     harmonic_oscillator: [HarmonicOscillator<HARMONIC_BATCH_SIZE>; NUM_HARMONIC_OSCILLATORS],
     amplitudes: [f32; NUM_HARMONICS],

@@ -29,7 +29,7 @@ const NUM_PATCHES_PER_BANK: usize = 32;
 
 static ALGORITHMS: Once<Algorithms<6, 32>> = Once::new();
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SixOpEngine<'a> {
     patches: [Patch; NUM_PATCHES_PER_BANK],
     patch_index_quantizer: HysteresisQuantizer2,
@@ -171,7 +171,7 @@ impl Engine for SixOpEngine<'_> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct FmVoice<'a> {
     lfo: Lfo,
     voice: Voice<'a, 6, 32>,

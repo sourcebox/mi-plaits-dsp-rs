@@ -6,7 +6,7 @@ use super::{DataFormat12Bit, FxContext, FxEngine};
 use crate::utils::delay_line::DelayLine;
 use crate::SAMPLE_RATE;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct Diffuser {
     ap1: DelayLine<i16, 126>,
     ap2: DelayLine<i16, 180>,

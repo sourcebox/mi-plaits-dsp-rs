@@ -19,7 +19,7 @@ impl Default for CosineOscillatorMode {
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct CosineOscillator {
     y1: f32,
     y0: f32,

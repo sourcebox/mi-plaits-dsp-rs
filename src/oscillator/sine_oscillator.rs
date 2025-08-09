@@ -232,7 +232,7 @@ impl FastSineOscillator {
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub enum RenderMode {
     #[default]
     Normal,

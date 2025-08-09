@@ -4,7 +4,7 @@
 
 use crate::utils::random;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct SmoothRandomGenerator {
     phase: f32,
     from: f32,

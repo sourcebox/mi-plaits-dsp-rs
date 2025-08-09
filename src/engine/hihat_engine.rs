@@ -20,7 +20,7 @@ use alloc::vec;
 use super::{note_to_frequency, Engine, EngineParameters, TriggerState};
 use crate::drums::hihat::{Hihat, NoiseType, VcaType};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct HihatEngine {
     hi_hat_1: Hihat,
     hi_hat_2: Hihat,

@@ -6,7 +6,7 @@ use crate::utils::clip_16;
 use crate::utils::filter::{FilterMode, FrequencyApproximation, Svf};
 use crate::utils::parameter_interpolator::ParameterInterpolator;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct LowPassGate {
     previous_gain: f32,
     filter: Svf,

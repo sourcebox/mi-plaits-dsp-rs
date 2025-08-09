@@ -13,7 +13,7 @@ pub const MODE_BATCH_SIZE: usize = 4;
 
 const MODE_FILTERS_LENGTH: usize = MAX_NUM_MODES / MODE_BATCH_SIZE;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct Resonator {
     resolution: usize,
     mode_amplitude: [f32; MAX_NUM_MODES],
@@ -116,7 +116,7 @@ impl Resonator {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ResonatorSvf<const BATCH_SIZE: usize> {
     state_1: [f32; BATCH_SIZE],
     state_2: [f32; BATCH_SIZE],

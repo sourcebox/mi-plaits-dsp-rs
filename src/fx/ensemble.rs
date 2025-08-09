@@ -6,7 +6,7 @@ use super::{DataFormat32Bit, FxContext, FxEngine};
 use crate::oscillator::sine_oscillator::sine_raw;
 use crate::utils::delay_line::DelayLine;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct Ensemble {
     line_l: DelayLine<f32, 511>,
     line_r: DelayLine<f32, 511>,

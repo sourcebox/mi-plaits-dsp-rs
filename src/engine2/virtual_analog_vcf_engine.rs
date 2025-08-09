@@ -20,7 +20,7 @@ use crate::utils::parameter_interpolator::ParameterInterpolator;
 use crate::utils::soft_clip;
 use crate::utils::units::semitones_to_ratio;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct VirtualAnalogVcfEngine {
     svf: [Svf; 2],
     oscillator: VariableShapeOscillator,

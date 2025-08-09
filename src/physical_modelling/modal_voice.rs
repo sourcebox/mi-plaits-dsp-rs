@@ -10,7 +10,7 @@ use crate::noise::dust::dust;
 use crate::utils::filter::FilterMode;
 use crate::utils::units::semitones_to_ratio;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct ModalVoice {
     excitation_filter: ResonatorSvf<1>,
     resonator: Resonator,

@@ -31,7 +31,7 @@ use crate::A0;
 const TABLE_SIZE: usize = 128;
 const TABLE_SIZE_F: f32 = TABLE_SIZE as f32;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct WavetableEngine<'a> {
     phase: f32,
 

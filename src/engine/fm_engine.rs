@@ -22,7 +22,7 @@ use crate::A0;
 
 const OVERSAMPLING: usize = 4;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct FmEngine {
     carrier_phase: u32,
     modulator_phase: u32,

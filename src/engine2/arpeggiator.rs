@@ -4,7 +4,7 @@
 
 use crate::utils::random;
 
-#[derive(Debug, Default, PartialEq, Eq)]
+#[derive(Debug, Default, PartialEq, Eq, Clone)]
 pub enum ArpeggiatorMode {
     #[default]
     Up,
@@ -30,7 +30,7 @@ where
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct Arpeggiator {
     mode: ArpeggiatorMode,
     range: i32,

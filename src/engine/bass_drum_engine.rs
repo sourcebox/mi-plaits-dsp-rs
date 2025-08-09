@@ -21,7 +21,7 @@ use crate::drums::analog_bass_drum::AnalogBassDrum;
 use crate::drums::synthetic_bass_drum::SyntheticBassDrum;
 use crate::fx::overdrive::Overdrive;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct BassDrumEngine {
     analog_bass_drum: AnalogBassDrum,
     synthetic_bass_drum: SyntheticBassDrum,

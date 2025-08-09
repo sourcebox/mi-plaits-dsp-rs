@@ -22,7 +22,7 @@ use crate::utils::filter::{FilterMode, FrequencyApproximation, NaiveSvf};
 use crate::utils::one_pole;
 use crate::utils::units::semitones_to_ratio;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct StringMachineEngine {
     chords: ChordBank,
 

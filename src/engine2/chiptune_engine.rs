@@ -28,7 +28,7 @@ use crate::SAMPLE_RATE;
 
 pub const NO_ENVELOPE: f32 = 2.0;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct ChiptuneEngine {
     voice: [SuperSquareOscillator; CHORD_NUM_VOICES],
     bass: NesTriangleOscillator,

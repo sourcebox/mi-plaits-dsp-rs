@@ -21,7 +21,7 @@ use crate::oscillator::variable_saw_oscillator::VariableSawOscillator;
 use crate::oscillator::variable_shape_oscillator::VariableShapeOscillator;
 use crate::utils::parameter_interpolator::ParameterInterpolator;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct VirtualAnalogEngine {
     primary: VariableShapeOscillator,
     auxiliary: VariableShapeOscillator,

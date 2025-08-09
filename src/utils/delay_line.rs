@@ -4,7 +4,7 @@
 
 use num_traits::{FromPrimitive, Num, Signed, ToPrimitive};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct DelayLine<T, const MAX_DELAY: usize> {
     write_ptr: usize,
     delay: usize,

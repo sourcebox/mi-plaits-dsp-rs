@@ -21,7 +21,7 @@ pub enum StringNonLinearity {
     Dispersion,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct String {
     string: DelayLine<f32, DELAY_LINE_SIZE>,
     stretch: DelayLine<f32, { DELAY_LINE_SIZE / 4 }>,

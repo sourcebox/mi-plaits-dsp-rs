@@ -19,12 +19,12 @@ pub mod virtual_analog_engine;
 pub mod waveshaping_engine;
 pub mod wavetable_engine;
 
-// use dyn_clone::DynClone;
+use dyn_clone::DynClone;
 
 use crate::utils::units::semitones_to_ratio;
 use crate::A0;
 
-pub trait Engine: Send + Sync {
+pub trait Engine: Send + Sync + DynClone {
     fn init(&mut self);
 
     fn reset(&mut self) {}
@@ -38,7 +38,7 @@ pub trait Engine: Send + Sync {
     );
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct EngineParameters {
     /// Trigger signal state
     pub trigger: TriggerState,
@@ -64,7 +64,7 @@ pub struct EngineParameters {
     pub accent: f32,
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum TriggerState {
     Low = 0,
     RisingEdge = 1,

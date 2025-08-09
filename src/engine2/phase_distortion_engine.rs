@@ -20,7 +20,7 @@ use crate::resources::fm::LUT_FM_FREQUENCY_QUANTIZER;
 use crate::utils::interpolate;
 use crate::utils::units::semitones_to_ratio;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PhaseDistortionEngine {
     shaper: VariableShapeOscillator,
     modulator: VariableShapeOscillator,

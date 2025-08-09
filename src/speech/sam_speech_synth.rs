@@ -12,7 +12,7 @@ const NUM_VOWELS: usize = 9;
 const NUM_CONSONANTS: usize = 8;
 const NUM_PHONEMES: usize = NUM_VOWELS + NUM_CONSONANTS;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct SamSpeechSynth {
     phase: f32,
     frequency: f32,
