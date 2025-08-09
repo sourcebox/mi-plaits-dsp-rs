@@ -8,7 +8,7 @@ use crate::oscillator::oscillator::MAX_FREQUENCY;
 use crate::utils::one_pole;
 use crate::utils::parameter_interpolator::ParameterInterpolator;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct WavetableOscillator {
     // Oscillator state.
     phase: f32,
@@ -110,7 +110,7 @@ impl WavetableOscillator {
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct Differentiator {
     lp: f32,
     previous: f32,

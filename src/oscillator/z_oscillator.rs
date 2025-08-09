@@ -7,7 +7,7 @@ use crate::oscillator::sine_oscillator::sine;
 use crate::utils::parameter_interpolator::ParameterInterpolator;
 use crate::utils::polyblep::{next_blep_sample, this_blep_sample};
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct ZOscillator {
     // Oscillator state.
     carrier_phase: f32,

@@ -14,7 +14,7 @@ use crate::utils::units::semitones_to_ratio;
 use crate::utils::{one_pole, slope};
 use crate::SAMPLE_RATE;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct SyntheticBassDrum {
     f0: f32,
     phase: f32,
@@ -178,7 +178,7 @@ impl SyntheticBassDrum {
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct SyntheticBassDrumClick {
     lp: f32,
     hp: f32,
@@ -207,7 +207,7 @@ impl SyntheticBassDrumClick {
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct SyntheticBassDrumAttackNoise {
     lp: f32,
     hp: f32,

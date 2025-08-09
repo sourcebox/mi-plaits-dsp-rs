@@ -63,7 +63,7 @@ impl DcBlocker {
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct OnePole {
     g: f32,
     gi: f32,
@@ -138,7 +138,7 @@ impl OnePole {
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct Svf {
     g: f32,
     r: f32,
@@ -469,7 +469,7 @@ impl Svf {
 }
 
 /// Naive Chamberlin SVF.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct NaiveSvf {
     f: f32,
     damp: f32,

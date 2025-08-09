@@ -6,7 +6,7 @@ use crate::utils::parameter_interpolator::ParameterInterpolator;
 use crate::utils::polyblep::{next_blep_sample, this_blep_sample};
 use crate::utils::random;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct ClockedNoise {
     // Oscillator state.
     phase: f32,
