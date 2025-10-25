@@ -29,6 +29,7 @@ pub fn semitones_to_ratio_safe(mut semitones: f32) -> f32 {
 }
 
 #[allow(clippy::excessive_precision)]
+#[allow(clippy::approx_constant)]
 const LUT_PITCH_RATIO_HIGH: [f32; 256] = [
     6.151958251e-04,
     6.517772725e-04,
