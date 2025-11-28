@@ -21,7 +21,7 @@ fn main() -> ! {
 
 #[derive(Debug)]
 struct App<'a> {
-    voices: [Voice<'a>; VOICE_COUNT],
+    voices: Box<[Voice<'a>; VOICE_COUNT]>,
     patches: [Patch; VOICE_COUNT],
     modulations: [Modulations; VOICE_COUNT],
     volume: f32,
@@ -32,7 +32,7 @@ struct App<'a> {
 impl<'a> App<'a> {
     pub fn new() -> Self {
         Self {
-            voices: core::array::from_fn(|_| Voice::new(CHUNK_SIZE)),
+            voices: Box::new(core::array::from_fn(|_| Voice::new(CHUNK_SIZE))),
             patches: core::array::from_fn(|_| Patch::default()),
             modulations: core::array::from_fn(|_| Modulations::default()),
             volume: 1.0,
