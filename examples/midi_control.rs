@@ -74,7 +74,7 @@ impl<'a> AudioGenerator for App<'a> {
         samples_right.clone_from_slice(&mix);
     }
 
-    fn process_midi(&mut self, message: Vec<u8>) {
+    fn process_midi(&mut self, message: Vec<u8>, _timestamp: u64) {
         match message[0] & 0xF0 {
             0x80 => {
                 // Note off
