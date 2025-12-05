@@ -55,7 +55,7 @@ impl<'a> AudioGenerator for App<'a> {
         }
     }
 
-    fn process(&mut self, samples_left: &mut [f32], samples_right: &mut [f32]) {
+    fn process(&mut self, frames: &mut [[f32; 2]]) {
         let mut mix = vec![0.0; CHUNK_SIZE];
 
         for (n, voice) in self.voices.iter_mut().enumerate() {
@@ -70,11 +70,13 @@ impl<'a> AudioGenerator for App<'a> {
             }
         }
 
-        samples_left.clone_from_slice(&mix);
-        samples_right.clone_from_slice(&mix);
+        for (n, frame) in frames.iter_mut().enumerate() {
+            frame[0] = mix[n];
+            frame[1] = mix[n];
+        }
     }
 
-    fn process_midi(&mut self, message: Vec<u8>, _timestamp: u64) {
+    fn process_midi(&mut self, message: &[u8], _timestamp: u64) {
         match message[0] & 0xF0 {
             0x80 => {
                 // Note off
