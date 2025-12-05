@@ -17,4 +17,4 @@ spin = { version = "0.10.0", features = ["once"] }
 hound = "3.5.1"
 log = "0.4.26"
 simple_logger = "5.0.0"
-audio-midi-shell = { git = "https://github.com/sourcebox/audio-midi-shell-rs" }
+audio-midi-shell = "0.1.0"
