@@ -50,7 +50,7 @@ impl StringMachineEngine {
 }
 
 impl Engine for StringMachineEngine {
-    fn init(&mut self) {
+    fn init(&mut self, _sample_rate_hz: f32) {
         for divide_down_voice in self.divide_down_voice.iter_mut() {
             divide_down_voice.init();
         }
@@ -89,7 +89,7 @@ impl Engine for StringMachineEngine {
         out.fill(0.0);
         aux.fill(0.0);
 
-        let f0 = note_to_frequency(parameters.note) * 0.998;
+        let f0 = note_to_frequency(parameters.note, parameters.a0_normalized) * 0.998;
         for note in 0..CHORD_NUM_NOTES {
             let note_f0 = f0 * self.chords.ratio(note as i32);
             let divide_down_gain = (4.0 - note_f0 * 32.0).clamp(0.0, 1.0);

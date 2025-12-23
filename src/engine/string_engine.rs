@@ -48,9 +48,9 @@ impl StringEngine {
 }
 
 impl Engine for StringEngine {
-    fn init(&mut self) {
+    fn init(&mut self, sample_rate_hz: f32) {
         for voice in &mut self.voice {
-            voice.init();
+            voice.init(sample_rate_hz);
         }
         self.f0 = [0.0; NUM_STRINGS];
         self.active_string = NUM_STRINGS - 1;
@@ -82,7 +82,7 @@ impl Engine for StringEngine {
             self.active_string = (self.active_string + 1) % NUM_STRINGS;
         }
 
-        let f0 = note_to_frequency(parameters.note);
+        let f0 = note_to_frequency(parameters.note, parameters.a0_normalized);
         self.f0[self.active_string] = f0;
         self.f0_delay.write(f0);
 

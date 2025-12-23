@@ -30,10 +30,10 @@ impl StringVoice {
         }
     }
 
-    pub fn init(&mut self) {
+    pub fn init(&mut self, sample_rate_hz: f32) {
         self.excitation_filter.init();
+        self.string.init(sample_rate_hz);
         self.remaining_noise_samples = 0;
-        self.reset();
     }
 
     pub fn reset(&mut self) {

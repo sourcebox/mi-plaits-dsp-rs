@@ -19,8 +19,26 @@ pub mod speech;
 pub mod utils;
 pub mod voice;
 
-/// Audio sample rate in Hz.
-pub const SAMPLE_RATE: f32 = 48000.0;
+/// Sample rate context for DSP calculations.
+#[derive(Debug, Clone, Copy)]
+pub struct SampleRate {
+    /// Sample rate in Hz
+    pub sample_rate_hz: f32,
+    /// Reciprocal of sample rate (1.0 / sample_rate_hz) for fast multiplication
+    pub inv_sr: f32,
+    /// Normalized frequency of A0 (55 Hz) for MIDI note conversion
+    pub a0_normalized: f32,
+}
 
-/// Normalized frequency of note A0.
-pub const A0: f32 = (440.0 / 8.0) / SAMPLE_RATE;
+impl SampleRate {
+    /// Create a new sample rate context.
+    pub fn new(sample_rate_hz: f32) -> Self {
+        let inv_sr = 1.0 / sample_rate_hz;
+        let a0_normalized = 55.0 * inv_sr;
+        Self {
+            sample_rate_hz,
+            inv_sr,
+            a0_normalized,
+        }
+    }
+}

@@ -10,7 +10,6 @@ use crate::utils::filter::{FilterMode, FrequencyApproximation, Svf};
 use crate::utils::one_pole;
 use crate::utils::parameter_interpolator::ParameterInterpolator;
 use crate::utils::units::semitones_to_ratio;
-use crate::SAMPLE_RATE;
 
 #[derive(Debug, Default)]
 pub struct AnalogBassDrum {
@@ -29,6 +28,13 @@ pub struct AnalogBassDrum {
 
     // Replace the resonator in "free running" (sustain) mode.
     oscillator: SineOscillator,
+
+    // Sample rate dependent constants
+    trigger_pulse_duration: i32,
+    fm_pulse_duration: i32,
+    pulse_decay_time: f32,
+    pulse_filter_time: f32,
+    retrig_pulse_duration: f32,
 }
 
 impl AnalogBassDrum {
@@ -36,7 +42,7 @@ impl AnalogBassDrum {
         Self::default()
     }
 
-    pub fn init(&mut self) {
+    pub fn init(&mut self, sample_rate_hz: f32) {
         self.pulse_remaining_samples = 0;
         self.fm_pulse_remaining_samples = 0;
         self.pulse = 0.0;
@@ -50,6 +56,13 @@ impl AnalogBassDrum {
 
         self.resonator.init();
         self.oscillator.init();
+
+        // Pre-compute sample rate dependent constants
+        self.trigger_pulse_duration = (1.0e-3 * sample_rate_hz) as i32;
+        self.fm_pulse_duration = (6.0e-3 * sample_rate_hz) as i32;
+        self.pulse_decay_time = 0.2e-3 * sample_rate_hz;
+        self.pulse_filter_time = 0.1e-3 * sample_rate_hz;
+        self.retrig_pulse_duration = 0.05 * sample_rate_hz;
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -66,20 +79,14 @@ impl AnalogBassDrum {
         self_fm_amount: f32,
         out: &mut [f32],
     ) {
-        const TRIGGER_PULSE_DURATION: i32 = (1.0e-3 * SAMPLE_RATE) as i32;
-        const FM_PULSE_DURATION: i32 = (6.0e-3 * SAMPLE_RATE) as i32;
-        const PULSE_DECAY_TIME: f32 = 0.2e-3 * SAMPLE_RATE;
-        const PULSE_FILTER_TIME: f32 = 0.1e-3 * SAMPLE_RATE;
-        const RETRIG_PULSE_DURATION: f32 = 0.05 * SAMPLE_RATE;
-
         let scale = 0.001 / f0;
         let q = 1500.0 * semitones_to_ratio(decay * 80.0);
         let tone_f = f32::min(4.0 * f0 * semitones_to_ratio(tone * 108.0), 1.0);
         let exciter_leak = 0.08 * (tone + 0.25);
 
         if trigger {
-            self.pulse_remaining_samples = TRIGGER_PULSE_DURATION;
-            self.fm_pulse_remaining_samples = FM_PULSE_DURATION;
+            self.pulse_remaining_samples = self.trigger_pulse_duration;
+            self.fm_pulse_remaining_samples = self.fm_pulse_duration;
             self.pulse_height = 3.0 + 7.0 * accent;
             self.lp_out = 0.0;
         }
@@ -99,7 +106,7 @@ impl AnalogBassDrum {
                 };
                 self.pulse = pulse;
             } else {
-                self.pulse *= 1.0 - 1.0 / PULSE_DECAY_TIME;
+                self.pulse *= 1.0 - 1.0 / self.pulse_decay_time;
                 pulse = self.pulse;
             }
             if sustain {
@@ -107,7 +114,7 @@ impl AnalogBassDrum {
             }
 
             // C40 / R163 / R162 / D83
-            one_pole(&mut self.pulse_lp, pulse, 1.0 / PULSE_FILTER_TIME);
+            one_pole(&mut self.pulse_lp, pulse, 1.0 / self.pulse_filter_time);
             pulse = diode((pulse - self.pulse_lp) + pulse * 0.044);
 
             // Q41 / Q42
@@ -123,12 +130,12 @@ impl AnalogBassDrum {
                 };
             } else {
                 // C39 / R161
-                self.retrig_pulse *= 1.0 - 1.0 / RETRIG_PULSE_DURATION;
+                self.retrig_pulse *= 1.0 - 1.0 / self.retrig_pulse_duration;
             }
             if sustain {
                 fm_pulse = 0.0;
             }
-            one_pole(&mut self.fm_pulse_lp, fm_pulse, 1.0 / PULSE_FILTER_TIME);
+            one_pole(&mut self.fm_pulse_lp, fm_pulse, 1.0 / self.pulse_filter_time);
 
             // Q43 and R170 leakage
             let punch = 0.7 + diode(10.0 * self.lp_out - 1.0);

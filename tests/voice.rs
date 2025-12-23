@@ -3,13 +3,13 @@
 mod wav_writer;
 
 use mi_plaits_dsp::voice::{Modulations, Patch, Voice, NUM_ENGINES};
-use mi_plaits_dsp::SAMPLE_RATE;
 
+const SAMPLE_RATE: f32 = 48000.0;
 const BLOCK_SIZE: usize = 24;
 
 #[test]
 fn all_engines() {
-    let mut voice = Voice::new(BLOCK_SIZE);
+    let mut voice = Voice::new(BLOCK_SIZE, SAMPLE_RATE);
     let mut out = [0.0; BLOCK_SIZE];
     let mut aux = [0.0; BLOCK_SIZE];
     let mut wav_data = Vec::new();
@@ -65,7 +65,7 @@ fn all_engines() {
 
 #[test]
 fn all_engines_trigger() {
-    let mut voice = Voice::new(BLOCK_SIZE);
+    let mut voice = Voice::new(BLOCK_SIZE, SAMPLE_RATE);
     let mut out = [0.0; BLOCK_SIZE];
     let mut aux = [0.0; BLOCK_SIZE];
     let mut wav_data = Vec::new();

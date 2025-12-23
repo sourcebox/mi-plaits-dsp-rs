@@ -26,7 +26,6 @@ use crate::oscillator::wavetable_oscillator::{interpolate_wave_hermite, Differen
 use crate::resources::waves::WAV_INTEGRATED_WAVES;
 use crate::utils::one_pole;
 use crate::utils::parameter_interpolator::SimpleParameterInterpolator;
-use crate::A0;
 
 const TABLE_SIZE: usize = 128;
 const TABLE_SIZE_F: f32 = TABLE_SIZE as f32;
@@ -107,7 +106,7 @@ impl<'a> WavetableEngine<'a> {
 }
 
 impl Engine for WavetableEngine<'_> {
-    fn init(&mut self) {
+    fn init(&mut self, _sample_rate_hz: f32) {
         self.phase = 0.0;
 
         self.x_lp = 0.0;
@@ -121,7 +120,7 @@ impl Engine for WavetableEngine<'_> {
         self.previous_x = 0.0;
         self.previous_y = 0.0;
         self.previous_z = 0.0;
-        self.previous_f0 = A0;
+        self.previous_f0 = 55.0 / _sample_rate_hz;  // A0 normalized
 
         self.diff_out.init();
     }
@@ -134,7 +133,7 @@ impl Engine for WavetableEngine<'_> {
         aux: &mut [f32],
         _already_enveloped: &mut bool,
     ) {
-        let f0 = note_to_frequency(parameters.note);
+        let f0 = note_to_frequency(parameters.note, parameters.a0_normalized);
 
         one_pole(&mut self.x_pre_lp, parameters.timbre * 6.9999, 0.2);
         one_pole(&mut self.y_pre_lp, parameters.morph * 6.9999, 0.2);

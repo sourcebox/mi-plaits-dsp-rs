@@ -6,8 +6,8 @@ mod wav_writer;
 use mi_plaits_dsp::oscillator::sine_oscillator::SineOscillator;
 
 use mi_plaits_dsp::fx::*;
-use mi_plaits_dsp::SAMPLE_RATE;
 
+const SAMPLE_RATE: f32 = 48000.0;
 const BLOCK_SIZE: usize = 24;
 
 #[test]
@@ -19,7 +19,7 @@ fn diffuser() {
     let mut fx = diffuser::Diffuser::new();
     let mut in_out = [0.0; BLOCK_SIZE];
     let mut wav_data = Vec::new();
-    fx.init();
+    fx.init(SAMPLE_RATE);
 
     let blocks = (duration * SAMPLE_RATE / (BLOCK_SIZE as f32)) as usize;
 

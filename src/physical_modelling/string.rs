@@ -12,7 +12,6 @@ use crate::utils::parameter_interpolator::ParameterInterpolator;
 use crate::utils::random;
 use crate::utils::units::semitones_to_ratio;
 use crate::utils::{crossfade, interpolate, one_pole};
-use crate::SAMPLE_RATE;
 
 pub const DELAY_LINE_SIZE: usize = 1024;
 
@@ -37,6 +36,8 @@ pub struct String {
     // do not fit the delay line. Rarely used.
     src_phase: f32,
     out_sample: [f32; 2],
+
+    sample_rate_hz: f32,
 }
 
 impl Default for String {
@@ -57,14 +58,26 @@ impl String {
             curved_bridge: 0.0,
             src_phase: 0.0,
             out_sample: [0.0; 2],
+            sample_rate_hz: 48000.0,
         }
+    }
+
+    pub fn init(&mut self, sample_rate_hz: f32) {
+        self.sample_rate_hz = sample_rate_hz;
+        self.string.reset();
+        self.stretch.reset();
+        self.iir_damping_filter.init();
+        self.dc_blocker.init(1.0 - 20.0 / sample_rate_hz);
+        self.dispersion_noise = 0.0;
+        self.curved_bridge = 0.0;
+        self.out_sample[0] = 0.0;
+        self.out_sample[1] = 0.0;
+        self.src_phase = 0.0;
     }
 
     pub fn reset(&mut self) {
         self.string.reset();
         self.stretch.reset();
-        self.iir_damping_filter.init();
-        self.dc_blocker.init(1.0 - 20.0 / SAMPLE_RATE);
         self.dispersion_noise = 0.0;
         self.curved_bridge = 0.0;
         self.out_sample[0] = 0.0;
@@ -152,7 +165,7 @@ impl String {
             ParameterInterpolator::new(&mut self.delay, delay * damping_compensation, out.len());
 
         let stretch_point = non_linearity_amount * (2.0 - non_linearity_amount) * 0.225;
-        let mut stretch_correction = (160.0 / SAMPLE_RATE) * delay;
+        let mut stretch_correction = (160.0 / self.sample_rate_hz) * delay;
         stretch_correction = stretch_correction.clamp(1.0, 2.1);
 
         let noise_amount_sqrt = if non_linearity_amount > 0.75 {

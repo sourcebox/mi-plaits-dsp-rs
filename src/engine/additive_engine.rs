@@ -51,7 +51,7 @@ impl AdditiveEngine {
 }
 
 impl Engine for AdditiveEngine {
-    fn init(&mut self) {
+    fn init(&mut self, _sample_rate_hz: f32) {
         for osc in self.harmonic_oscillator.iter_mut() {
             osc.init();
         }
@@ -69,7 +69,7 @@ impl Engine for AdditiveEngine {
         aux: &mut [f32],
         _already_enveloped: &mut bool,
     ) {
-        let f0 = note_to_frequency(parameters.note);
+        let f0 = note_to_frequency(parameters.note, parameters.a0_normalized);
 
         let centroid = parameters.timbre;
         let raw_bumps = parameters.harmonics;

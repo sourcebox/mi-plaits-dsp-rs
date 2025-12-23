@@ -50,7 +50,7 @@ impl VirtualAnalogVcfEngine {
 }
 
 impl Engine for VirtualAnalogVcfEngine {
-    fn init(&mut self) {
+    fn init(&mut self, _sample_rate_hz: f32) {
         self.oscillator.init();
         self.sub_oscillator.init();
 
@@ -71,7 +71,7 @@ impl Engine for VirtualAnalogVcfEngine {
         aux: &mut [f32],
         _already_enveloped: &mut bool,
     ) {
-        let f0 = note_to_frequency(parameters.note);
+        let f0 = note_to_frequency(parameters.note, parameters.a0_normalized);
 
         let shape = ((parameters.morph - 0.25) * 2.0 + 0.5).clamp(0.5, 1.0);
 

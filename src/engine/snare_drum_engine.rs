@@ -29,9 +29,9 @@ impl SnareDrumEngine {
 }
 
 impl Engine for SnareDrumEngine {
-    fn init(&mut self) {
-        self.analog_snare_drum.init();
-        self.synthetic_snare_drum.init();
+    fn init(&mut self, sample_rate_hz: f32) {
+        self.analog_snare_drum.init(sample_rate_hz);
+        self.synthetic_snare_drum.init(sample_rate_hz);
     }
 
     #[inline]
@@ -42,7 +42,7 @@ impl Engine for SnareDrumEngine {
         aux: &mut [f32],
         _already_enveloped: &mut bool,
     ) {
-        let f0 = note_to_frequency(parameters.note);
+        let f0 = note_to_frequency(parameters.note, parameters.a0_normalized);
 
         let sustain = matches!(parameters.trigger, TriggerState::Unpatched);
         let trigger = matches!(parameters.trigger, TriggerState::RisingEdge);

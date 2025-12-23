@@ -37,7 +37,7 @@ impl SwarmEngine {
 }
 
 impl Engine for SwarmEngine {
-    fn init(&mut self) {
+    fn init(&mut self, _sample_rate_hz: f32) {
         self.reset();
     }
 
@@ -58,9 +58,9 @@ impl Engine for SwarmEngine {
         aux: &mut [f32],
         _already_enveloped: &mut bool,
     ) {
-        let f0 = note_to_frequency(parameters.note);
+        let f0 = note_to_frequency(parameters.note, parameters.a0_normalized);
         let control_rate = out.len() as f32;
-        let density = note_to_frequency(parameters.timbre * 120.0) * 0.025 * control_rate;
+        let density = note_to_frequency(parameters.timbre * 120.0, parameters.a0_normalized) * 0.025 * control_rate;
         let spread = parameters.harmonics * parameters.harmonics * parameters.harmonics;
         let mut size_ratio = 0.25 * semitones_to_ratio((1.0 - parameters.morph) * 84.0);
 

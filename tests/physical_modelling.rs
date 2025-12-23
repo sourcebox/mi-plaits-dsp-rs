@@ -3,8 +3,8 @@
 mod wav_writer;
 
 use mi_plaits_dsp::physical_modelling::*;
-use mi_plaits_dsp::SAMPLE_RATE;
 
+const SAMPLE_RATE: f32 = 48000.0;
 const BLOCK_SIZE: usize = 24;
 
 #[test]
@@ -138,7 +138,7 @@ fn string_voice() {
     let mut temp_2 = [0.0; BLOCK_SIZE];
     let mut wav_data = Vec::new();
     let mut wav_data_aux = Vec::new();
-    model.init();
+    model.init(SAMPLE_RATE);
 
     let blocks = (duration * SAMPLE_RATE / (BLOCK_SIZE as f32)) as usize;
     let f0 = frequency / SAMPLE_RATE;

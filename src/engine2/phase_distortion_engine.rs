@@ -41,7 +41,7 @@ impl PhaseDistortionEngine {
 }
 
 impl Engine for PhaseDistortionEngine {
-    fn init(&mut self) {
+    fn init(&mut self, _sample_rate_hz: f32) {
         self.shaper.init();
         self.modulator.init();
     }
@@ -53,7 +53,7 @@ impl Engine for PhaseDistortionEngine {
         aux: &mut [f32],
         _already_enveloped: &mut bool,
     ) {
-        let f0 = 0.5 * note_to_frequency(parameters.note);
+        let f0 = 0.5 * note_to_frequency(parameters.note, parameters.a0_normalized);
         let modulator_f = f32::min(
             0.25,
             f0 * semitones_to_ratio(interpolate(

@@ -22,7 +22,6 @@ use crate::fm::{
 };
 use crate::utils::hysteresis_quantizer::HysteresisQuantizer2;
 use crate::utils::soft_clip;
-use crate::SAMPLE_RATE;
 
 const NUM_SIX_OP_VOICES: usize = 2;
 const NUM_PATCHES_PER_BANK: usize = 32;
@@ -39,6 +38,7 @@ pub struct SixOpEngine<'a> {
 
     active_voice: i32,
     rendered_voice: i32,
+    sample_rate: f32,
 }
 
 impl SixOpEngine<'_> {
@@ -50,6 +50,7 @@ impl SixOpEngine<'_> {
             temp_buffer: vec![0.0; block_size].into_boxed_slice(),
             active_voice: 0,
             rendered_voice: 0,
+            sample_rate: 48000.0,
         }
     }
 
@@ -65,7 +66,8 @@ impl SixOpEngine<'_> {
 }
 
 impl Engine for SixOpEngine<'_> {
-    fn init(&mut self) {
+    fn init(&mut self, sample_rate_hz: f32) {
+        self.sample_rate = sample_rate_hz;
         self.patch_index_quantizer.init(32, 0.005, false);
 
         for voice in self.voice.iter_mut() {
@@ -75,7 +77,7 @@ impl Engine for SixOpEngine<'_> {
                     algo.init();
                     algo
                 }),
-                SAMPLE_RATE,
+                sample_rate_hz,
             );
         }
 
@@ -96,7 +98,7 @@ impl Engine for SixOpEngine<'_> {
 
         if parameters.trigger == TriggerState::Unpatched {
             let t = parameters.morph;
-            self.voice[0].mutable_lfo().scrub(2.0 * SAMPLE_RATE * t);
+            self.voice[0].mutable_lfo().scrub(2.0 * self.sample_rate * t);
 
             let pitch_mod = self.voice[0].lfo().pitch_mod();
             let amp_mod = self.voice[0].lfo().amp_mod();

@@ -8,7 +8,6 @@ use crate::utils::parameter_interpolator::ParameterInterpolator;
 use crate::utils::random;
 use crate::utils::units::semitones_to_ratio;
 use crate::utils::{one_pole, soft_clip};
-use crate::SAMPLE_RATE;
 
 const NUM_MODES: usize = 5;
 
@@ -26,6 +25,10 @@ pub struct AnalogSnareDrum {
 
     // Replace the resonators in "free running" (sustain) mode.
     oscillator: [SineOscillator; NUM_MODES],
+
+    // Sample rate dependent constants
+    trigger_pulse_duration: i32,
+    pulse_decay_time: i32,
 }
 
 impl AnalogSnareDrum {
@@ -33,7 +36,7 @@ impl AnalogSnareDrum {
         Self::default()
     }
 
-    pub fn init(&mut self) {
+    pub fn init(&mut self, sample_rate_hz: f32) {
         self.pulse_remaining_samples = 0;
         self.pulse = 0.0;
         self.pulse_height = 0.0;
@@ -46,6 +49,10 @@ impl AnalogSnareDrum {
             self.oscillator[i].init();
         }
         self.noise_filter.init();
+
+        // Pre-compute sample rate dependent constants
+        self.trigger_pulse_duration = (1.0e-3 * sample_rate_hz) as i32;
+        self.pulse_decay_time = (0.1e-3 * sample_rate_hz) as i32;
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -62,8 +69,6 @@ impl AnalogSnareDrum {
         out: &mut [f32],
     ) {
         let decay_xt = decay * (1.0 + decay * (decay - 1.0));
-        const TRIGGER_PULSE_DURATION: i32 = (1.0e-3 * SAMPLE_RATE) as i32;
-        const PULSE_DECAY_TIME: i32 = (0.1e-3 * SAMPLE_RATE) as i32;
         let q = 2000.0 * semitones_to_ratio(decay_xt * 84.0);
         let noise_envelope_decay =
             1.0 - 0.0017 * semitones_to_ratio(-decay * (50.0 + snappy * 10.0));
@@ -72,7 +77,7 @@ impl AnalogSnareDrum {
         snappy = (snappy * 1.1 - 0.05).clamp(0.0, 1.0);
 
         if trigger {
-            self.pulse_remaining_samples = TRIGGER_PULSE_DURATION;
+            self.pulse_remaining_samples = self.trigger_pulse_duration;
             self.pulse_height = 3.0 + 7.0 * accent;
             self.noise_envelope = 2.0;
         }
@@ -129,7 +134,7 @@ impl AnalogSnareDrum {
                 };
                 self.pulse = pulse;
             } else {
-                self.pulse *= 1.0 - 1.0 / (PULSE_DECAY_TIME as f32);
+                self.pulse *= 1.0 - 1.0 / (self.pulse_decay_time as f32);
                 pulse = self.pulse;
             }
 

@@ -20,10 +20,9 @@ pub mod waveshaping_engine;
 pub mod wavetable_engine;
 
 use crate::utils::units::semitones_to_ratio;
-use crate::A0;
 
 pub trait Engine {
-    fn init(&mut self);
+    fn init(&mut self, sample_rate_hz: f32);
 
     fn reset(&mut self) {}
 
@@ -60,6 +59,9 @@ pub struct EngineParameters {
     /// Level setting
     /// Range: 0.0 - 1.0
     pub accent: f32,
+
+    /// Normalized frequency of A0 (55 Hz) for pitch calculations
+    pub a0_normalized: f32,
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -77,9 +79,9 @@ impl Default for TriggerState {
 }
 
 #[inline]
-pub fn note_to_frequency(mut midi_note: f32) -> f32 {
+pub fn note_to_frequency(mut midi_note: f32, a0_normalized: f32) -> f32 {
     midi_note -= 9.0;
     midi_note = midi_note.clamp(-128.0, 127.0);
 
-    A0 * 0.25 * semitones_to_ratio(midi_note)
+    a0_normalized * 0.25 * semitones_to_ratio(midi_note)
 }

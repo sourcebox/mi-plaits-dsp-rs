@@ -1,11 +1,12 @@
 //! Tests for wavetable engine
 
 use mi_plaits_dsp::engine::*;
-use mi_plaits_dsp::SAMPLE_RATE;
 
 use crate::modulation;
 use crate::wav_writer;
 
+const SAMPLE_RATE: f32 = 48000.0;
+const A0_NORMALIZED: f32 = 55.0 / SAMPLE_RATE;
 const BLOCK_SIZE: usize = 24;
 
 #[test]
@@ -16,7 +17,7 @@ fn wavetable_engine_harmonics() {
     let mut wav_data = Vec::new();
     let mut wav_data_aux = Vec::new();
 
-    engine.init();
+    engine.init(SAMPLE_RATE);
 
     let duration = 2.0;
     let blocks = (duration * SAMPLE_RATE / (BLOCK_SIZE as f32)) as usize;
@@ -34,6 +35,7 @@ fn wavetable_engine_harmonics() {
             morph: 0.5,
             harmonics: modulation::ramp_up(n, blocks),
             accent: 1.0,
+            a0_normalized: A0_NORMALIZED,
         };
 
         engine.render(&parameters, &mut out, &mut aux, &mut already_enveloped);
@@ -57,7 +59,7 @@ fn wavetable_engine_timbre() {
     let mut wav_data = Vec::new();
     let mut wav_data_aux = Vec::new();
 
-    engine.init();
+    engine.init(SAMPLE_RATE);
 
     let duration = 2.0;
     let blocks = (duration * SAMPLE_RATE / (BLOCK_SIZE as f32)) as usize;
@@ -75,6 +77,7 @@ fn wavetable_engine_timbre() {
             morph: 0.5,
             harmonics: 0.5,
             accent: 1.0,
+            a0_normalized: A0_NORMALIZED,
         };
 
         engine.render(&parameters, &mut out, &mut aux, &mut already_enveloped);
@@ -94,7 +97,7 @@ fn wavetable_engine_morph() {
     let mut wav_data = Vec::new();
     let mut wav_data_aux = Vec::new();
 
-    engine.init();
+    engine.init(SAMPLE_RATE);
 
     let duration = 2.0;
     let blocks = (duration * SAMPLE_RATE / (BLOCK_SIZE as f32)) as usize;
@@ -112,6 +115,7 @@ fn wavetable_engine_morph() {
             morph: modulation::ramp_up(n, blocks),
             harmonics: 0.5,
             accent: 1.0,
+            a0_normalized: A0_NORMALIZED,
         };
 
         engine.render(&parameters, &mut out, &mut aux, &mut already_enveloped);

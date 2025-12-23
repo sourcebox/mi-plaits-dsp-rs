@@ -37,7 +37,6 @@ use crate::utils::delay_line::DelayLine;
 use crate::utils::hysteresis_quantizer::HysteresisQuantizer2;
 use crate::utils::limiter::Limiter;
 use crate::utils::units::semitones_to_ratio;
-use crate::SAMPLE_RATE;
 
 const MAX_TRIGGER_DELAY: usize = 8;
 pub const NUM_ENGINES: usize = 24;
@@ -211,10 +210,17 @@ pub struct Voice<'a> {
 
     out_post_processor: ChannelPostProcessor,
     aux_post_processor: ChannelPostProcessor,
+
+    sample_rate_hz: f32,
+    inv_sr: f32,
+    a0_normalized: f32,
 }
 
 impl Voice<'_> {
-    pub fn new(block_size: usize) -> Self {
+    pub fn new(block_size: usize, sample_rate_hz: f32) -> Self {
+        let inv_sr = 1.0 / sample_rate_hz;
+        let a0_normalized = 55.0 * inv_sr;
+
         Self {
             additive_engine: AdditiveEngine::new(),
             bass_drum_engine: BassDrumEngine::new(),
@@ -256,12 +262,17 @@ impl Voice<'_> {
 
             out_post_processor: ChannelPostProcessor::new(),
             aux_post_processor: ChannelPostProcessor::new(),
+
+            sample_rate_hz,
+            inv_sr,
+            a0_normalized,
         }
     }
 
     pub fn init(&mut self) {
+        let sample_rate_hz = self.sample_rate_hz;
         for i in 0..NUM_ENGINES {
-            self.get_engine(i).unwrap().0.init();
+            self.get_engine(i).unwrap().0.init(sample_rate_hz);
         }
 
         self.engine_quantizer.init(NUM_ENGINES as i32, 0.05, true);
@@ -347,6 +358,7 @@ impl Voice<'_> {
         }
 
         let mut p = EngineParameters::default();
+        p.a0_normalized = self.a0_normalized;
 
         let rising_edge = self.trigger_state && !previous_trigger_state;
         let note = (modulations.note + self.previous_note) * 0.5;
@@ -364,7 +376,7 @@ impl Voice<'_> {
             p.trigger = TriggerState::Unpatched;
         }
 
-        let short_decay = (200.0 * out.len() as f32) / SAMPLE_RATE
+        let short_decay = (200.0 * out.len() as f32) * self.inv_sr
             * semitones_to_ratio(-96.0 * patch.decay.clamp(0.1, 1.0));
 
         self.decay_envelope.process(short_decay * 2.0);
@@ -471,7 +483,7 @@ impl Voice<'_> {
         // Compute LPG parameters.
         if !lpg_bypass {
             let hf = patch.lpg_colour;
-            let decay_tail = (20.0 * out.len() as f32) / SAMPLE_RATE
+            let decay_tail = (20.0 * out.len() as f32) * self.inv_sr
                 * semitones_to_ratio(-72.0 * patch.decay + 12.0 * hf)
                 - short_decay;
 
@@ -479,7 +491,7 @@ impl Voice<'_> {
                 self.lpg_envelope
                     .process_lp(compressed_level, short_decay, decay_tail, hf);
             } else {
-                let attack = note_to_frequency(p.note) * out.len() as f32 * 2.0;
+                let attack = note_to_frequency(p.note, self.a0_normalized) * out.len() as f32 * 2.0;
                 self.lpg_envelope
                     .process_ping(attack, short_decay, decay_tail, hf);
             }

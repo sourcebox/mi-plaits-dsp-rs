@@ -24,7 +24,6 @@ use crate::oscillator::super_square_oscillator::SuperSquareOscillator;
 use crate::utils::hysteresis_quantizer::HysteresisQuantizer2;
 use crate::utils::one_pole;
 use crate::utils::units::semitones_to_ratio;
-use crate::SAMPLE_RATE;
 
 pub const NO_ENVELOPE: f32 = 2.0;
 
@@ -40,6 +39,7 @@ pub struct ChiptuneEngine {
     envelope_shape: f32,
     envelope_state: f32,
     aux_envelope_amount: f32,
+    sample_rate: f32,
 }
 
 impl ChiptuneEngine {
@@ -55,6 +55,7 @@ impl ChiptuneEngine {
             envelope_shape: 0.0,
             envelope_state: 0.0,
             aux_envelope_amount: 0.0,
+            sample_rate: 48000.0,
         }
     }
 
@@ -65,7 +66,8 @@ impl ChiptuneEngine {
 }
 
 impl Engine for ChiptuneEngine {
-    fn init(&mut self) {
+    fn init(&mut self, sample_rate_hz: f32) {
+        self.sample_rate = sample_rate_hz;
         self.bass.init();
 
         for voice in &mut self.voice {
@@ -94,7 +96,7 @@ impl Engine for ChiptuneEngine {
         aux: &mut [f32],
         already_enveloped: &mut bool,
     ) {
-        let f0 = note_to_frequency(parameters.note);
+        let f0 = note_to_frequency(parameters.note, parameters.a0_normalized);
         let shape = parameters.morph * 0.995;
         let clocked = parameters.trigger != TriggerState::Unpatched;
         let mut root_transposition = 1.0;
@@ -147,7 +149,7 @@ impl Engine for ChiptuneEngine {
         // Apply envelope if necessary.
         if self.envelope_shape != NO_ENVELOPE {
             let shape = f32::abs(self.envelope_shape);
-            let decay = 1.0 - 2.0 / SAMPLE_RATE * semitones_to_ratio(60.0 * shape) * shape;
+            let decay = 1.0 - 2.0 / self.sample_rate * semitones_to_ratio(60.0 * shape) * shape;
             let aux_envelope_amount = (self.envelope_shape * 20.0).clamp(0.0, 1.0);
 
             for (out_sample, aux_sample) in out.iter_mut().zip(aux.iter_mut()) {

@@ -41,7 +41,7 @@ impl ModalEngine {
 }
 
 impl Engine for ModalEngine {
-    fn init(&mut self) {
+    fn init(&mut self, _sample_rate_hz: f32) {
         self.harmonics_lp = 0.0;
         self.reset();
     }
@@ -70,7 +70,7 @@ impl Engine for ModalEngine {
             sustain,
             trigger,
             parameters.accent,
-            note_to_frequency(parameters.note),
+            note_to_frequency(parameters.note, parameters.a0_normalized),
             self.harmonics_lp,
             parameters.timbre,
             parameters.morph,

@@ -6,7 +6,6 @@
 use crate::oscillator::oscillator::{Oscillator, OscillatorShape};
 use crate::utils::filter::{FilterMode, FrequencyApproximation, Svf};
 use crate::utils::units::semitones_to_ratio;
-use crate::{A0, SAMPLE_RATE};
 
 const NUM_FORMANTS: usize = 5;
 const NUM_PHONEMES: usize = 5;
@@ -20,6 +19,9 @@ pub struct NaiveSpeechSynth {
 
     filter: [Svf; NUM_FORMANTS],
     pulse_coloration: Svf,
+
+    sample_rate_hz: f32,
+    a0_normalized: f32,
 }
 
 impl NaiveSpeechSynth {
@@ -27,7 +29,9 @@ impl NaiveSpeechSynth {
         Self::default()
     }
 
-    pub fn init(&mut self) {
+    pub fn init(&mut self, sample_rate_hz: f32) {
+        self.sample_rate_hz = sample_rate_hz;
+        self.a0_normalized = 27.5 / sample_rate_hz;
         self.pulse.init();
         self.frequency = 0.0;
         self.click_duration = 0;
@@ -37,7 +41,7 @@ impl NaiveSpeechSynth {
         }
         self.pulse_coloration.init();
         self.pulse_coloration
-            .set_f_q(800.0 / SAMPLE_RATE, 0.5, FrequencyApproximation::Dirty);
+            .set_f_q(800.0 / sample_rate_hz, 0.5, FrequencyApproximation::Dirty);
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -53,7 +57,7 @@ impl NaiveSpeechSynth {
         output: &mut [f32],
     ) {
         if click {
-            self.click_duration = (SAMPLE_RATE * 0.05) as usize;
+            self.click_duration = (self.sample_rate_hz * 0.05) as usize;
         }
         self.click_duration -= usize::min(self.click_duration, output.len());
 
@@ -120,7 +124,7 @@ impl NaiveSpeechSynth {
             if f >= 160.0 {
                 f = 160.0;
             }
-            f = A0 * semitones_to_ratio(f - 33.0);
+            f = self.a0_normalized * semitones_to_ratio(f - 33.0);
             if self.click_duration != 0 && i == 0 {
                 f *= 0.5;
             }

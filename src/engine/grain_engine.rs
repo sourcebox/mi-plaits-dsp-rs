@@ -35,7 +35,7 @@ impl GrainEngine {
 }
 
 impl Engine for GrainEngine {
-    fn init(&mut self) {
+    fn init(&mut self, _sample_rate_hz: f32) {
         self.grainlet[0].init();
         self.grainlet[1].init();
         self.z_oscillator.init();
@@ -52,9 +52,9 @@ impl Engine for GrainEngine {
         _already_enveloped: &mut bool,
     ) {
         let root = parameters.note;
-        let f0 = note_to_frequency(root);
+        let f0 = note_to_frequency(root, parameters.a0_normalized);
 
-        let f1 = note_to_frequency(24.0 + 84.0 * parameters.timbre);
+        let f1 = note_to_frequency(24.0 + 84.0 * parameters.timbre, parameters.a0_normalized);
         let ratio = semitones_to_ratio(-24.0 + 48.0 * parameters.harmonics);
         let carrier_bleed = if parameters.harmonics < 0.5 {
             1.0 - 2.0 * parameters.harmonics
@@ -73,7 +73,7 @@ impl Engine for GrainEngine {
                 self.dc_blocker[0].process(*out_sample + *aux_sample, FilterMode::HighPass);
         }
 
-        let cutoff = note_to_frequency(root + 96.0 * parameters.timbre);
+        let cutoff = note_to_frequency(root + 96.0 * parameters.timbre, parameters.a0_normalized);
         self.z_oscillator
             .render(f0, cutoff, parameters.morph, parameters.harmonics, aux);
 

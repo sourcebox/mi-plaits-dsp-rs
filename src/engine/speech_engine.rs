@@ -59,10 +59,10 @@ impl SpeechEngine<'_> {
 }
 
 impl Engine for SpeechEngine<'_> {
-    fn init(&mut self) {
-        self.sam_speech_synth.init();
-        self.naive_speech_synth.init();
-        self.lpc_speech_synth_controller.init();
+    fn init(&mut self, sample_rate_hz: f32) {
+        self.sam_speech_synth.init(sample_rate_hz);
+        self.naive_speech_synth.init(sample_rate_hz);
+        self.lpc_speech_synth_controller.init(sample_rate_hz);
         self.word_bank_quantizer
             .init(NUM_WORD_BANKS as i32 + 1, 0.1, false);
         self.prosody_amount = 0.0;
@@ -82,7 +82,7 @@ impl Engine for SpeechEngine<'_> {
         aux: &mut [f32],
         already_enveloped: &mut bool,
     ) {
-        let f0 = note_to_frequency(parameters.note);
+        let f0 = note_to_frequency(parameters.note, parameters.a0_normalized);
 
         let group = parameters.harmonics * 6.0;
 

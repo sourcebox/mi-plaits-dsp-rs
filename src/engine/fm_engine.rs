@@ -18,7 +18,6 @@ use crate::oscillator::sine_oscillator::sine_pm;
 use crate::resources::fm::LUT_FM_FREQUENCY_QUANTIZER;
 use crate::utils::parameter_interpolator::ParameterInterpolator;
 use crate::utils::{interpolate, one_pole};
-use crate::A0;
 
 const OVERSAMPLING: usize = 4;
 
@@ -45,13 +44,14 @@ impl FmEngine {
 }
 
 impl Engine for FmEngine {
-    fn init(&mut self) {
+    fn init(&mut self, _sample_rate_hz: f32) {
         self.carrier_phase = 0;
         self.modulator_phase = 0;
         self.sub_phase = 0;
 
-        self.previous_carrier_frequency = A0;
-        self.previous_modulator_frequency = A0;
+        let a0 = 55.0 / _sample_rate_hz;  // A0 normalized
+        self.previous_carrier_frequency = a0;
+        self.previous_modulator_frequency = a0;
         self.previous_amount = 0.0;
         self.previous_feedback = 0.0;
         self.previous_sample = 0.0;
@@ -71,7 +71,7 @@ impl Engine for FmEngine {
         let ratio = interpolate(&LUT_FM_FREQUENCY_QUANTIZER, parameters.harmonics, 128.0);
 
         let modulator_note = note + ratio;
-        let mut target_modulator_frequency = note_to_frequency(modulator_note);
+        let mut target_modulator_frequency = note_to_frequency(modulator_note, parameters.a0_normalized);
         target_modulator_frequency = target_modulator_frequency.clamp(0.0, 0.5);
 
         // Reduce the maximum FM index for high pitched notes, to prevent aliasing.
@@ -81,7 +81,7 @@ impl Engine for FmEngine {
 
         let mut carrier_frequency = ParameterInterpolator::new(
             &mut self.previous_carrier_frequency,
-            note_to_frequency(note),
+            note_to_frequency(note, parameters.a0_normalized),
             out.len(),
         );
         let mut modulator_frequency = ParameterInterpolator::new(

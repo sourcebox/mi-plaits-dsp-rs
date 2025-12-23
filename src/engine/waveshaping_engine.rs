@@ -37,7 +37,7 @@ impl WaveshapingEngine {
 }
 
 impl Engine for WaveshapingEngine {
-    fn init(&mut self) {
+    fn init(&mut self, _sample_rate_hz: f32) {
         self.slope.init();
         self.triangle.init();
         self.previous_shape = 0.0;
@@ -55,7 +55,7 @@ impl Engine for WaveshapingEngine {
     ) {
         let root = parameters.note;
 
-        let f0 = note_to_frequency(root);
+        let f0 = note_to_frequency(root, parameters.a0_normalized);
         let pw = parameters.morph * 0.45 + 0.5;
 
         // Start from bandlimited slope signal.

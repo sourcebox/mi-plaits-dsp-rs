@@ -87,7 +87,7 @@ impl<'a> WaveTerrainEngine<'a> {
 }
 
 impl Engine for WaveTerrainEngine<'_> {
-    fn init(&mut self) {
+    fn init(&mut self, _sample_rate_hz: f32) {
         self.path.init();
         self.offset = 0.0;
         self.terrain_idx = 0.0;
@@ -104,7 +104,7 @@ impl Engine for WaveTerrainEngine<'_> {
         const OVERSAMPLING: usize = 2;
         const SCALE: f32 = 1.0 / OVERSAMPLING as f32;
 
-        let f0 = note_to_frequency(parameters.note);
+        let f0 = note_to_frequency(parameters.note, parameters.a0_normalized);
         let attenuation = f32::max(1.0 - 8.0 * f0, 0.0);
         let radius = 0.1 + 0.9 * parameters.timbre * attenuation * (2.0 - attenuation);
 

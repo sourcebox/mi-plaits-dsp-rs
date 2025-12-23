@@ -4,8 +4,8 @@ mod modulation;
 mod wav_writer;
 
 use mi_plaits_dsp::oscillator::*;
-use mi_plaits_dsp::SAMPLE_RATE;
 
+const SAMPLE_RATE: f32 = 48000.0;
 const BLOCK_SIZE: usize = 24;
 
 #[test]

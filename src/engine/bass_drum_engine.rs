@@ -36,9 +36,9 @@ impl BassDrumEngine {
 }
 
 impl Engine for BassDrumEngine {
-    fn init(&mut self) {
-        self.analog_bass_drum.init();
-        self.synthetic_bass_drum.init();
+    fn init(&mut self, sample_rate_hz: f32) {
+        self.analog_bass_drum.init(sample_rate_hz);
+        self.synthetic_bass_drum.init(sample_rate_hz);
         self.overdrive.init();
     }
 
@@ -50,7 +50,7 @@ impl Engine for BassDrumEngine {
         aux: &mut [f32],
         _already_enveloped: &mut bool,
     ) {
-        let f0 = note_to_frequency(parameters.note);
+        let f0 = note_to_frequency(parameters.note, parameters.a0_normalized);
 
         let attack_fm_amount = f32::min(parameters.harmonics * 4.0, 1.0);
         let self_fm_amount = (parameters.harmonics * 4.0 - 1.0).clamp(0.0, 1.0);

@@ -41,9 +41,9 @@ impl HihatEngine {
 }
 
 impl Engine for HihatEngine {
-    fn init(&mut self) {
-        self.hi_hat_1.init();
-        self.hi_hat_2.init();
+    fn init(&mut self, sample_rate_hz: f32) {
+        self.hi_hat_1.init(sample_rate_hz);
+        self.hi_hat_2.init(sample_rate_hz);
     }
 
     #[inline]
@@ -54,7 +54,7 @@ impl Engine for HihatEngine {
         aux: &mut [f32],
         _already_enveloped: &mut bool,
     ) {
-        let f0 = note_to_frequency(parameters.note);
+        let f0 = note_to_frequency(parameters.note, parameters.a0_normalized);
 
         let sustain = matches!(parameters.trigger, TriggerState::Unpatched);
         let trigger = matches!(parameters.trigger, TriggerState::RisingEdge);

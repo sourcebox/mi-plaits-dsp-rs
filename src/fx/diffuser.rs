@@ -4,7 +4,6 @@
 
 use super::{DataFormat12Bit, FxContext, FxEngine};
 use crate::utils::delay_line::DelayLine;
-use crate::SAMPLE_RATE;
 
 #[derive(Debug, Default)]
 pub struct Diffuser {
@@ -18,6 +17,8 @@ pub struct Diffuser {
 
     engine: FxEngine<8192, DataFormat12Bit>,
     lp_decay: f32,
+
+    sample_rate_hz: f32,
 }
 
 impl Diffuser {
@@ -33,11 +34,13 @@ impl Diffuser {
 
             engine: FxEngine::new(),
             lp_decay: 0.0,
+            sample_rate_hz: 48000.0,
         }
     }
 
-    pub fn init(&mut self) {
-        self.engine.set_lfo_frequency(0.3 / SAMPLE_RATE);
+    pub fn init(&mut self, sample_rate_hz: f32) {
+        self.sample_rate_hz = sample_rate_hz;
+        self.engine.set_lfo_frequency(0.3 / sample_rate_hz);
         self.lp_decay = 0.0;
     }
 

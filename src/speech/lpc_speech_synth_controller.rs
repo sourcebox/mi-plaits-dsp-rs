@@ -11,7 +11,6 @@ use super::lpc_speech_synth_words::{NUM_WORD_BANKS, WORD_BANKS};
 use crate::utils::parameter_interpolator::ParameterInterpolator;
 use crate::utils::polyblep::{next_blep_sample, this_blep_sample};
 use crate::utils::units::semitones_to_ratio;
-use crate::SAMPLE_RATE;
 
 const MAX_WORDS: usize = 32;
 const MAX_FRAMES: usize = 1024;
@@ -33,6 +32,8 @@ pub struct LpcSpeechSynthController<'a> {
     remaining_frame_samples: usize,
 
     word_bank: LpcSpeechSynthWordBank<'a>,
+
+    sample_rate_hz: f32,
 }
 
 impl Default for LpcSpeechSynthController<'_> {
@@ -53,10 +54,12 @@ impl LpcSpeechSynthController<'_> {
             last_playback_frame: -1,
             remaining_frame_samples: 0,
             word_bank: LpcSpeechSynthWordBank::new(WORD_BANKS.as_slice(), NUM_WORD_BANKS),
+            sample_rate_hz: 48000.0,
         }
     }
 
-    pub fn init(&mut self) {
+    pub fn init(&mut self, sample_rate_hz: f32) {
+        self.sample_rate_hz = sample_rate_hz;
         self.synth.init();
     }
 
@@ -84,7 +87,7 @@ impl LpcSpeechSynthController<'_> {
         let rate = rate_ratio / 6.0;
 
         // All utterances have been normalized for an average f0 of 100 Hz.
-        let pitch_shift = frequency / (rate_ratio * LPC_SPEECH_SYNTH_DEFAULT_F0 / SAMPLE_RATE);
+        let pitch_shift = frequency / (rate_ratio * LPC_SPEECH_SYNTH_DEFAULT_F0 / self.sample_rate_hz);
         let time_stretch = semitones_to_ratio(
             -speed * 24.0
                 + (if formant_shift < 0.4 {
@@ -145,7 +148,7 @@ impl LpcSpeechSynthController<'_> {
                 };
                 self.synth
                     .play_frame(frames, self.playback_frame as f32, false);
-                self.remaining_frame_samples = (SAMPLE_RATE / SYNTH_FPS * time_stretch) as usize;
+                self.remaining_frame_samples = (self.sample_rate_hz / SYNTH_FPS * time_stretch) as usize;
                 self.playback_frame += 1;
                 if self.playback_frame >= self.last_playback_frame {
                     let back_to_scan_mode = bank == -1 || free_running;

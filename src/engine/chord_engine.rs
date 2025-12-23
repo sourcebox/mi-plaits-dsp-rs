@@ -72,7 +72,7 @@ impl Default for ChordEngine<'_> {
 }
 
 impl Engine for ChordEngine<'_> {
-    fn init(&mut self) {
+    fn init(&mut self, _sample_rate_hz: f32) {
         for i in 0..CHORD_NUM_VOICES {
             self.divide_down_voice[i].init();
             self.wavetable_voice[i].init();
@@ -118,7 +118,7 @@ impl Engine for ChordEngine<'_> {
         out.fill(0.0);
         aux.fill(0.0);
 
-        let f0 = note_to_frequency(parameters.note) * 0.998;
+        let f0 = note_to_frequency(parameters.note, parameters.a0_normalized) * 0.998;
         let waveform = f32::max((self.morph_lp - 0.535) * 2.15, 0.0);
 
         for note in 0..CHORD_NUM_VOICES {

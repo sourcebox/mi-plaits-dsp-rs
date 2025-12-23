@@ -3,8 +3,8 @@
 mod wav_writer;
 
 use mi_plaits_dsp::drums::*;
-use mi_plaits_dsp::SAMPLE_RATE;
 
+const SAMPLE_RATE: f32 = 48000.0;
 const BLOCK_SIZE: usize = 24;
 
 #[test]
@@ -20,7 +20,7 @@ fn analog_bass_drum() {
     let mut drum = analog_bass_drum::AnalogBassDrum::new();
     let mut out = [0.0; BLOCK_SIZE];
     let mut wav_data = Vec::new();
-    drum.init();
+    drum.init(SAMPLE_RATE);
 
     let blocks = (duration * SAMPLE_RATE / (BLOCK_SIZE as f32)) as usize;
     let f0 = frequency / SAMPLE_RATE;
@@ -56,7 +56,7 @@ fn analog_snare_drum() {
     let mut drum = analog_snare_drum::AnalogSnareDrum::new();
     let mut out = [0.0; BLOCK_SIZE];
     let mut wav_data = Vec::new();
-    drum.init();
+    drum.init(SAMPLE_RATE);
 
     let blocks = (duration * SAMPLE_RATE / (BLOCK_SIZE as f32)) as usize;
     let f0 = frequency / SAMPLE_RATE;
@@ -84,7 +84,7 @@ fn hihat() {
     let mut temp_1 = [0.0; BLOCK_SIZE];
     let mut temp_2 = [0.0; BLOCK_SIZE];
     let mut wav_data = Vec::new();
-    drum.init();
+    drum.init(SAMPLE_RATE);
 
     let blocks = (duration * SAMPLE_RATE / (BLOCK_SIZE as f32)) as usize;
     let f0 = frequency / SAMPLE_RATE;
@@ -127,7 +127,7 @@ fn synthetic_bass_drum() {
     let mut drum = synthetic_bass_drum::SyntheticBassDrum::new();
     let mut out = [0.0; BLOCK_SIZE];
     let mut wav_data = Vec::new();
-    drum.init();
+    drum.init(SAMPLE_RATE);
 
     let blocks = (duration * SAMPLE_RATE / (BLOCK_SIZE as f32)) as usize;
     let f0 = frequency / SAMPLE_RATE;
@@ -164,7 +164,7 @@ fn synthetic_snare_drum() {
     let mut drum = synthetic_snare_drum::SyntheticSnareDrum::new();
     let mut out = [0.0; BLOCK_SIZE];
     let mut wav_data = Vec::new();
-    drum.init();
+    drum.init(SAMPLE_RATE);
 
     let blocks = (duration * SAMPLE_RATE / (BLOCK_SIZE as f32)) as usize;
     let f0 = frequency / SAMPLE_RATE;

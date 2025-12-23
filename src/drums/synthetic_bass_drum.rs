@@ -12,10 +12,10 @@ use crate::utils::parameter_interpolator::ParameterInterpolator;
 use crate::utils::random;
 use crate::utils::units::semitones_to_ratio;
 use crate::utils::{one_pole, slope};
-use crate::SAMPLE_RATE;
 
 #[derive(Debug, Default)]
 pub struct SyntheticBassDrum {
+    sample_rate_hz: f32,
     f0: f32,
     phase: f32,
     phase_noise: f32,
@@ -43,7 +43,8 @@ impl SyntheticBassDrum {
         Self::default()
     }
 
-    pub fn init(&mut self) {
+    pub fn init(&mut self, sample_rate_hz: f32) {
+        self.sample_rate_hz = sample_rate_hz;
         self.phase = 0.0;
         self.phase_noise = 0.0;
         self.f0 = 0.0;
@@ -56,7 +57,7 @@ impl SyntheticBassDrum {
         self.tone_lp = 0.0;
         self.sustain_gain = 0.0;
 
-        self.click.init();
+        self.click.init(sample_rate_hz);
         self.noise.init();
     }
 
@@ -82,10 +83,10 @@ impl SyntheticBassDrum {
 
         dirtiness *= f32::max(1.0 - 8.0 * f0, 0.0);
 
-        let fm_decay = 1.0 - 1.0 / (0.008 * (1.0 + fm_envelope_decay * 4.0) * SAMPLE_RATE);
+        let fm_decay = 1.0 - 1.0 / (0.008 * (1.0 + fm_envelope_decay * 4.0) * self.sample_rate_hz);
 
-        let body_env_decay = 1.0 - 1.0 / (0.02 * SAMPLE_RATE) * semitones_to_ratio(-decay * 60.0);
-        let transient_env_decay = 1.0 - 1.0 / (0.005 * SAMPLE_RATE);
+        let body_env_decay = 1.0 - 1.0 / (0.02 * self.sample_rate_hz) * semitones_to_ratio(-decay * 60.0);
+        let transient_env_decay = 1.0 - 1.0 / (0.005 * self.sample_rate_hz);
         let tone_f = f32::min(4.0 * f0 * semitones_to_ratio(tone * 108.0), 1.0);
         let transient_level = tone;
 
@@ -93,8 +94,8 @@ impl SyntheticBassDrum {
             self.fm = 1.0;
             self.body_env = 0.3 + 0.7 * accent;
             self.transient_env = self.body_env;
-            self.body_env_pulse_width = (SAMPLE_RATE * 0.001) as i32;
-            self.fm_pulse_width = (SAMPLE_RATE * 0.0013) as i32;
+            self.body_env_pulse_width = (self.sample_rate_hz * 0.001) as i32;
+            self.fm_pulse_width = (self.sample_rate_hz * 0.0013) as i32;
         }
 
         let mut sustain_gain =
@@ -180,6 +181,7 @@ impl SyntheticBassDrum {
 
 #[derive(Debug, Default)]
 pub struct SyntheticBassDrumClick {
+    sample_rate_hz: f32,
     lp: f32,
     hp: f32,
     filter: Svf,
@@ -190,12 +192,13 @@ impl SyntheticBassDrumClick {
         Self::default()
     }
 
-    pub fn init(&mut self) {
+    pub fn init(&mut self, sample_rate_hz: f32) {
+        self.sample_rate_hz = sample_rate_hz;
         self.lp = 0.0;
         self.hp = 0.0;
         self.filter.init();
         self.filter
-            .set_f_q(5000.0 / SAMPLE_RATE, 2.0, FrequencyApproximation::Fast);
+            .set_f_q(5000.0 / self.sample_rate_hz, 2.0, FrequencyApproximation::Fast);
     }
 
     #[inline]

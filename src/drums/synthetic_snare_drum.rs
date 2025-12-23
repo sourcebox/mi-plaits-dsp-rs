@@ -15,10 +15,10 @@ use crate::utils::parameter_interpolator::ParameterInterpolator;
 use crate::utils::random;
 use crate::utils::sqrt;
 use crate::utils::units::semitones_to_ratio;
-use crate::SAMPLE_RATE;
 
 #[derive(Debug, Default)]
 pub struct SyntheticSnareDrum {
+    sample_rate_hz: f32,
     phase: [f32; 2],
     drum_amplitude: f32,
     snare_amplitude: f32,
@@ -36,7 +36,8 @@ impl SyntheticSnareDrum {
         Self::default()
     }
 
-    pub fn init(&mut self) {
+    pub fn init(&mut self, sample_rate_hz: f32) {
+        self.sample_rate_hz = sample_rate_hz;
         self.phase = [0.0; 2];
         self.drum_amplitude = 0.0;
         self.snare_amplitude = 0.0;
@@ -65,11 +66,11 @@ impl SyntheticSnareDrum {
         let decay_xt = decay * (1.0 + decay * (decay - 1.0));
         fm_amount *= fm_amount;
         let drum_decay = 1.0
-            - 1.0 / (0.015 * SAMPLE_RATE)
+            - 1.0 / (0.015 * self.sample_rate_hz)
                 * semitones_to_ratio(-decay_xt * 72.0 - fm_amount * 12.0 + snappy * 7.0);
         let snare_decay =
-            1.0 - 1.0 / (0.01 * SAMPLE_RATE) * semitones_to_ratio(-decay * 60.0 - snappy * 7.0);
-        let fm_decay = 1.0 - 1.0 / (0.007 * SAMPLE_RATE);
+            1.0 - 1.0 / (0.01 * self.sample_rate_hz) * semitones_to_ratio(-decay * 60.0 - snappy * 7.0);
+        let fm_decay = 1.0 - 1.0 / (0.007 * self.sample_rate_hz);
 
         snappy = snappy * 1.1 - 0.05;
         snappy = snappy.clamp(0.0, 1.0);
@@ -95,7 +96,7 @@ impl SyntheticSnareDrum {
             self.fm = 1.0;
             self.phase[0] = 0.0;
             self.phase[1] = 0.0;
-            self.hold_counter = ((0.04 + decay * 0.03) * SAMPLE_RATE) as i32;
+            self.hold_counter = ((0.04 + decay * 0.03) * self.sample_rate_hz) as i32;
         }
 
         let mut sustain_gain =

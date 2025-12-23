@@ -4,7 +4,7 @@ use std::path::Path;
 
 use hound::*;
 
-use mi_plaits_dsp::SAMPLE_RATE;
+const SAMPLE_RATE: f32 = 48000.0;
 
 /// Writes sample data as WAV file in 32-bit float format.
 pub fn write(

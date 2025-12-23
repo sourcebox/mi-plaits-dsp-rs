@@ -5,7 +5,6 @@
 use crate::oscillator::sine_oscillator::sine_raw;
 use crate::utils::parameter_interpolator::ParameterInterpolator;
 use crate::utils::polyblep::{next_blep_sample, this_blep_sample};
-use crate::SAMPLE_RATE;
 
 const NUM_FORMANTS: usize = 3;
 const NUM_VOWELS: usize = 9;
@@ -23,6 +22,8 @@ pub struct SamSpeechSynth {
     formant_phase: [u32; 3],
     consonant_samples: usize,
     consonant_index: f32,
+
+    sample_rate_hz: f32,
 }
 
 impl SamSpeechSynth {
@@ -30,7 +31,8 @@ impl SamSpeechSynth {
         Self::default()
     }
 
-    pub fn init(&mut self) {
+    pub fn init(&mut self, sample_rate_hz: f32) {
+        self.sample_rate_hz = sample_rate_hz;
         self.phase = 0.0;
         self.frequency = 0.0;
         self.pulse_next_sample = 0.0;
@@ -56,7 +58,7 @@ impl SamSpeechSynth {
         }
 
         if consonant {
-            self.consonant_samples = (SAMPLE_RATE * 0.05) as usize;
+            self.consonant_samples = (self.sample_rate_hz * 0.05) as usize;
             let r = (vowel + 3.0 * frequency + 7.0 * formant_shift) * 8.0;
             self.consonant_index = (r as usize % NUM_CONSONANTS) as f32;
         }
@@ -76,6 +78,7 @@ impl SamSpeechSynth {
             formant_shift,
             formant_frequency.as_mut_slice(),
             formant_amplitude.as_mut_slice(),
+            self.sample_rate_hz,
         );
 
         let mut fm = ParameterInterpolator::new(&mut self.frequency, frequency, output.len());
@@ -123,6 +126,7 @@ fn interpolate_phoneme_data(
     mut formant_shift: f32,
     formant_frequency: &mut [u32],
     formant_amplitude: &mut [f32],
+    sample_rate_hz: f32,
 ) {
     let phoneme_integral = phoneme as usize;
     let phoneme_fractional = phoneme - (phoneme_integral as f32);
@@ -136,7 +140,7 @@ fn interpolate_phoneme_data(
         let f_1 = p_1.formant[i].frequency;
         let f_2 = p_2.formant[i].frequency;
         let mut f = (f_1.wrapping_add(f_2.wrapping_sub(f_1))) as f32 * phoneme_fractional;
-        f *= 8.0 * formant_shift * 4294967296.0 / SAMPLE_RATE;
+        f *= 8.0 * formant_shift * 4294967296.0 / sample_rate_hz;
         formant_frequency[i] = f as u32;
 
         let a_1 = FORMANT_AMPLITUDE_LUT[p_1.formant[i].amplitude as usize];
