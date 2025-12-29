@@ -10,7 +10,7 @@ use crate::utils::parameter_interpolator::ParameterInterpolator;
 use crate::utils::rsqrt::fast_rsqrt_carmack;
 use crate::utils::{interpolate, interpolate_wrap};
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct SineOscillator {
     // Oscillator state.
     phase: f32,
@@ -111,7 +111,7 @@ impl SineOscillator {
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct FastSineOscillator {
     // Oscillator state.
     x: f32,
@@ -232,7 +232,7 @@ impl FastSineOscillator {
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub enum RenderMode {
     #[default]
     Normal,

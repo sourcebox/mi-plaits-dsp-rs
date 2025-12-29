@@ -15,7 +15,7 @@ use crate::utils::polyblep::{
 pub const MAX_FREQUENCY: f32 = 0.25;
 pub const MIN_FREQUENCY: f32 = 0.000001;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum OscillatorShape {
     ImpulseTrain,
     Saw,
@@ -27,7 +27,7 @@ pub enum OscillatorShape {
     SquareTriangle,
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct Oscillator {
     // Oscillator state.
     phase: f32,

@@ -8,7 +8,7 @@
 use crate::oscillator::sine_oscillator::{sine, sine_no_wrap};
 use crate::utils::parameter_interpolator::{ParameterInterpolator, SimpleParameterInterpolator};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct HarmonicOscillator<const NUM_HARMONICS: usize> {
     // Oscillator state.
     phase: f32,

@@ -5,7 +5,7 @@
 use crate::utils::parameter_interpolator::ParameterInterpolator;
 use crate::utils::soft_clip;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct Overdrive {
     pre_gain: f32,
     post_gain: f32,

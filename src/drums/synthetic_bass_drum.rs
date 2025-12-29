@@ -13,7 +13,7 @@ use crate::utils::random;
 use crate::utils::units::semitones_to_ratio;
 use crate::utils::{one_pole, slope};
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct SyntheticBassDrum {
     sample_rate_hz: f32,
     f0: f32,
@@ -179,7 +179,7 @@ impl SyntheticBassDrum {
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct SyntheticBassDrumClick {
     sample_rate_hz: f32,
     lp: f32,
@@ -210,7 +210,7 @@ impl SyntheticBassDrumClick {
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct SyntheticBassDrumAttackNoise {
     lp: f32,
     hp: f32,

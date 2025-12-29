@@ -24,7 +24,7 @@ use crate::utils::one_pole;
 
 pub const CHORD_NUM_HARMONICS: usize = 3;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ChordEngine<'a> {
     divide_down_voice: [StringSynthOscillator; CHORD_NUM_VOICES],
     wavetable_voice: [WavetableOscillator; CHORD_NUM_VOICES],

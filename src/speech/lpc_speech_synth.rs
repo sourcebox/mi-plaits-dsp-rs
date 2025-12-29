@@ -59,7 +59,7 @@ impl LpcSpeechSynthFrame {
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct LpcSpeechSynth {
     phase: f32,
     frequency: f32,

@@ -11,7 +11,7 @@ use crate::utils::{one_pole, soft_clip};
 
 const NUM_MODES: usize = 5;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct AnalogSnareDrum {
     pulse_remaining_samples: i32,
     pulse: f32,

@@ -20,7 +20,7 @@ use super::{note_to_frequency, Engine, EngineParameters, TriggerState};
 use crate::physical_modelling::modal_voice::ModalVoice;
 use crate::utils::one_pole;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ModalEngine {
     voice: ModalVoice,
     harmonics_lp: f32,

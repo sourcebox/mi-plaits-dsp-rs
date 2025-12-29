@@ -8,7 +8,7 @@ use crate::oscillator::oscillator::MAX_FREQUENCY;
 use crate::utils::parameter_interpolator::ParameterInterpolator;
 use crate::utils::polyblep::{next_blep_sample, this_blep_sample};
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct SuperSquareOscillator {
     master_phase: f32,
     slave_phase: f32,

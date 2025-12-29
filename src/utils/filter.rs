@@ -5,7 +5,7 @@
 #[allow(unused_imports)]
 use num_traits::float::Float;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum FilterMode {
     LowPass,
     BandPass,
@@ -13,7 +13,7 @@ pub enum FilterMode {
     HighPass,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum FrequencyApproximation {
     Exact,
     Accurate,
@@ -29,7 +29,7 @@ const M_PI_POW_7: f32 = M_PI_POW_5 * M_PI_POW_2;
 const M_PI_POW_9: f32 = M_PI_POW_7 * M_PI_POW_2;
 const M_PI_POW_11: f32 = M_PI_POW_9 * M_PI_POW_2;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct DcBlocker {
     pole: f32,
     x: f32,
@@ -63,7 +63,7 @@ impl DcBlocker {
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct OnePole {
     g: f32,
     gi: f32,
@@ -138,7 +138,7 @@ impl OnePole {
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct Svf {
     g: f32,
     r: f32,
@@ -469,7 +469,7 @@ impl Svf {
 }
 
 /// Naive Chamberlin SVF.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct NaiveSvf {
     f: f32,
     damp: f32,
@@ -621,7 +621,7 @@ impl NaiveSvf {
 
 /// Modified Chamberlin SVF (Duane K. Wise)
 /// <http://www.dafx.ca/proceedings/papers/p_053.pdf>
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct ModifiedSvf {
     f: f32,
     fq: f32,
@@ -689,7 +689,7 @@ impl ModifiedSvf {
 
 /// Two passes of modified Chamberlin SVF with the same coefficients -
 /// to implement Linkwitz–Riley (Butterworth squared) crossover filters.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct CrossoverSvf {
     f: f32,
     fq: f32,

@@ -7,7 +7,7 @@ use crate::utils::random;
 use crate::utils::sqrt;
 use crate::utils::units::semitones_to_ratio;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct Particle {
     pre_gain: f32,
     filter: Svf,

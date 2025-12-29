@@ -167,7 +167,7 @@ impl Default for Resources<'_> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Voice<'a> {
     pub additive_engine: AdditiveEngine,
     pub bass_drum_engine: BassDrumEngine,
@@ -554,7 +554,7 @@ impl Voice<'_> {
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct ChannelPostProcessor {
     limiter: Limiter,
     lpg: LowPassGate,

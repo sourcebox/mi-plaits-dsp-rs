@@ -25,7 +25,7 @@ use crate::oscillator::wavetable_oscillator::interpolate_wave;
 use crate::resources::waves::WAV_INTEGRATED_WAVES;
 use crate::utils::parameter_interpolator::SimpleParameterInterpolator;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct WaveTerrainEngine<'a> {
     path: FastSineOscillator,
     offset: f32,

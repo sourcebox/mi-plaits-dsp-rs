@@ -22,7 +22,7 @@ use crate::utils::delay_line::DelayLine;
 
 const NUM_STRINGS: usize = 3;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct StringEngine {
     voice: [StringVoice; NUM_STRINGS],
 

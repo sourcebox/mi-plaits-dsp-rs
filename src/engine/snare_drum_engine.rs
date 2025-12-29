@@ -16,7 +16,7 @@ use super::{note_to_frequency, Engine, EngineParameters, TriggerState};
 use crate::drums::analog_snare_drum::AnalogSnareDrum;
 use crate::drums::synthetic_snare_drum::SyntheticSnareDrum;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct SnareDrumEngine {
     analog_snare_drum: AnalogSnareDrum,
     synthetic_snare_drum: SyntheticSnareDrum,

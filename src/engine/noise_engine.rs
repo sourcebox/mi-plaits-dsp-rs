@@ -22,7 +22,7 @@ use crate::utils::parameter_interpolator::ParameterInterpolator;
 use crate::utils::sqrt;
 use crate::utils::units::semitones_to_ratio;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct NoiseEngine {
     clocked_noise: [ClockedNoise; 2],
     lp_hp_filter: Svf,

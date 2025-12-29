@@ -7,7 +7,7 @@ use crate::utils::polyblep::{
     next_blep_sample, next_integrated_blep_sample, this_blep_sample, this_integrated_blep_sample,
 };
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct NesTriangleOscillator {
     phase: f32,
     next_sample: f32,

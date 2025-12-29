@@ -17,7 +17,7 @@ use super::operator::Operator;
 use super::patch::Patch;
 use crate::utils::units::semitones_to_ratio_safe;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct VoiceParameters {
     pub sustain: bool,
     pub gate: bool,
@@ -35,7 +35,7 @@ impl VoiceParameters {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Voice<'a, const NUM_OPERATORS: usize, const NUM_ALGORITHMS: usize> {
     algorithms: Option<&'a Algorithms<NUM_OPERATORS, NUM_ALGORITHMS>>,
     sample_rate: f32,

@@ -19,7 +19,7 @@ const NUM_CONSONANTS: usize = 10;
 pub const NUM_PHONEMES: usize = NUM_VOWELS + NUM_CONSONANTS;
 const SYNTH_FPS: f32 = 40.0;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct LpcSpeechSynthController<'a> {
     clock_phase: f32,
     sample: [f32; 2],
@@ -199,13 +199,13 @@ impl LpcSpeechSynthController<'_> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct LpcSpeechSynthWordBankData<'a> {
     pub data: &'a [u8],
     pub size: usize,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct LpcSpeechSynthWordBank<'a> {
     word_banks: &'a [LpcSpeechSynthWordBankData<'a>],
 

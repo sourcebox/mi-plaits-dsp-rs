@@ -21,7 +21,7 @@
 
 use super::operator::{render_operators, RenderFn};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Algorithms<const NUM_OPERATORS: usize, const NUM_ALGORITHMS: usize> {
     render_call: [[RenderCall; NUM_OPERATORS]; NUM_ALGORITHMS],
 }
@@ -170,7 +170,7 @@ const OPCODE_SOURCE_FEEDBACK: u8 = 0x30;
 const OPCODE_ADDITIVE_FLAG: u8 = 0x04;
 const OPCODE_FEEDBACK_SOURCE_FLAG: u8 = 0x40;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct RenderCall {
     pub render_fn: Option<RenderFn>,
     pub n: u32,
@@ -184,7 +184,7 @@ impl RenderCall {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 struct RendererSpecs {
     n: u32,
     modulation_source: i32,

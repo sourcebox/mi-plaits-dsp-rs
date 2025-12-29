@@ -6,7 +6,7 @@ use crate::oscillator::oscillator::MAX_FREQUENCY;
 use crate::oscillator::sine_oscillator::sine;
 use crate::utils::parameter_interpolator::ParameterInterpolator;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct VosimOscillator {
     // Oscillator state.
     carrier_phase: f32,

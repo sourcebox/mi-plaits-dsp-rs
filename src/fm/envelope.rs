@@ -25,7 +25,7 @@ use super::dx_units::{
 
 pub const PREVIOUS_LEVEL: f32 = -100.0;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Envelope<const NUM_STAGES: usize = 4, const RESHAPE_ASCENDING_SEGMENTS: bool = false> {
     pub stage: usize,
     pub phase: f32,
@@ -185,7 +185,7 @@ impl<const NUM_STAGES: usize, const RESHAPE_ASCENDING_SEGMENTS: bool> Default
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct OperatorEnvelope<const NUM_STAGES: usize = 4>(pub Envelope<NUM_STAGES, true>);
 
 impl<const NUM_STAGES: usize> OperatorEnvelope<NUM_STAGES> {
@@ -244,7 +244,7 @@ impl<const NUM_STAGES: usize> Default for OperatorEnvelope<NUM_STAGES> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PitchEnvelope<const NUM_STAGES: usize = 4>(pub Envelope<NUM_STAGES, false>);
 
 impl<const NUM_STAGES: usize> PitchEnvelope<NUM_STAGES> {

@@ -15,16 +15,16 @@ use num_traits::{FromPrimitive, Num, Signed, ToPrimitive};
 
 pub trait DataType {}
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct DataFormat12Bit;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct DataFormat32Bit;
 
 impl DataType for DataFormat12Bit {}
 impl DataType for DataFormat32Bit {}
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct FxEngine<const SIZE: usize, DT>
 where
     DT: DataType,
@@ -69,7 +69,7 @@ where
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct FxContext<DT>
 where
     DT: DataType,

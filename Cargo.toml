@@ -10,6 +10,7 @@ keywords = ["audio", "dsp", "synthesizer"]
 categories = ["no-std", "multimedia::audio"]
 
 [dependencies]
+dyn-clone = "1.0.17"
 num-traits = { version = "0.2", default-features = false, features = ["libm"] }
 spin = { version = "0.10.0", features = ["once"] }
 

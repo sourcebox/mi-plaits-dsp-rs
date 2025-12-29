@@ -8,7 +8,7 @@ use crate::utils::filter::{FilterMode, FrequencyApproximation, Svf};
 use crate::utils::random;
 use crate::utils::units::semitones_to_ratio;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct StringVoice {
     excitation_filter: Svf,
     string: String,

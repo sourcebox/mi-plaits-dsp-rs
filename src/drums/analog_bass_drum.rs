@@ -11,7 +11,7 @@ use crate::utils::one_pole;
 use crate::utils::parameter_interpolator::ParameterInterpolator;
 use crate::utils::units::semitones_to_ratio;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct AnalogBassDrum {
     pulse_remaining_samples: i32,
     fm_pulse_remaining_samples: i32,

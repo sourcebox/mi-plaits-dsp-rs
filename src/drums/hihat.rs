@@ -25,7 +25,7 @@ pub enum VcaType {
     Linear,
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct Hihat {
     sample_rate_hz: f32,
     envelope: f32,
@@ -162,7 +162,7 @@ impl Hihat {
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct SquareNoise {
     phase: [u32; 6],
 }
@@ -215,7 +215,7 @@ impl SquareNoise {
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct RingModNoise {
     sample_rate_hz: f32,
     oscillator: [Oscillator; 6],

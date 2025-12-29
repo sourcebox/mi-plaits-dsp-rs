@@ -6,7 +6,7 @@ use core::cell::RefCell;
 
 use crate::oscillator::sine_oscillator::sine_pm;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct Operator {
     pub phase: u32,
     pub amplitude: f32,
