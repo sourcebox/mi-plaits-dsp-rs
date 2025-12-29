@@ -85,7 +85,8 @@ impl SyntheticBassDrum {
 
         let fm_decay = 1.0 - 1.0 / (0.008 * (1.0 + fm_envelope_decay * 4.0) * self.sample_rate_hz);
 
-        let body_env_decay = 1.0 - 1.0 / (0.02 * self.sample_rate_hz) * semitones_to_ratio(-decay * 60.0);
+        let body_env_decay =
+            1.0 - 1.0 / (0.02 * self.sample_rate_hz) * semitones_to_ratio(-decay * 60.0);
         let transient_env_decay = 1.0 - 1.0 / (0.005 * self.sample_rate_hz);
         let tone_f = f32::min(4.0 * f0 * semitones_to_ratio(tone * 108.0), 1.0);
         let transient_level = tone;
@@ -197,8 +198,11 @@ impl SyntheticBassDrumClick {
         self.lp = 0.0;
         self.hp = 0.0;
         self.filter.init();
-        self.filter
-            .set_f_q(5000.0 / self.sample_rate_hz, 2.0, FrequencyApproximation::Fast);
+        self.filter.set_f_q(
+            5000.0 / self.sample_rate_hz,
+            2.0,
+            FrequencyApproximation::Fast,
+        );
     }
 
     #[inline]

@@ -69,7 +69,10 @@ impl Engine for ParticleEngine {
         _already_enveloped: &mut bool,
     ) {
         let f0 = note_to_frequency(parameters.note, parameters.a0_normalized);
-        let density_sqrt = note_to_frequency(60.0 + parameters.timbre * parameters.timbre * 72.0, parameters.a0_normalized);
+        let density_sqrt = note_to_frequency(
+            60.0 + parameters.timbre * parameters.timbre * 72.0,
+            parameters.a0_normalized,
+        );
         let density = density_sqrt * density_sqrt * (1.0 / NUM_PARTICLES as f32);
         let gain = 1.0 / density;
         let q_sqrt = semitones_to_ratio(if parameters.morph >= 0.5 {

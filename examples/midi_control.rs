@@ -32,7 +32,9 @@ struct App<'a> {
 impl<'a> App<'a> {
     pub fn new() -> Self {
         Self {
-            voices: Box::new(core::array::from_fn(|_| Voice::new(CHUNK_SIZE, SAMPLE_RATE as f32))),
+            voices: Box::new(core::array::from_fn(|_| {
+                Voice::new(CHUNK_SIZE, SAMPLE_RATE as f32)
+            })),
             patches: core::array::from_fn(|_| Patch::default()),
             modulations: core::array::from_fn(|_| Modulations::default()),
             volume: 1.0,

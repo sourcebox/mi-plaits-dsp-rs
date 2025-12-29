@@ -135,7 +135,11 @@ impl AnalogBassDrum {
             if sustain {
                 fm_pulse = 0.0;
             }
-            one_pole(&mut self.fm_pulse_lp, fm_pulse, 1.0 / self.pulse_filter_time);
+            one_pole(
+                &mut self.fm_pulse_lp,
+                fm_pulse,
+                1.0 / self.pulse_filter_time,
+            );
 
             // Q43 and R170 leakage
             let punch = 0.7 + diode(10.0 * self.lp_out - 1.0);

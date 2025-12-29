@@ -77,10 +77,16 @@ impl Engine for VirtualAnalogEngine {
         let sync_amount = parameters.timbre * parameters.timbre;
         let auxiliary_detune = compute_detuning(parameters.harmonics);
         let primary_f = note_to_frequency(parameters.note, parameters.a0_normalized);
-        let auxiliary_f = note_to_frequency(parameters.note + auxiliary_detune, parameters.a0_normalized);
-        let primary_sync_f = note_to_frequency(parameters.note + sync_amount * 48.0, parameters.a0_normalized);
-        let auxiliary_sync_f =
-            note_to_frequency(parameters.note + auxiliary_detune + sync_amount * 48.0, parameters.a0_normalized);
+        let auxiliary_f =
+            note_to_frequency(parameters.note + auxiliary_detune, parameters.a0_normalized);
+        let primary_sync_f = note_to_frequency(
+            parameters.note + sync_amount * 48.0,
+            parameters.a0_normalized,
+        );
+        let auxiliary_sync_f = note_to_frequency(
+            parameters.note + auxiliary_detune + sync_amount * 48.0,
+            parameters.a0_normalized,
+        );
 
         let mut shape = parameters.morph * 1.5;
         shape = shape.clamp(0.0, 1.0);
@@ -131,7 +137,10 @@ impl Engine for VirtualAnalogEngine {
         let mut saw_gain = 8.0 * (1.0 - parameters.morph);
         saw_gain = saw_gain.clamp(0.02, 1.0);
 
-        let square_sync_f = note_to_frequency(parameters.note + square_sync_ratio, parameters.a0_normalized);
+        let square_sync_f = note_to_frequency(
+            parameters.note + square_sync_ratio,
+            parameters.a0_normalized,
+        );
 
         self.sync.render(
             primary_f,

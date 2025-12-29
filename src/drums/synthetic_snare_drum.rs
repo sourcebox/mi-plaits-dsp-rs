@@ -68,8 +68,8 @@ impl SyntheticSnareDrum {
         let drum_decay = 1.0
             - 1.0 / (0.015 * self.sample_rate_hz)
                 * semitones_to_ratio(-decay_xt * 72.0 - fm_amount * 12.0 + snappy * 7.0);
-        let snare_decay =
-            1.0 - 1.0 / (0.01 * self.sample_rate_hz) * semitones_to_ratio(-decay * 60.0 - snappy * 7.0);
+        let snare_decay = 1.0
+            - 1.0 / (0.01 * self.sample_rate_hz) * semitones_to_ratio(-decay * 60.0 - snappy * 7.0);
         let fm_decay = 1.0 - 1.0 / (0.007 * self.sample_rate_hz);
 
         snappy = snappy * 1.1 - 0.05;

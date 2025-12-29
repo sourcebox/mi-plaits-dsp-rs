@@ -87,7 +87,8 @@ impl LpcSpeechSynthController<'_> {
         let rate = rate_ratio / 6.0;
 
         // All utterances have been normalized for an average f0 of 100 Hz.
-        let pitch_shift = frequency / (rate_ratio * LPC_SPEECH_SYNTH_DEFAULT_F0 / self.sample_rate_hz);
+        let pitch_shift =
+            frequency / (rate_ratio * LPC_SPEECH_SYNTH_DEFAULT_F0 / self.sample_rate_hz);
         let time_stretch = semitones_to_ratio(
             -speed * 24.0
                 + (if formant_shift < 0.4 {
@@ -148,7 +149,8 @@ impl LpcSpeechSynthController<'_> {
                 };
                 self.synth
                     .play_frame(frames, self.playback_frame as f32, false);
-                self.remaining_frame_samples = (self.sample_rate_hz / SYNTH_FPS * time_stretch) as usize;
+                self.remaining_frame_samples =
+                    (self.sample_rate_hz / SYNTH_FPS * time_stretch) as usize;
                 self.playback_frame += 1;
                 if self.playback_frame >= self.last_playback_frame {
                     let back_to_scan_mode = bank == -1 || free_running;

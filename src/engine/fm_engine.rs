@@ -49,7 +49,7 @@ impl Engine for FmEngine {
         self.modulator_phase = 0;
         self.sub_phase = 0;
 
-        let a0 = 55.0 / _sample_rate_hz;  // A0 normalized
+        let a0 = 55.0 / _sample_rate_hz; // A0 normalized
         self.previous_carrier_frequency = a0;
         self.previous_modulator_frequency = a0;
         self.previous_amount = 0.0;
@@ -71,7 +71,8 @@ impl Engine for FmEngine {
         let ratio = interpolate(&LUT_FM_FREQUENCY_QUANTIZER, parameters.harmonics, 128.0);
 
         let modulator_note = note + ratio;
-        let mut target_modulator_frequency = note_to_frequency(modulator_note, parameters.a0_normalized);
+        let mut target_modulator_frequency =
+            note_to_frequency(modulator_note, parameters.a0_normalized);
         target_modulator_frequency = target_modulator_frequency.clamp(0.0, 0.5);
 
         // Reduce the maximum FM index for high pitched notes, to prevent aliasing.

@@ -98,7 +98,9 @@ impl Engine for SixOpEngine<'_> {
 
         if parameters.trigger == TriggerState::Unpatched {
             let t = parameters.morph;
-            self.voice[0].mutable_lfo().scrub(2.0 * self.sample_rate * t);
+            self.voice[0]
+                .mutable_lfo()
+                .scrub(2.0 * self.sample_rate * t);
 
             let pitch_mod = self.voice[0].lfo().pitch_mod();
             let amp_mod = self.voice[0].lfo().amp_mod();

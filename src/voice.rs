@@ -376,7 +376,8 @@ impl Voice<'_> {
             p.trigger = TriggerState::Unpatched;
         }
 
-        let short_decay = (200.0 * out.len() as f32) * self.inv_sr
+        let short_decay = (200.0 * out.len() as f32)
+            * self.inv_sr
             * semitones_to_ratio(-96.0 * patch.decay.clamp(0.1, 1.0));
 
         self.decay_envelope.process(short_decay * 2.0);
@@ -483,7 +484,8 @@ impl Voice<'_> {
         // Compute LPG parameters.
         if !lpg_bypass {
             let hf = patch.lpg_colour;
-            let decay_tail = (20.0 * out.len() as f32) * self.inv_sr
+            let decay_tail = (20.0 * out.len() as f32)
+                * self.inv_sr
                 * semitones_to_ratio(-72.0 * patch.decay + 12.0 * hf)
                 - short_decay;
 

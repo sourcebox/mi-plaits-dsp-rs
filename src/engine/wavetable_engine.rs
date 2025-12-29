@@ -120,7 +120,7 @@ impl Engine for WavetableEngine<'_> {
         self.previous_x = 0.0;
         self.previous_y = 0.0;
         self.previous_z = 0.0;
-        self.previous_f0 = 55.0 / _sample_rate_hz;  // A0 normalized
+        self.previous_f0 = 55.0 / _sample_rate_hz; // A0 normalized
 
         self.diff_out.init();
     }

@@ -77,10 +77,15 @@ impl Engine for NoiseEngine {
         let trigger = matches!(parameters.trigger, TriggerState::RisingEdge);
 
         let f0 = note_to_frequency(parameters.note, parameters.a0_normalized);
-        let f1 = note_to_frequency(parameters.note + parameters.harmonics * 48.0 - 24.0, parameters.a0_normalized);
+        let f1 = note_to_frequency(
+            parameters.note + parameters.harmonics * 48.0 - 24.0,
+            parameters.a0_normalized,
+        );
         let clock_lowest_note = if sustain { 0.0 } else { -24.0 };
-        let clock_f =
-            note_to_frequency(parameters.timbre * (128.0 - clock_lowest_note) + clock_lowest_note, parameters.a0_normalized);
+        let clock_f = note_to_frequency(
+            parameters.timbre * (128.0 - clock_lowest_note) + clock_lowest_note,
+            parameters.a0_normalized,
+        );
         let q = 0.5 * semitones_to_ratio(parameters.morph * 120.0);
         let sync = trigger;
         self.clocked_noise[0].render(sync, clock_f, aux);
