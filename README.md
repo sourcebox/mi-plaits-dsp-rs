@@ -4,6 +4,8 @@ Native Rust port of the DSP code used by the [Mutable Instruments Plaits](https:
 
 This port is based on firmware release 1.2 as published at <https://github.com/pichenettes/eurorack>.
 
+**NOTE:** The original code runs at a sampling frequency of 48kHz. Using other sample rates is possible, but there are noticeable differences in sound.
+
 ## Background
 
 `Plaits` is a Eurorack module released by Mutable Instruments in 2018. It is a macro oscillator featuring 24 different engines. Please refer to the [original user manual](https://mutable-instruments.net/modules/plaits/manual/) for further details.
