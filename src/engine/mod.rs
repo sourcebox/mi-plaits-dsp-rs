@@ -68,18 +68,13 @@ pub struct EngineParameters {
     pub a0_normalized: f32,
 }
 
-#[derive(Debug, PartialEq, Eq, Clone)]
+#[derive(Debug, Default, PartialEq, Eq, Clone)]
 pub enum TriggerState {
+    #[default]
     Low = 0,
     RisingEdge = 1,
     Unpatched = 2,
     High = 4,
-}
-
-impl Default for TriggerState {
-    fn default() -> Self {
-        Self::Low
-    }
 }
 
 #[inline]

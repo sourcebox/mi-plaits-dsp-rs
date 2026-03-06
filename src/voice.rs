@@ -357,8 +357,10 @@ impl Voice<'_> {
             self.reload_resources = false;
         }
 
-        let mut p = EngineParameters::default();
-        p.a0_normalized = self.a0_normalized;
+        let mut p = EngineParameters {
+            a0_normalized: self.a0_normalized,
+            ..Default::default()
+        };
 
         let rising_edge = self.trigger_state && !previous_trigger_state;
         let note = (modulations.note + self.previous_note) * 0.5;

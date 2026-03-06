@@ -45,7 +45,7 @@ impl ChordBank {
         for (i, _) in CHORDS.iter().enumerate().take(CHORD_NUM_CHORDS) {
             let mut count = 0;
 
-            for j in 0..CHORD_NUM_NOTES {
+            for (j, _) in CHORDS.iter().enumerate().take(CHORD_NUM_NOTES) {
                 self.ratios[i * CHORD_NUM_NOTES + j] = semitones_to_ratio(CHORDS[i][j]);
                 if CHORDS[i][j] != 0.01
                     && CHORDS[i][j] != 7.01
