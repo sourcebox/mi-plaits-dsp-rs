@@ -75,7 +75,7 @@ impl VosimOscillator {
             let f1 = f1_modulation.next();
             let f2 = f2_modulation.next();
 
-            self.carrier_phase += carrier_frequency;
+            self.carrier_phase += f0;
             if self.carrier_phase >= 1.0 {
                 self.carrier_phase -= 1.0;
                 let reset_time = self.carrier_phase / f0;

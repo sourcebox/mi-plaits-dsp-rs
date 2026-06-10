@@ -15,10 +15,13 @@ use crate::utils::parameter_interpolator::ParameterInterpolator;
 use crate::utils::random;
 use crate::utils::sqrt;
 use crate::utils::units::semitones_to_ratio;
+use crate::utils::REFERENCE_SAMPLE_RATE;
 
 #[derive(Debug, Default, Clone)]
 pub struct SyntheticSnareDrum {
     sample_rate_hz: f32,
+    sr_ratio: f32,
+    noise_gain: f32,
     phase: [f32; 2],
     drum_amplitude: f32,
     snare_amplitude: f32,
@@ -38,6 +41,10 @@ impl SyntheticSnareDrum {
 
     pub fn init(&mut self, sample_rate_hz: f32) {
         self.sample_rate_hz = sample_rate_hz;
+        // Compensate the white noise spectral density so the filtered snare
+        // noise keeps the same level at any sample rate.
+        self.noise_gain = sqrt(sample_rate_hz / REFERENCE_SAMPLE_RATE);
+        self.sr_ratio = sample_rate_hz / REFERENCE_SAMPLE_RATE;
         self.phase = [0.0; 2];
         self.drum_amplitude = 0.0;
         self.snare_amplitude = 0.0;
@@ -131,7 +138,9 @@ impl SyntheticSnareDrum {
             // signal leaving Q40's collector and resetting all oscillators
             // allow some intermodulation.
             let mut reset_noise = 0.0;
-            let mut reset_noise_amount = (0.125 - f0) * 8.0;
+            // The limit is defined in terms of the normalized frequency at
+            // the reference rate.
+            let mut reset_noise_amount = (0.125 - f0 * self.sr_ratio) * 8.0;
             reset_noise_amount = reset_noise_amount.clamp(0.0, 1.0);
             reset_noise_amount *= reset_noise_amount;
             reset_noise_amount *= fm_amount;
@@ -165,7 +174,7 @@ impl SyntheticSnareDrum {
             drum *= self.drum_amplitude * drum_level;
             drum = self.drum_lp.process(drum, FilterMode::LowPass);
 
-            let noise = random::get_float();
+            let noise = random::get_float() * self.noise_gain;
             let mut snare = self.snare_lp.process(noise, FilterMode::LowPass);
             snare = self.snare_hp.process(snare, FilterMode::HighPass);
             snare = (snare + 0.1) * (self.snare_amplitude + self.fm) * snare_level;

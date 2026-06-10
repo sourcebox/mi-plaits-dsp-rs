@@ -23,6 +23,10 @@ impl Particle {
         self.filter.init();
     }
 
+    /// `density` is the per-sample impulse probability at the current sample
+    /// rate, while `sr_ratio` (`sample_rate_hz / 48000.0`) refers frequencies
+    /// and densities back to the reference rate so that the impulse level and
+    /// filter normalization stay the same at any sample rate.
     #[allow(clippy::too_many_arguments)]
     #[inline]
     pub fn render(
@@ -33,6 +37,7 @@ impl Particle {
         frequency: f32,
         spread: f32,
         q: f32,
+        sr_ratio: f32,
         out: &mut [f32],
         aux: &mut [f32],
     ) {
@@ -49,7 +54,7 @@ impl Particle {
                 if can_radomize_frequency {
                     let u = 2.0 * random::get_float() - 1.0;
                     let f = f32::min(semitones_to_ratio(spread * u) * frequency, 0.25);
-                    self.pre_gain = 0.5 / sqrt(q * f * sqrt(density));
+                    self.pre_gain = 0.5 / sqrt(q * f * sr_ratio * sqrt(density * sr_ratio));
                     self.filter.set_f_q(f, q, FrequencyApproximation::Dirty);
                     // Keep the cutoff constant for this whole block.
                     can_radomize_frequency = false;

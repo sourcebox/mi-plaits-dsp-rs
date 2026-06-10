@@ -19,6 +19,7 @@ use crate::oscillator::variable_shape_oscillator::VariableShapeOscillator;
 use crate::resources::fm::LUT_FM_FREQUENCY_QUANTIZER;
 use crate::utils::interpolate;
 use crate::utils::units::semitones_to_ratio;
+use crate::utils::REFERENCE_SAMPLE_RATE;
 
 #[derive(Debug, Clone)]
 pub struct PhaseDistortionEngine {
@@ -27,6 +28,9 @@ pub struct PhaseDistortionEngine {
 
     temp_buffer_1: Box<[f32]>,
     temp_buffer_2: Box<[f32]>,
+
+    // Sample rate dependent constants
+    sr_ratio: f32,
 }
 
 impl PhaseDistortionEngine {
@@ -36,14 +40,16 @@ impl PhaseDistortionEngine {
             modulator: VariableShapeOscillator::new(),
             temp_buffer_1: vec![0.0; block_size * 2].into_boxed_slice(),
             temp_buffer_2: vec![0.0; block_size * 2].into_boxed_slice(),
+            sr_ratio: 1.0,
         }
     }
 }
 
 impl Engine for PhaseDistortionEngine {
-    fn init(&mut self, _sample_rate_hz: f32) {
+    fn init(&mut self, sample_rate_hz: f32) {
         self.shaper.init();
         self.modulator.init();
+        self.sr_ratio = sample_rate_hz / REFERENCE_SAMPLE_RATE;
     }
 
     fn render(
@@ -63,7 +69,11 @@ impl Engine for PhaseDistortionEngine {
             )),
         );
         let pw = 0.5 + parameters.morph * 0.49;
-        let amount = 8.0 * parameters.timbre * parameters.timbre * (1.0 - modulator_f * 3.8);
+        // The distortion amount limit is defined in terms of the normalized
+        // frequency at the reference rate. The 2x oversampling factor is the
+        // same at any sample rate, so only the rate ratio matters.
+        let amount =
+            8.0 * parameters.timbre * parameters.timbre * (1.0 - modulator_f * self.sr_ratio * 3.8);
 
         // Upsample by 2x
         let synced = &mut self.temp_buffer_1;

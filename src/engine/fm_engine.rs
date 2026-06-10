@@ -17,7 +17,7 @@ use crate::downsampler::Downsampler;
 use crate::oscillator::sine_oscillator::sine_pm;
 use crate::resources::fm::LUT_FM_FREQUENCY_QUANTIZER;
 use crate::utils::parameter_interpolator::ParameterInterpolator;
-use crate::utils::{interpolate, one_pole};
+use crate::utils::{interpolate, one_pole, scaled_smoothing_coefficient, REFERENCE_SAMPLE_RATE};
 
 const OVERSAMPLING: usize = 4;
 
@@ -35,6 +35,9 @@ pub struct FmEngine {
 
     sub_fir: f32,
     carrier_fir: f32,
+
+    // Sample rate dependent constants
+    feedback_lp_coefficient: f32,
 }
 
 impl FmEngine {
@@ -55,6 +58,12 @@ impl Engine for FmEngine {
         self.previous_amount = 0.0;
         self.previous_feedback = 0.0;
         self.previous_sample = 0.0;
+
+        // The feedback path is smoothed at the oversampled rate; the
+        // oversampling factor is constant, so rescaling by the sample rate
+        // ratio keeps the smoothing time constant in seconds.
+        self.feedback_lp_coefficient =
+            scaled_smoothing_coefficient(0.05, REFERENCE_SAMPLE_RATE / _sample_rate_hz);
     }
 
     #[inline]
@@ -131,7 +140,11 @@ impl Engine for FmEngine {
                 let modulator = sine_pm(self.modulator_phase, modulator_fb * self.previous_sample);
                 let carrier = sine_pm(self.carrier_phase, amount * modulator);
                 let sub = sine_pm(self.sub_phase, amount * carrier * 0.25);
-                one_pole(&mut self.previous_sample, carrier, 0.05);
+                one_pole(
+                    &mut self.previous_sample,
+                    carrier,
+                    self.feedback_lp_coefficient,
+                );
                 carrier_downsampler.accumulate(j, carrier);
                 sub_downsampler.accumulate(j, sub);
             }

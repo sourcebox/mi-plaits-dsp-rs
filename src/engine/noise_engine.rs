@@ -21,6 +21,7 @@ use crate::utils::filter::{FilterMode, FrequencyApproximation, Svf};
 use crate::utils::parameter_interpolator::ParameterInterpolator;
 use crate::utils::sqrt;
 use crate::utils::units::semitones_to_ratio;
+use crate::utils::REFERENCE_SAMPLE_RATE;
 
 #[derive(Debug, Clone)]
 pub struct NoiseEngine {
@@ -34,6 +35,9 @@ pub struct NoiseEngine {
     previous_mode: f32,
 
     temp_buffer: Box<[f32]>,
+
+    // Sample rate dependent constants
+    sr_ratio: f32,
 }
 
 impl NoiseEngine {
@@ -47,12 +51,13 @@ impl NoiseEngine {
             previous_q: 0.0,
             previous_mode: 0.0,
             temp_buffer: vec![0.0; block_size].into_boxed_slice(),
+            sr_ratio: 1.0,
         }
     }
 }
 
 impl Engine for NoiseEngine {
-    fn init(&mut self, _sample_rate_hz: f32) {
+    fn init(&mut self, sample_rate_hz: f32) {
         self.clocked_noise[0].init();
         self.clocked_noise[1].init();
         self.lp_hp_filter.init();
@@ -63,6 +68,8 @@ impl Engine for NoiseEngine {
         self.previous_f1 = 0.0;
         self.previous_q = 0.0;
         self.previous_mode = 0.0;
+
+        self.sr_ratio = sample_rate_hz / REFERENCE_SAMPLE_RATE;
     }
 
     #[inline]
@@ -106,7 +113,10 @@ impl Engine for NoiseEngine {
             let f0 = f0_modulation.next();
             let f1 = f1_modulation.next();
             let q = q_modulation.next();
-            let gain = 1.0 / sqrt((0.5 + q) * 40.0 * f0);
+            // The gain normalization is defined in terms of the normalized
+            // frequency at the reference rate; refer f0 back to it so the
+            // output level stays the same at any sample rate.
+            let gain = 1.0 / sqrt((0.5 + q) * 40.0 * f0 * self.sr_ratio);
             self.lp_hp_filter
                 .set_f_q(f0, q, FrequencyApproximation::Accurate);
             self.bp_filter[0].set_f_q(f0, q, FrequencyApproximation::Accurate);

@@ -7,7 +7,9 @@ use crate::utils::filter::{FilterMode, FrequencyApproximation, Svf};
 use crate::utils::parameter_interpolator::ParameterInterpolator;
 use crate::utils::random;
 use crate::utils::units::semitones_to_ratio;
-use crate::utils::{one_pole, soft_clip};
+use crate::utils::{
+    one_pole, powf, scaled_smoothing_coefficient, soft_clip, sqrt, REFERENCE_SAMPLE_RATE,
+};
 
 const NUM_MODES: usize = 5;
 
@@ -28,7 +30,11 @@ pub struct AnalogSnareDrum {
 
     // Sample rate dependent constants
     trigger_pulse_duration: i32,
-    pulse_decay_time: i32,
+    pulse_decay_coefficient: f32,
+    rate_ratio: f32,
+    sr_ratio: f32,
+    pulse_lp_coefficient: f32,
+    noise_gain: f32,
 }
 
 impl AnalogSnareDrum {
@@ -50,9 +56,19 @@ impl AnalogSnareDrum {
         }
         self.noise_filter.init();
 
-        // Pre-compute sample rate dependent constants
+        // Pre-compute sample rate dependent constants. The pulse decay is
+        // very fast (0.1ms), so its coefficient is rescaled with an exact
+        // pole mapping to keep the pulse shape identical in absolute time.
         self.trigger_pulse_duration = (1.0e-3 * sample_rate_hz) as i32;
-        self.pulse_decay_time = (0.1e-3 * sample_rate_hz) as i32;
+        self.rate_ratio = REFERENCE_SAMPLE_RATE / sample_rate_hz;
+        self.pulse_decay_coefficient =
+            scaled_smoothing_coefficient(1.0 / (0.1e-3 * REFERENCE_SAMPLE_RATE), self.rate_ratio);
+        self.sr_ratio = sample_rate_hz / REFERENCE_SAMPLE_RATE;
+        self.pulse_lp_coefficient = scaled_smoothing_coefficient(0.75, self.rate_ratio);
+        // White noise spreads its energy up to Nyquist; compensate its
+        // spectral density so the band-passed snare noise keeps the same
+        // level at any sample rate.
+        self.noise_gain = sqrt(sample_rate_hz / REFERENCE_SAMPLE_RATE);
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -70,8 +86,10 @@ impl AnalogSnareDrum {
     ) {
         let decay_xt = decay * (1.0 + decay * (decay - 1.0));
         let q = 2000.0 * semitones_to_ratio(decay_xt * 84.0);
-        let noise_envelope_decay =
-            1.0 - 0.0017 * semitones_to_ratio(-decay * (50.0 + snappy * 10.0));
+        let noise_envelope_decay = powf(
+            1.0 - 0.0017 * semitones_to_ratio(-decay * (50.0 + snappy * 10.0)),
+            self.rate_ratio,
+        );
         let exciter_leak = snappy * (2.0 - snappy) * 0.1;
 
         snappy = (snappy * 1.1 - 0.05).clamp(0.0, 1.0);
@@ -89,9 +107,11 @@ impl AnalogSnareDrum {
 
         for i in 0..NUM_MODES {
             f[i] = f32::min(f0 * MODE_FREQUENCIES[i], 0.499);
+            // The Q is derived from the normalized frequency; refer it to the
+            // reference rate so the ring time stays constant in seconds.
             self.resonator[i].set_f_q(
                 f[i],
-                1.0 + f[i] * (if i == 0 { q } else { q * 0.25 }),
+                1.0 + f[i] * self.sr_ratio * (if i == 0 { q } else { q * 0.25 }),
                 FrequencyApproximation::Fast,
             );
         }
@@ -116,8 +136,11 @@ impl AnalogSnareDrum {
         }
 
         let f_noise = (f0 * 16.0).clamp(0.0, 0.499);
-        self.noise_filter
-            .set_f_q(f_noise, 1.0 + f_noise * 1.5, FrequencyApproximation::Fast);
+        self.noise_filter.set_f_q(
+            f_noise,
+            1.0 + f_noise * self.sr_ratio * 1.5,
+            FrequencyApproximation::Fast,
+        );
 
         let mut sustain_gain =
             ParameterInterpolator::new(&mut self.sustain_gain, accent * decay, out.len());
@@ -134,14 +157,14 @@ impl AnalogSnareDrum {
                 };
                 self.pulse = pulse;
             } else {
-                self.pulse *= 1.0 - 1.0 / (self.pulse_decay_time as f32);
+                self.pulse *= 1.0 - self.pulse_decay_coefficient;
                 pulse = self.pulse;
             }
 
             let sustain_gain_value = sustain_gain.next();
 
             // R189 / C57 / R190 + C58 / C59 / R197 / R196 / IC14
-            one_pole(&mut self.pulse_lp, pulse, 0.75);
+            one_pole(&mut self.pulse_lp, pulse, self.pulse_lp_coefficient);
 
             let mut shell = 0.0;
             for i in 0..NUM_MODES {
@@ -161,7 +184,7 @@ impl AnalogSnareDrum {
             shell = soft_clip(shell);
 
             // C56 / R194 / Q48 / C54 / R188 / D54
-            let mut noise = 2.0 * random::get_float() - 1.0;
+            let mut noise = (2.0 * random::get_float() - 1.0) * self.noise_gain;
             if noise < 0.0 {
                 noise = 0.0;
             }

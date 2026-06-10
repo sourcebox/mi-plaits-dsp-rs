@@ -24,8 +24,8 @@
 use super::{note_to_frequency, Engine, EngineParameters};
 use crate::oscillator::wavetable_oscillator::{interpolate_wave_hermite, Differentiator};
 use crate::resources::waves::WAV_INTEGRATED_WAVES;
-use crate::utils::one_pole;
 use crate::utils::parameter_interpolator::SimpleParameterInterpolator;
+use crate::utils::{one_pole, scaled_smoothing_coefficient, REFERENCE_SAMPLE_RATE};
 
 const TABLE_SIZE: usize = 128;
 const TABLE_SIZE_F: f32 = TABLE_SIZE as f32;
@@ -50,6 +50,11 @@ pub struct WavetableEngine<'a> {
     diff_out: Differentiator,
 
     wavetables: &'a [i16; 25344],
+
+    // Sample rate dependent constants
+    rate_ratio: f32,
+    xy_smoothing_coefficient: f32,
+    z_smoothing_coefficient: f32,
 }
 
 impl Default for WavetableEngine<'_> {
@@ -79,6 +84,10 @@ impl<'a> WavetableEngine<'a> {
             diff_out: Differentiator::new(),
 
             wavetables: &WAV_INTEGRATED_WAVES,
+
+            rate_ratio: 1.0,
+            xy_smoothing_coefficient: 0.2,
+            z_smoothing_coefficient: 0.05,
         }
     }
 
@@ -123,6 +132,13 @@ impl Engine for WavetableEngine<'_> {
         self.previous_f0 = 55.0 / _sample_rate_hz; // A0 normalized
 
         self.diff_out.init();
+
+        // The wavetable coordinates are smoothed once per block; keep the
+        // smoothing times constant in seconds when the block rate changes
+        // with the sample rate.
+        self.rate_ratio = REFERENCE_SAMPLE_RATE / _sample_rate_hz;
+        self.xy_smoothing_coefficient = scaled_smoothing_coefficient(0.2, self.rate_ratio);
+        self.z_smoothing_coefficient = scaled_smoothing_coefficient(0.05, self.rate_ratio);
     }
 
     #[inline]
@@ -135,16 +151,31 @@ impl Engine for WavetableEngine<'_> {
     ) {
         let f0 = note_to_frequency(parameters.note, parameters.a0_normalized);
 
-        one_pole(&mut self.x_pre_lp, parameters.timbre * 6.9999, 0.2);
-        one_pole(&mut self.y_pre_lp, parameters.morph * 6.9999, 0.2);
-        one_pole(&mut self.z_pre_lp, parameters.harmonics * 6.9999, 0.05);
+        one_pole(
+            &mut self.x_pre_lp,
+            parameters.timbre * 6.9999,
+            self.xy_smoothing_coefficient,
+        );
+        one_pole(
+            &mut self.y_pre_lp,
+            parameters.morph * 6.9999,
+            self.xy_smoothing_coefficient,
+        );
+        one_pole(
+            &mut self.z_pre_lp,
+            parameters.harmonics * 6.9999,
+            self.z_smoothing_coefficient,
+        );
 
         let x = self.x_pre_lp;
         let y = self.y_pre_lp;
         let z = self.z_pre_lp;
 
         let quantization = (z - 3.0).clamp(0.0, 1.0);
-        let lp_coefficient = (2.0 * f0 * (4.0 - 3.0 * quantization)).clamp(0.01, 0.1);
+        // The clamping bounds are normalized frequencies at the reference
+        // rate; rescale them so they stay constant in Hz.
+        let lp_coefficient = (2.0 * f0 * (4.0 - 3.0 * quantization))
+            .clamp(0.01 * self.rate_ratio, 0.1 * self.rate_ratio);
 
         let x_integral = x as usize;
         let mut x_fractional = x - (x_integral as f32);
@@ -178,7 +209,7 @@ impl Engine for WavetableEngine<'_> {
         for (out_sample, aux_sample) in out.iter_mut().zip(aux.iter_mut()) {
             let f0 = f0_modulation.update(&mut self.previous_f0);
 
-            let gain = (1.0 / (f0 * 131072.0)) * (0.95 - f0);
+            let gain = (1.0 / (f0 * 131072.0)) * (0.95 - f0 * self.rate_ratio.recip());
             let cutoff = f32::min(TABLE_SIZE_F * f0, 1.0);
 
             one_pole(

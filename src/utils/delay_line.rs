@@ -2,16 +2,22 @@
 
 // Based on MIT-licensed code (c) 2014 by Olivier Gillet (ol.gillet@gmail.com)
 
+use alloc::vec::Vec;
+
 use num_traits::{FromPrimitive, Num, Signed, ToPrimitive};
 
+/// Delay line with a base capacity of `BASE_MAX_DELAY` samples at the
+/// reference sample rate (48kHz). Call [`DelayLine::set_scale`] with
+/// `sample_rate_hz / 48000.0` to keep the maximum delay time constant in
+/// seconds at other sample rates.
 #[derive(Debug, Clone)]
-pub struct DelayLine<T, const MAX_DELAY: usize> {
+pub struct DelayLine<T, const BASE_MAX_DELAY: usize> {
     write_ptr: usize,
     delay: usize,
-    line: [T; MAX_DELAY],
+    line: Vec<T>,
 }
 
-impl<T, const MAX_DELAY: usize> Default for DelayLine<T, MAX_DELAY>
+impl<T, const BASE_MAX_DELAY: usize> Default for DelayLine<T, BASE_MAX_DELAY>
 where
     T: Copy + Default + Num + Signed + FromPrimitive + ToPrimitive,
 {
@@ -20,20 +26,34 @@ where
     }
 }
 
-impl<T, const MAX_DELAY: usize> DelayLine<T, MAX_DELAY>
+impl<T, const BASE_MAX_DELAY: usize> DelayLine<T, BASE_MAX_DELAY>
 where
     T: Copy + Default + Num + Signed + FromPrimitive + ToPrimitive,
 {
     pub fn new() -> Self {
+        let mut line = Vec::new();
+        line.resize(BASE_MAX_DELAY, T::zero());
         Self {
             write_ptr: 0,
             delay: 1,
-            line: [T::zero(); MAX_DELAY],
+            line,
         }
     }
 
     pub fn init(&mut self) {
         self.reset();
+    }
+
+    /// Resize the line so that its maximum delay time in seconds stays the
+    /// same at a different sample rate. `scale` is `sample_rate_hz / 48000.0`.
+    /// The line content is cleared.
+    pub fn set_scale(&mut self, scale: f32) {
+        let length = ((BASE_MAX_DELAY as f32 * scale) + 0.5) as usize;
+        let length = length.max(1);
+        self.line.clear();
+        self.line.resize(length, T::zero());
+        self.delay = 1;
+        self.write_ptr = 0;
     }
 
     pub fn reset(&mut self) {
@@ -45,7 +65,7 @@ where
     }
 
     pub fn max_delay(&self) -> usize {
-        MAX_DELAY
+        self.line.len()
     }
 
     #[inline]
@@ -55,13 +75,14 @@ where
 
     #[inline]
     pub fn write(&mut self, sample: T) {
+        let max_delay = self.line.len();
         self.line[self.write_ptr] = sample;
-        self.write_ptr = (self.write_ptr + MAX_DELAY - 1) % MAX_DELAY;
+        self.write_ptr = (self.write_ptr + max_delay - 1) % max_delay;
     }
 
     #[inline]
     pub fn allpass(&mut self, sample: T, delay: usize, coefficient: T) -> T {
-        let read = self.line[(self.write_ptr + delay) % MAX_DELAY];
+        let read = self.line[(self.write_ptr + delay) % self.line.len()];
         let write = sample + coefficient * read;
         self.write(write);
 
@@ -76,20 +97,21 @@ where
 
     #[inline]
     pub fn read(&self) -> T {
-        self.line[(self.write_ptr + self.delay) % MAX_DELAY]
+        self.line[(self.write_ptr + self.delay) % self.line.len()]
     }
 
     #[inline]
     pub fn read_with_delay(&self, delay: usize) -> T {
-        self.line[(self.write_ptr + delay) % MAX_DELAY]
+        self.line[(self.write_ptr + delay) % self.line.len()]
     }
 
     #[inline]
     pub fn read_with_delay_frac(&self, delay: f32) -> T {
+        let max_delay = self.line.len();
         let delay_integral = delay as usize;
         let delay_fractional = delay - (delay_integral as f32);
-        let a = self.line[(self.write_ptr + delay_integral) % MAX_DELAY];
-        let b = self.line[(self.write_ptr + delay_integral + 1) % MAX_DELAY];
+        let a = self.line[(self.write_ptr + delay_integral) % max_delay];
+        let b = self.line[(self.write_ptr + delay_integral + 1) % max_delay];
 
         let frac = (b - a).to_f32().unwrap_or_default() * delay_fractional;
 
@@ -98,13 +120,14 @@ where
 
     #[inline]
     pub fn read_hermite(&self, delay: f32) -> T {
+        let max_delay = self.line.len();
         let delay_integral = delay as usize;
         let delay_fractional = delay - (delay_integral as f32);
-        let t = self.write_ptr + delay_integral + MAX_DELAY;
-        let xm1 = self.line[(t - 1) % MAX_DELAY];
-        let x0 = self.line[(t) % MAX_DELAY];
-        let x1 = self.line[(t + 1) % MAX_DELAY];
-        let x2 = self.line[(t + 2) % MAX_DELAY];
+        let t = self.write_ptr + delay_integral + max_delay;
+        let xm1 = self.line[(t - 1) % max_delay];
+        let x0 = self.line[(t) % max_delay];
+        let x1 = self.line[(t + 1) % max_delay];
+        let x2 = self.line[(t + 2) % max_delay];
         let c = T::from_f32((x1 - xm1).to_f32().unwrap_or_default() * 0.5).unwrap_or_default();
         let v = x0 - x1;
         let w = c + v;

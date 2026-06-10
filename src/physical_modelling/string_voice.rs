@@ -7,12 +7,17 @@ use crate::noise::dust::dust;
 use crate::utils::filter::{FilterMode, FrequencyApproximation, Svf};
 use crate::utils::random;
 use crate::utils::units::semitones_to_ratio;
+use crate::utils::{sqrt, REFERENCE_SAMPLE_RATE};
 
 #[derive(Debug, Clone)]
 pub struct StringVoice {
     excitation_filter: Svf,
     string: String,
     remaining_noise_samples: usize,
+
+    // Sample rate dependent constants
+    sr_ratio: f32,
+    noise_gain: f32,
 }
 
 impl Default for StringVoice {
@@ -27,6 +32,8 @@ impl StringVoice {
             excitation_filter: Svf::default(),
             string: String::new(),
             remaining_noise_samples: 0,
+            sr_ratio: 1.0,
+            noise_gain: 1.0,
         }
     }
 
@@ -34,6 +41,10 @@ impl StringVoice {
         self.excitation_filter.init();
         self.string.init(sample_rate_hz);
         self.remaining_noise_samples = 0;
+        self.sr_ratio = sample_rate_hz / REFERENCE_SAMPLE_RATE;
+        // Compensate the white noise spectral density so the filtered
+        // excitation burst keeps the same energy at any sample rate.
+        self.noise_gain = sqrt(self.sr_ratio);
     }
 
     pub fn reset(&mut self) {
@@ -76,10 +87,15 @@ impl StringVoice {
         }
 
         if sustain {
+            // `dust_f` is a per-sample probability at the reference rate:
+            // rescale it to keep the particle rate constant in Hz, and
+            // compensate the impulse amplitude so each impulse keeps the same
+            // energy in absolute time.
             let dust_f = 0.00005 + 0.99995 * density * density;
 
             for sample_temp in temp.iter_mut() {
-                *sample_temp = dust(dust_f) * (8.0 - dust_f * 6.0) * accent;
+                *sample_temp =
+                    dust(dust_f / self.sr_ratio) * self.sr_ratio * (8.0 - dust_f * 6.0) * accent;
             }
         } else if self.remaining_noise_samples > 0 {
             let mut noise_samples = usize::min(self.remaining_noise_samples, out.len());
@@ -87,7 +103,7 @@ impl StringVoice {
             let mut tail = out.len() - noise_samples;
             let mut start_index = 0;
             while noise_samples > 0 {
-                temp[start_index] = 2.0 * random::get_float() - 1.0;
+                temp[start_index] = (2.0 * random::get_float() - 1.0) * self.noise_gain;
                 start_index += 1;
                 noise_samples -= 1;
             }

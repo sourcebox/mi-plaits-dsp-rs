@@ -7,9 +7,9 @@ use num_traits::float::Float;
 
 use crate::oscillator::sine_oscillator::SineOscillator;
 use crate::utils::filter::{FilterMode, FrequencyApproximation, Svf};
-use crate::utils::one_pole;
 use crate::utils::parameter_interpolator::ParameterInterpolator;
 use crate::utils::units::semitones_to_ratio;
+use crate::utils::{one_pole, scaled_smoothing_coefficient, REFERENCE_SAMPLE_RATE};
 
 #[derive(Debug, Default, Clone)]
 pub struct AnalogBassDrum {
@@ -32,9 +32,10 @@ pub struct AnalogBassDrum {
     // Sample rate dependent constants
     trigger_pulse_duration: i32,
     fm_pulse_duration: i32,
-    pulse_decay_time: f32,
-    pulse_filter_time: f32,
-    retrig_pulse_duration: f32,
+    pulse_decay_coefficient: f32,
+    pulse_filter_coefficient: f32,
+    retrig_decay_coefficient: f32,
+    sr_ratio: f32,
 }
 
 impl AnalogBassDrum {
@@ -57,12 +58,20 @@ impl AnalogBassDrum {
         self.resonator.init();
         self.oscillator.init();
 
-        // Pre-compute sample rate dependent constants
+        // Pre-compute sample rate dependent constants. The pulse shaping
+        // filters are very fast (fractions of a millisecond), so their
+        // coefficients are rescaled with an exact pole mapping to keep the
+        // pulse shapes identical in absolute time at any sample rate.
+        let rate_ratio = REFERENCE_SAMPLE_RATE / sample_rate_hz;
         self.trigger_pulse_duration = (1.0e-3 * sample_rate_hz) as i32;
         self.fm_pulse_duration = (6.0e-3 * sample_rate_hz) as i32;
-        self.pulse_decay_time = 0.2e-3 * sample_rate_hz;
-        self.pulse_filter_time = 0.1e-3 * sample_rate_hz;
-        self.retrig_pulse_duration = 0.05 * sample_rate_hz;
+        self.pulse_decay_coefficient =
+            scaled_smoothing_coefficient(1.0 / (0.2e-3 * REFERENCE_SAMPLE_RATE), rate_ratio);
+        self.pulse_filter_coefficient =
+            scaled_smoothing_coefficient(1.0 / (0.1e-3 * REFERENCE_SAMPLE_RATE), rate_ratio);
+        self.retrig_decay_coefficient =
+            scaled_smoothing_coefficient(1.0 / (0.05 * REFERENCE_SAMPLE_RATE), rate_ratio);
+        self.sr_ratio = sample_rate_hz / REFERENCE_SAMPLE_RATE;
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -79,7 +88,9 @@ impl AnalogBassDrum {
         self_fm_amount: f32,
         out: &mut [f32],
     ) {
-        let scale = 0.001 / f0;
+        // The drive normalization is defined in terms of the normalized
+        // frequency at the reference rate.
+        let scale = 0.001 / (f0 * self.sr_ratio);
         let q = 1500.0 * semitones_to_ratio(decay * 80.0);
         let tone_f = f32::min(4.0 * f0 * semitones_to_ratio(tone * 108.0), 1.0);
         let exciter_leak = 0.08 * (tone + 0.25);
@@ -106,7 +117,7 @@ impl AnalogBassDrum {
                 };
                 self.pulse = pulse;
             } else {
-                self.pulse *= 1.0 - 1.0 / self.pulse_decay_time;
+                self.pulse *= 1.0 - self.pulse_decay_coefficient;
                 pulse = self.pulse;
             }
             if sustain {
@@ -114,7 +125,7 @@ impl AnalogBassDrum {
             }
 
             // C40 / R163 / R162 / D83
-            one_pole(&mut self.pulse_lp, pulse, 1.0 / self.pulse_filter_time);
+            one_pole(&mut self.pulse_lp, pulse, self.pulse_filter_coefficient);
             pulse = diode((pulse - self.pulse_lp) + pulse * 0.044);
 
             // Q41 / Q42
@@ -130,7 +141,7 @@ impl AnalogBassDrum {
                 };
             } else {
                 // C39 / R161
-                self.retrig_pulse *= 1.0 - 1.0 / self.retrig_pulse_duration;
+                self.retrig_pulse *= 1.0 - self.retrig_decay_coefficient;
             }
             if sustain {
                 fm_pulse = 0.0;
@@ -138,7 +149,7 @@ impl AnalogBassDrum {
             one_pole(
                 &mut self.fm_pulse_lp,
                 fm_pulse,
-                1.0 / self.pulse_filter_time,
+                self.pulse_filter_coefficient,
             );
 
             // Q43 and R170 leakage
@@ -159,8 +170,14 @@ impl AnalogBassDrum {
                     &mut self.lp_out,
                 );
             } else {
-                self.resonator
-                    .set_f_q(f, 1.0 + q * f, FrequencyApproximation::Dirty);
+                // The Q is derived from the normalized frequency; refer it to
+                // the reference rate so the ring time stays constant in
+                // seconds.
+                self.resonator.set_f_q(
+                    f,
+                    1.0 + q * f * self.sr_ratio,
+                    FrequencyApproximation::Dirty,
+                );
                 self.resonator.process_dual(
                     (pulse - self.retrig_pulse * 0.2) * scale,
                     &mut resonator_out,

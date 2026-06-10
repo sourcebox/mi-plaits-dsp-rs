@@ -11,6 +11,7 @@ use crate::utils::parameter_interpolator::ParameterInterpolator;
 use crate::utils::polyblep::{
     next_blep_sample, next_integrated_blep_sample, this_blep_sample, this_integrated_blep_sample,
 };
+use crate::utils::scaled_smoothing_coefficient;
 
 pub const MAX_FREQUENCY: f32 = 0.25;
 pub const MIN_FREQUENCY: f32 = 0.000001;
@@ -27,7 +28,7 @@ pub enum OscillatorShape {
     SquareTriangle,
 }
 
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Clone)]
 pub struct Oscillator {
     // Oscillator state.
     phase: f32,
@@ -39,6 +40,26 @@ pub struct Oscillator {
     // For interpolation of parameters.
     frequency: f32,
     pw: f32,
+
+    // Sample rate dependent constants (used by the impulse train shape).
+    impulse_train_lp_coefficient: f32,
+    impulse_train_gain: f32,
+}
+
+impl Default for Oscillator {
+    fn default() -> Self {
+        Self {
+            phase: 0.5,
+            next_sample: 0.0,
+            lp_state: 1.0,
+            hp_state: 0.0,
+            high: true,
+            frequency: 0.001,
+            pw: 0.5,
+            impulse_train_lp_coefficient: 0.25,
+            impulse_train_gain: 4.0,
+        }
+    }
 }
 
 impl Oscillator {
@@ -55,6 +76,14 @@ impl Oscillator {
 
         self.frequency = 0.001;
         self.pw = 0.5;
+    }
+
+    /// Rescale the impulse train smoothing filter so that the rendered
+    /// impulses keep the same shape and amplitude in absolute time at any
+    /// sample rate. `rate_ratio` is `48000.0 / sample_rate_hz`.
+    pub fn set_sample_rate_ratio(&mut self, rate_ratio: f32) {
+        self.impulse_train_lp_coefficient = scaled_smoothing_coefficient(0.25, rate_ratio);
+        self.impulse_train_gain = 4.0 * 0.25 / self.impulse_train_lp_coefficient;
     }
 
     #[inline]
@@ -123,8 +152,9 @@ impl Oscillator {
                     if matches!(shape, OscillatorShape::Saw) {
                         *out_sample = 2.0 * this_sample - 1.0;
                     } else {
-                        self.lp_state += 0.25 * ((self.hp_state - this_sample) - self.lp_state);
-                        *out_sample = 4.0 * self.lp_state;
+                        self.lp_state += self.impulse_train_lp_coefficient
+                            * ((self.hp_state - this_sample) - self.lp_state);
+                        *out_sample = self.impulse_train_gain * self.lp_state;
                         self.hp_state = this_sample;
                     }
                 }

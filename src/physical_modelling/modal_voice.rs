@@ -9,11 +9,25 @@ use super::resonator::{Resonator, ResonatorSvf, MAX_NUM_MODES};
 use crate::noise::dust::dust;
 use crate::utils::filter::FilterMode;
 use crate::utils::units::semitones_to_ratio;
+use crate::utils::REFERENCE_SAMPLE_RATE;
 
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Clone)]
 pub struct ModalVoice {
     excitation_filter: ResonatorSvf<1>,
     resonator: Resonator,
+
+    // Sample rate dependent constants
+    sr_ratio: f32,
+}
+
+impl Default for ModalVoice {
+    fn default() -> Self {
+        Self {
+            excitation_filter: ResonatorSvf::default(),
+            resonator: Resonator::default(),
+            sr_ratio: 1.0,
+        }
+    }
 }
 
 impl ModalVoice {
@@ -21,9 +35,10 @@ impl ModalVoice {
         Self::default()
     }
 
-    pub fn init(&mut self) {
+    pub fn init(&mut self, sample_rate_hz: f32) {
         self.excitation_filter.init();
         self.resonator.init(0.015, MAX_NUM_MODES);
+        self.sr_ratio = sample_rate_hz / REFERENCE_SAMPLE_RATE;
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -57,9 +72,14 @@ impl ModalVoice {
 
         // Synthesize excitation signal.
         if sustain {
+            // `dust_f` is a per-sample probability at the reference rate:
+            // rescale it to keep the particle rate constant in Hz, and
+            // compensate the impulse amplitude so each impulse keeps the same
+            // energy in absolute time.
             let dust_f = 0.00005 + 0.99995 * density * density;
             for sample_temp in temp.iter_mut() {
-                *sample_temp = dust(dust_f) * (4.0 - dust_f * 3.0) * accent;
+                *sample_temp =
+                    dust(dust_f / self.sr_ratio) * self.sr_ratio * (4.0 - dust_f * 3.0) * accent;
             }
         } else {
             for temp_sample in temp.iter_mut() {
@@ -86,7 +106,14 @@ impl ModalVoice {
             *aux_sample += *temp_2_sample;
         }
 
-        self.resonator
-            .process(f0, structure, brightness, damping, temp_2, out);
+        self.resonator.process(
+            f0,
+            structure,
+            brightness,
+            damping,
+            self.sr_ratio,
+            temp_2,
+            out,
+        );
     }
 }

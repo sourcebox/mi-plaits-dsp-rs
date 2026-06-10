@@ -22,8 +22,8 @@ use crate::engine::{note_to_frequency, Engine, EngineParameters, TriggerState};
 use crate::oscillator::nes_triangle_oscillator::NesTriangleOscillator;
 use crate::oscillator::super_square_oscillator::SuperSquareOscillator;
 use crate::utils::hysteresis_quantizer::HysteresisQuantizer2;
-use crate::utils::one_pole;
 use crate::utils::units::semitones_to_ratio;
+use crate::utils::{one_pole, scaled_smoothing_coefficient, REFERENCE_SAMPLE_RATE};
 
 pub const NO_ENVELOPE: f32 = 2.0;
 
@@ -152,8 +152,15 @@ impl Engine for ChiptuneEngine {
             let decay = 1.0 - 2.0 / self.sample_rate * semitones_to_ratio(60.0 * shape) * shape;
             let aux_envelope_amount = (self.envelope_shape * 20.0).clamp(0.0, 1.0);
 
+            let aux_envelope_coefficient =
+                scaled_smoothing_coefficient(0.01, REFERENCE_SAMPLE_RATE / self.sample_rate);
+
             for (out_sample, aux_sample) in out.iter_mut().zip(aux.iter_mut()) {
-                one_pole(&mut self.aux_envelope_amount, aux_envelope_amount, 0.01);
+                one_pole(
+                    &mut self.aux_envelope_amount,
+                    aux_envelope_amount,
+                    aux_envelope_coefficient,
+                );
                 self.envelope_state *= decay;
                 *out_sample *= self.envelope_state;
                 *aux_sample *= 1.0 + self.aux_envelope_amount * (self.envelope_state - 1.0);

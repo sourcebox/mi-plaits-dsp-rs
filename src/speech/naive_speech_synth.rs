@@ -6,6 +6,7 @@
 use crate::oscillator::oscillator::{Oscillator, OscillatorShape};
 use crate::utils::filter::{FilterMode, FrequencyApproximation, Svf};
 use crate::utils::units::semitones_to_ratio;
+use crate::utils::REFERENCE_SAMPLE_RATE;
 
 const NUM_FORMANTS: usize = 5;
 const NUM_PHONEMES: usize = 5;
@@ -33,6 +34,8 @@ impl NaiveSpeechSynth {
         self.sample_rate_hz = sample_rate_hz;
         self.a0_normalized = 27.5 / sample_rate_hz;
         self.pulse.init();
+        self.pulse
+            .set_sample_rate_ratio(REFERENCE_SAMPLE_RATE / sample_rate_hz);
         self.frequency = 0.0;
         self.click_duration = 0;
 

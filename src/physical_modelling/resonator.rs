@@ -40,6 +40,10 @@ impl Resonator {
         }
     }
 
+    /// `sr_ratio` is `sample_rate_hz / 48000.0`; it refers the mode Q and the
+    /// anti-aliasing attenuation back to the reference sample rate so decay
+    /// times and the spectral envelope stay constant in absolute terms.
+    #[allow(clippy::too_many_arguments)]
     #[inline]
     pub fn process(
         &mut self,
@@ -47,6 +51,7 @@ impl Resonator {
         structure: f32,
         mut brightness: f32,
         damping: f32,
+        sr_ratio: f32,
         in_: &[f32],
         out: &mut [f32],
     ) {
@@ -74,10 +79,14 @@ impl Resonator {
             if mode_frequency >= 0.499 {
                 mode_frequency = 0.499;
             }
-            let mode_attenuation = 1.0 - mode_frequency * 2.0;
+            // Reference the attenuation and Q to the 48kHz-normalized mode
+            // frequency: the spectral envelope and ring times then stay the
+            // same in absolute terms at any sample rate.
+            let mode_frequency_ref = mode_frequency * sr_ratio;
+            let mode_attenuation = (1.0 - mode_frequency_ref * 2.0).max(0.0);
 
             mode_f[batch_counter] = mode_frequency;
-            mode_q[batch_counter] = 1.0 + mode_frequency * q;
+            mode_q[batch_counter] = 1.0 + mode_frequency_ref * q;
             mode_a[batch_counter] = self.mode_amplitude[i] * mode_attenuation;
             batch_counter += 1;
 

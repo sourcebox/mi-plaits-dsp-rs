@@ -14,6 +14,7 @@ use crate::utils::filter::{FilterMode, FrequencyApproximation, Svf};
 use crate::utils::parameter_interpolator::ParameterInterpolator;
 use crate::utils::random;
 use crate::utils::units::semitones_to_ratio;
+use crate::utils::{powf, REFERENCE_SAMPLE_RATE};
 
 pub enum NoiseType {
     Square,
@@ -77,8 +78,11 @@ impl Hihat {
         resonance: bool,
         two_stage_envelope: bool,
     ) {
-        let envelope_decay = 1.0 - 0.003 * semitones_to_ratio(-decay * 84.0);
-        let cut_decay = 1.0 - 0.0025 * semitones_to_ratio(-decay * 36.0);
+        // The decay coefficients are defined per sample at the reference rate;
+        // rescale them so decay times stay constant in seconds.
+        let rate_ratio = REFERENCE_SAMPLE_RATE / self.sample_rate_hz;
+        let envelope_decay = powf(1.0 - 0.003 * semitones_to_ratio(-decay * 84.0), rate_ratio);
+        let cut_decay = powf(1.0 - 0.0025 * semitones_to_ratio(-decay * 36.0), rate_ratio);
 
         if trigger {
             self.envelope = (1.5 + 0.5 * (1.0 - decay)) * (0.3 + 0.7 * accent);

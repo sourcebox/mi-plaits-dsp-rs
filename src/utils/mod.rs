@@ -18,6 +18,37 @@ pub mod units;
 #[allow(unused_imports)]
 use num_traits::float::Float;
 
+/// Sample rate the original Plaits firmware runs at, in Hz.
+///
+/// All hardcoded per-sample coefficients, delay lengths and probabilities in the
+/// ported code are defined relative to this rate. Components rescale them at
+/// init time so that the rendered output is perceptually identical at any
+/// sample rate.
+pub const REFERENCE_SAMPLE_RATE: f32 = 48000.0;
+
+/// Rescales a one-pole smoothing/decay coefficient defined at a reference
+/// update rate so that the resulting time constant stays identical at another
+/// update rate.
+///
+/// `rate_ratio` is `reference_rate / actual_rate`. For per-sample coefficients
+/// this is `48000.0 / sample_rate_hz`; for per-block coefficients the block
+/// rate scales identically as long as the block size is constant.
+#[inline]
+pub fn scaled_smoothing_coefficient(coefficient_at_reference: f32, rate_ratio: f32) -> f32 {
+    // At the reference rate, return the original constant bit-for-bit, so
+    // that rendering at 48kHz is exactly identical to the original code.
+    if rate_ratio == 1.0 {
+        return coefficient_at_reference;
+    }
+    1.0 - powf(1.0 - coefficient_at_reference, rate_ratio)
+}
+
+/// `x.powf(y)` for `f32` in `no_std` context.
+#[inline]
+pub fn powf(x: f32, y: f32) -> f32 {
+    Float::powf(x, y)
+}
+
 #[inline]
 pub fn interpolate(table: &[f32], mut index: f32, size: f32) -> f32 {
     index = index.clamp(0.0, 1.0);

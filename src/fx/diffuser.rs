@@ -4,6 +4,7 @@
 
 use super::{DataFormat12Bit, FxContext, FxEngine};
 use crate::utils::delay_line::DelayLine;
+use crate::utils::{scaled_smoothing_coefficient, REFERENCE_SAMPLE_RATE};
 
 #[derive(Debug, Default, Clone)]
 pub struct Diffuser {
@@ -19,6 +20,10 @@ pub struct Diffuser {
     lp_decay: f32,
 
     sample_rate_hz: f32,
+
+    // Sample rate dependent constants
+    delay_scale: f32,
+    klp: f32,
 }
 
 impl Diffuser {
@@ -35,6 +40,8 @@ impl Diffuser {
             engine: FxEngine::new(),
             lp_decay: 0.0,
             sample_rate_hz: 48000.0,
+            delay_scale: 1.0,
+            klp: 0.75,
         }
     }
 
@@ -42,6 +49,18 @@ impl Diffuser {
         self.sample_rate_hz = sample_rate_hz;
         self.engine.set_lfo_frequency(0.3 / sample_rate_hz);
         self.lp_decay = 0.0;
+
+        // Keep delay/tap times constant in seconds and the absorption filter
+        // cutoff constant in Hz at any sample rate.
+        self.delay_scale = sample_rate_hz / REFERENCE_SAMPLE_RATE;
+        self.klp = scaled_smoothing_coefficient(0.75, REFERENCE_SAMPLE_RATE / sample_rate_hz);
+        self.ap1.set_scale(self.delay_scale);
+        self.ap2.set_scale(self.delay_scale);
+        self.ap3.set_scale(self.delay_scale);
+        self.ap4.set_scale(self.delay_scale);
+        self.dapa.set_scale(self.delay_scale);
+        self.dapb.set_scale(self.delay_scale);
+        self.del.set_scale(self.delay_scale);
     }
 
     pub fn reset(&mut self) {
@@ -64,7 +83,8 @@ impl Diffuser {
         let mut c = FxContext::new();
 
         let kap = 0.625;
-        let klp = 0.75;
+        let klp = self.klp;
+        let scale = self.delay_scale;
         let mut lp = self.lp_decay;
 
         for in_out_sample in in_out.iter_mut() {
@@ -77,9 +97,9 @@ impl Diffuser {
             c.write_all_pass(&mut self.ap2, -kap);
             c.read_line(&mut self.ap3, kap);
             c.write_all_pass(&mut self.ap3, -kap);
-            c.interpolate(&mut self.ap4, 400.0, 43.0, kap);
+            c.interpolate(&mut self.ap4, 400.0 * scale, 43.0 * scale, kap);
             c.write_all_pass(&mut self.ap4, -kap);
-            c.interpolate(&mut self.del, 3070.0, 340.0, rt);
+            c.interpolate(&mut self.del, 3070.0 * scale, 340.0 * scale, rt);
             c.lp(&mut lp, klp);
             c.read_line(&mut self.dapa, -kap);
             c.write_all_pass(&mut self.dapa, kap);

@@ -46,7 +46,7 @@ fn ensemble() {
     let mut wav_data_left = Vec::new();
     let mut wav_data_right = Vec::new();
     osc.init();
-    fx.init();
+    fx.init(SAMPLE_RATE);
     fx.set_amount(0.5);
     fx.set_depth(0.5);
 

@@ -21,7 +21,7 @@ use num_traits::float::Float;
 use super::{note_to_frequency, Engine, EngineParameters};
 use crate::oscillator::harmonic_oscillator::HarmonicOscillator;
 use crate::oscillator::sine_oscillator::sine;
-use crate::utils::one_pole;
+use crate::utils::{one_pole, scaled_smoothing_coefficient, REFERENCE_SAMPLE_RATE};
 
 const HARMONIC_BATCH_SIZE: usize = 12;
 const NUM_HARMONICS: usize = 36;
@@ -31,6 +31,9 @@ const NUM_HARMONIC_OSCILLATORS: usize = NUM_HARMONICS / HARMONIC_BATCH_SIZE;
 pub struct AdditiveEngine {
     harmonic_oscillator: [HarmonicOscillator<HARMONIC_BATCH_SIZE>; NUM_HARMONIC_OSCILLATORS],
     amplitudes: [f32; NUM_HARMONICS],
+
+    // Sample rate dependent constants
+    smoothing_coefficient: f32,
 }
 
 impl Default for AdditiveEngine {
@@ -40,6 +43,7 @@ impl Default for AdditiveEngine {
                 HarmonicOscillator::<HARMONIC_BATCH_SIZE>::default()
             }),
             amplitudes: [0.0; NUM_HARMONICS],
+            smoothing_coefficient: 0.001,
         }
     }
 }
@@ -51,10 +55,16 @@ impl AdditiveEngine {
 }
 
 impl Engine for AdditiveEngine {
-    fn init(&mut self, _sample_rate_hz: f32) {
+    fn init(&mut self, sample_rate_hz: f32) {
         for osc in self.harmonic_oscillator.iter_mut() {
             osc.init();
+            osc.set_sample_rate_ratio(sample_rate_hz / REFERENCE_SAMPLE_RATE);
         }
+
+        // The spectrum is smoothed once per block; keep the smoothing time
+        // constant in seconds when the block rate changes with the sample rate.
+        self.smoothing_coefficient =
+            scaled_smoothing_coefficient(0.001, REFERENCE_SAMPLE_RATE / sample_rate_hz);
     }
 
     fn reset(&mut self) {
@@ -82,6 +92,7 @@ impl Engine for AdditiveEngine {
             bumps,
             &mut self.amplitudes[..],
             &INTEGER_HARMONICS,
+            self.smoothing_coefficient,
         );
         self.harmonic_oscillator[0].render(f0, &self.amplitudes[..12], out, 1);
         self.harmonic_oscillator[1].render(f0, &self.amplitudes[12..], out, 13);
@@ -92,6 +103,7 @@ impl Engine for AdditiveEngine {
             bumps,
             &mut self.amplitudes[24..],
             &ORGAN_HARMONICS,
+            self.smoothing_coefficient,
         );
 
         self.harmonic_oscillator[2].render(f0, &self.amplitudes[24..], aux, 1);
@@ -111,6 +123,7 @@ fn update_amplitudes(
     bumps: f32,
     amplitudes: &mut [f32],
     harmonic_indices: &[usize],
+    smoothing_coefficient: f32,
 ) {
     let n = (harmonic_indices.len() as f32) - 1.0;
     let margin = (1.0 / slope - 1.0) / (1.0 + bumps);
@@ -141,7 +154,7 @@ fn update_amplitudes(
         // normalized spectrum, and both of them cause more annoyances than this
         // "incorrect" solution.
 
-        one_pole(&mut amplitudes[j], gain, 0.001);
+        one_pole(&mut amplitudes[j], gain, smoothing_coefficient);
         sum += amplitudes[j];
     }
 

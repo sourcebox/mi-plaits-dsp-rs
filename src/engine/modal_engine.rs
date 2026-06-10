@@ -18,7 +18,7 @@ use alloc::vec;
 
 use super::{note_to_frequency, Engine, EngineParameters, TriggerState};
 use crate::physical_modelling::modal_voice::ModalVoice;
-use crate::utils::one_pole;
+use crate::utils::{one_pole, scaled_smoothing_coefficient, REFERENCE_SAMPLE_RATE};
 
 #[derive(Debug, Clone)]
 pub struct ModalEngine {
@@ -27,6 +27,10 @@ pub struct ModalEngine {
 
     temp_buffer_1: Box<[f32]>,
     temp_buffer_2: Box<[f32]>,
+
+    // Sample rate dependent constants
+    sample_rate_hz: f32,
+    smoothing_coefficient: f32,
 }
 
 impl ModalEngine {
@@ -36,18 +40,26 @@ impl ModalEngine {
             harmonics_lp: 0.0,
             temp_buffer_1: vec![0.0; block_size].into_boxed_slice(),
             temp_buffer_2: vec![0.0; block_size].into_boxed_slice(),
+            sample_rate_hz: 48000.0,
+            smoothing_coefficient: 0.01,
         }
     }
 }
 
 impl Engine for ModalEngine {
-    fn init(&mut self, _sample_rate_hz: f32) {
+    fn init(&mut self, sample_rate_hz: f32) {
+        self.sample_rate_hz = sample_rate_hz;
         self.harmonics_lp = 0.0;
+        // The harmonics parameter is smoothed once per block; keep the
+        // smoothing time constant in seconds when the block rate changes
+        // with the sample rate.
+        self.smoothing_coefficient =
+            scaled_smoothing_coefficient(0.01, REFERENCE_SAMPLE_RATE / sample_rate_hz);
         self.reset();
     }
 
     fn reset(&mut self) {
-        self.voice.init();
+        self.voice.init(self.sample_rate_hz);
     }
 
     #[inline]
@@ -61,7 +73,11 @@ impl Engine for ModalEngine {
         out.fill(0.0);
         aux.fill(0.0);
 
-        one_pole(&mut self.harmonics_lp, parameters.harmonics, 0.01);
+        one_pole(
+            &mut self.harmonics_lp,
+            parameters.harmonics,
+            self.smoothing_coefficient,
+        );
 
         let sustain = matches!(parameters.trigger, TriggerState::Unpatched);
         let trigger = matches!(parameters.trigger, TriggerState::RisingEdge);

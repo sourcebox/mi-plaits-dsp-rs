@@ -20,27 +20,35 @@ use crate::oscillator::grainlet_oscillator::GrainletOscillator;
 use crate::oscillator::z_oscillator::ZOscillator;
 use crate::utils::filter::{FilterMode, FrequencyApproximation, OnePole};
 use crate::utils::units::semitones_to_ratio;
+use crate::utils::REFERENCE_SAMPLE_RATE;
 
 #[derive(Debug, Default, Clone)]
 pub struct GrainEngine {
     grainlet: [GrainletOscillator; 2],
     z_oscillator: ZOscillator,
     dc_blocker: [OnePole; 2],
+
+    // Sample rate dependent constants
+    sr_ratio: f32,
 }
 
 impl GrainEngine {
     pub fn new() -> Self {
-        Self::default()
+        Self {
+            sr_ratio: 1.0,
+            ..Default::default()
+        }
     }
 }
 
 impl Engine for GrainEngine {
-    fn init(&mut self, _sample_rate_hz: f32) {
+    fn init(&mut self, sample_rate_hz: f32) {
         self.grainlet[0].init();
         self.grainlet[1].init();
         self.z_oscillator.init();
         self.dc_blocker[0].init();
         self.dc_blocker[1].init();
+        self.sr_ratio = sample_rate_hz / REFERENCE_SAMPLE_RATE;
     }
 
     #[inline]
@@ -62,7 +70,10 @@ impl Engine for GrainEngine {
             0.0
         };
         let carrier_bleed_fixed = carrier_bleed * (2.0 - carrier_bleed);
-        let carrier_shape = 0.33 + (parameters.morph - 0.33) * f32::max(1.0 - f0 * 24.0, 0.0);
+        // The high-note shape limit is defined in terms of the normalized
+        // frequency at the reference rate.
+        let carrier_shape =
+            0.33 + (parameters.morph - 0.33) * f32::max(1.0 - f0 * self.sr_ratio * 24.0, 0.0);
 
         self.grainlet[0].render(f0, f1, carrier_shape, carrier_bleed_fixed, out);
         self.grainlet[1].render(f0, f1 * ratio, carrier_shape, carrier_bleed_fixed, aux);

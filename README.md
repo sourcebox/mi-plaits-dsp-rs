@@ -4,7 +4,7 @@ Native Rust port of the DSP code used by the [Mutable Instruments Plaits](https:
 
 This port is based on firmware release 1.2 as published at <https://github.com/pichenettes/eurorack>.
 
-**NOTE:** The original code runs at a sampling frequency of 48kHz. Using other sample rates is possible, but there are noticeable differences in sound.
+**NOTE:** The original code runs at a sampling frequency of 48kHz. This port is sample rate independent: all oscillators, voices, filters and effects are rescaled at initialization so that pitch, timbre, envelope times, modulation rates and noise density are perceptually identical at any sample rate. This is verified by a regression test suite (`tests/sample_rate_independence.rs`) that compares pitch, band energies and loudness envelopes of every engine across sample rates.
 
 ## Background
 

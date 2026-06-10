@@ -84,7 +84,13 @@ impl LpcSpeechSynthController<'_> {
         output: &mut [f32],
     ) {
         let rate_ratio = semitones_to_ratio((formant_shift - 0.5) * 36.0);
-        let rate = rate_ratio / 6.0;
+        // The LPC synth produces one sample per `1.0 / rate` output samples,
+        // i.e. it runs at an effective rate of 8kHz (scaled by the formant
+        // shift). Deriving the clock from the actual sample rate keeps the
+        // synth's pitch, formants and excitation pulse shape identical at any
+        // sample rate. At 48kHz this is bit-for-bit the original
+        // `rate_ratio / 6.0`.
+        let rate = rate_ratio / (self.sample_rate_hz / 8000.0);
 
         // All utterances have been normalized for an average f0 of 100 Hz.
         let pitch_shift =

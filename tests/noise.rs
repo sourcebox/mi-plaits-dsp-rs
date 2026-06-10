@@ -69,7 +69,7 @@ fn particle() {
         out.fill(0.0);
         aux.fill(0.0);
         let sync = n % (blocks / 5) == 0;
-        noise.render(sync, density, gain, f, spread, q, &mut out, &mut aux);
+        noise.render(sync, density, gain, f, spread, q, 1.0, &mut out, &mut aux);
         wav_data.extend_from_slice(&out);
         wav_data_aux.extend_from_slice(&aux);
     }

@@ -15,38 +15,42 @@
 use super::{note_to_frequency, Engine, EngineParameters, TriggerState};
 use crate::oscillator::oscillator::MAX_FREQUENCY;
 use crate::oscillator::sine_oscillator::{sine, FastSineOscillator};
-use crate::utils::one_pole;
 use crate::utils::parameter_interpolator::ParameterInterpolator;
 use crate::utils::polyblep::{next_blep_sample, this_blep_sample};
 use crate::utils::random;
 use crate::utils::units::semitones_to_ratio;
+use crate::utils::{one_pole, powf, scaled_smoothing_coefficient, REFERENCE_SAMPLE_RATE};
 
 const NUM_SWARM_VOICES: usize = 8;
 
 #[derive(Debug, Default, Clone)]
 pub struct SwarmEngine {
     swarm_voice: [SwarmVoice; NUM_SWARM_VOICES],
+    sample_rate_hz: f32,
 }
 
 impl SwarmEngine {
     pub fn new() -> Self {
         Self {
             swarm_voice: core::array::from_fn(|_| SwarmVoice::default()),
+            sample_rate_hz: 48000.0,
         }
     }
 }
 
 impl Engine for SwarmEngine {
-    fn init(&mut self, _sample_rate_hz: f32) {
+    fn init(&mut self, sample_rate_hz: f32) {
+        self.sample_rate_hz = sample_rate_hz;
         self.reset();
     }
 
     fn reset(&mut self) {
         let n = (NUM_SWARM_VOICES as i32 - 1) / 2;
+        let rate_ratio = REFERENCE_SAMPLE_RATE / self.sample_rate_hz;
 
         for i in 0..NUM_SWARM_VOICES as i32 {
             let rank = i.wrapping_sub(n) as f32 / n as f32;
-            self.swarm_voice[i as usize].init(rank);
+            self.swarm_voice[i as usize].init(rank, rate_ratio);
         }
     }
 
@@ -105,9 +109,9 @@ impl SwarmVoice {
         Self::default()
     }
 
-    pub fn init(&mut self, rank: f32) {
+    pub fn init(&mut self, rank: f32, rate_ratio: f32) {
         self.rank = rank;
-        self.envelope.init();
+        self.envelope.init(rate_ratio);
         self.saw.init();
         self.sine.init();
     }
@@ -207,6 +211,12 @@ pub struct GrainEnvelope {
     amplitude: f32,
     previous_size_ratio: f32,
     filter_coefficient: f32,
+
+    // Sample rate dependent constants. The envelope is updated once per
+    // block; with a fixed block size the block rate scales with the sample
+    // rate.
+    rate_ratio: f32,
+    filter_coefficient_decay: f32,
 }
 
 impl GrainEnvelope {
@@ -214,7 +224,7 @@ impl GrainEnvelope {
         Self::default()
     }
 
-    pub fn init(&mut self) {
+    pub fn init(&mut self, rate_ratio: f32) {
         self.from = 0.0;
         self.interval = 1.0;
         self.phase = 1.0;
@@ -222,6 +232,8 @@ impl GrainEnvelope {
         self.amplitude = 0.5;
         self.previous_size_ratio = 0.0;
         self.filter_coefficient = 0.0;
+        self.rate_ratio = rate_ratio;
+        self.filter_coefficient_decay = powf(0.95, rate_ratio);
     }
 
     #[inline]
@@ -280,13 +292,13 @@ impl GrainEnvelope {
             self.filter_coefficient = 0.5;
         }
 
-        self.filter_coefficient *= 0.95;
+        self.filter_coefficient *= self.filter_coefficient_decay;
 
         self.previous_size_ratio = size_ratio;
         one_pole(
             &mut self.amplitude,
             target_amplitude,
-            0.5 - self.filter_coefficient,
+            scaled_smoothing_coefficient(0.5 - self.filter_coefficient, self.rate_ratio),
         );
 
         self.amplitude

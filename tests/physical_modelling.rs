@@ -23,7 +23,7 @@ fn modal_voice() {
     let mut temp_2 = [0.0; BLOCK_SIZE];
     let mut wav_data = Vec::new();
     let mut wav_data_aux = Vec::new();
-    model.init();
+    model.init(SAMPLE_RATE);
 
     let blocks = (duration * SAMPLE_RATE / (BLOCK_SIZE as f32)) as usize;
     let f0 = frequency / SAMPLE_RATE;
@@ -79,7 +79,7 @@ fn resonator() {
             in_[0] = 1.0;
         }
         out.fill(0.0);
-        model.process(f0, structure, brightness, damping, &mut in_, &mut out);
+        model.process(f0, structure, brightness, damping, 1.0, &mut in_, &mut out);
         wav_data.extend_from_slice(&out);
     }
 

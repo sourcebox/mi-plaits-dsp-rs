@@ -16,6 +16,9 @@ pub struct HarmonicOscillator<const NUM_HARMONICS: usize> {
     // For interpolation of parameters.
     frequency: f32,
     amplitude: [f32; NUM_HARMONICS],
+
+    // Sample rate dependent constants
+    sr_ratio: f32,
 }
 
 impl<const NUM_HARMONICS: usize> Default for HarmonicOscillator<NUM_HARMONICS> {
@@ -24,6 +27,7 @@ impl<const NUM_HARMONICS: usize> Default for HarmonicOscillator<NUM_HARMONICS> {
             phase: 0.0,
             frequency: 0.0,
             amplitude: [0.0; NUM_HARMONICS],
+            sr_ratio: 1.0,
         }
     }
 }
@@ -39,6 +43,13 @@ impl<const NUM_HARMONICS: usize> HarmonicOscillator<NUM_HARMONICS> {
         for elem in self.amplitude.iter_mut() {
             *elem = 0.0;
         }
+    }
+
+    /// Refer the per-harmonic anti-aliasing attenuation to the reference
+    /// sample rate so the spectral envelope stays the same at any sample
+    /// rate. `sr_ratio` is `sample_rate_hz / 48000.0`.
+    pub fn set_sample_rate_ratio(&mut self, sr_ratio: f32) {
+        self.sr_ratio = sr_ratio;
     }
 
     #[inline]
@@ -64,7 +75,8 @@ impl<const NUM_HARMONICS: usize> HarmonicOscillator<NUM_HARMONICS> {
             if f >= 0.5 {
                 f = 0.5;
             }
-            am[i].init(a[i], amplitudes[i] * (1.0 - f * 2.0), out.len());
+            let attenuation = (1.0 - f * self.sr_ratio * 2.0).max(0.0);
+            am[i].init(a[i], amplitudes[i] * attenuation, out.len());
         }
 
         for out_sample in out.iter_mut() {

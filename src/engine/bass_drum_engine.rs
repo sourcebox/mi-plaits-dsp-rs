@@ -20,6 +20,7 @@ use super::{note_to_frequency, Engine, EngineParameters, TriggerState};
 use crate::drums::analog_bass_drum::AnalogBassDrum;
 use crate::drums::synthetic_bass_drum::SyntheticBassDrum;
 use crate::fx::overdrive::Overdrive;
+use crate::utils::REFERENCE_SAMPLE_RATE;
 
 #[derive(Debug, Default, Clone)]
 pub struct BassDrumEngine {
@@ -27,6 +28,9 @@ pub struct BassDrumEngine {
     synthetic_bass_drum: SyntheticBassDrum,
 
     overdrive: Overdrive,
+
+    // Sample rate dependent constants
+    sr_ratio: f32,
 }
 
 impl BassDrumEngine {
@@ -40,6 +44,7 @@ impl Engine for BassDrumEngine {
         self.analog_bass_drum.init(sample_rate_hz);
         self.synthetic_bass_drum.init(sample_rate_hz);
         self.overdrive.init();
+        self.sr_ratio = sample_rate_hz / REFERENCE_SAMPLE_RATE;
     }
 
     #[inline]
@@ -54,8 +59,10 @@ impl Engine for BassDrumEngine {
 
         let attack_fm_amount = f32::min(parameters.harmonics * 4.0, 1.0);
         let self_fm_amount = (parameters.harmonics * 4.0 - 1.0).clamp(0.0, 1.0);
-        let drive =
-            f32::max(parameters.harmonics * 2.0 - 1.0, 0.0) * f32::max(1.0 - 16.0 * f0, 0.0);
+        // The drive limit is defined in terms of the normalized frequency at
+        // the reference rate.
+        let drive = f32::max(parameters.harmonics * 2.0 - 1.0, 0.0)
+            * f32::max(1.0 - 16.0 * f0 * self.sr_ratio, 0.0);
 
         let sustain = matches!(parameters.trigger, TriggerState::Unpatched);
         let trigger = matches!(parameters.trigger, TriggerState::RisingEdge);

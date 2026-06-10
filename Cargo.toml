@@ -19,3 +19,8 @@ hound = "3.5.1"
 log = "0.4.26"
 simple_logger = "5.0.0"
 audio-midi-shell = "0.1.0"
+
+# The sample rate independence tests render several seconds of audio at
+# multiple sample rates; without optimization they are unreasonably slow.
+[profile.test]
+opt-level = 2

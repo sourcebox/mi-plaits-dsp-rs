@@ -2,13 +2,33 @@
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-#[derive(Debug, Default, Clone)]
+use crate::utils::{scaled_smoothing_coefficient, REFERENCE_SAMPLE_RATE};
+
+#[derive(Debug, Clone)]
 pub struct LpgEnvelope {
     vactrol_state: f32,
     gain: f32,
     frequency: f32,
     hf_bleed: f32,
     ramp_up: bool,
+
+    // Sample rate dependent constants
+    frequency_scale: f32,
+    attack_coefficient: f32,
+}
+
+impl Default for LpgEnvelope {
+    fn default() -> Self {
+        Self {
+            vactrol_state: 0.0,
+            gain: 1.0,
+            frequency: 0.5,
+            hf_bleed: 0.0,
+            ramp_up: false,
+            frequency_scale: 1.0,
+            attack_coefficient: 0.6,
+        }
+    }
 }
 
 impl LpgEnvelope {
@@ -16,7 +36,19 @@ impl LpgEnvelope {
         Self::default()
     }
 
-    pub fn init(&mut self) {
+    pub fn init(&mut self, sample_rate_hz: f32) {
+        // The LPG filter cutoff constants are normalized frequencies at the
+        // reference sample rate; rescale them so the cutoff stays constant
+        // in Hz. The vactrol state is updated once per block; with a fixed
+        // block size the block rate scales with the sample rate, so the same
+        // ratio rescales its attack coefficient.
+        let rate_ratio = REFERENCE_SAMPLE_RATE / sample_rate_hz;
+        self.frequency_scale = rate_ratio;
+        self.attack_coefficient = scaled_smoothing_coefficient(0.6, rate_ratio);
+        self.reset();
+    }
+
+    pub fn reset(&mut self) {
         self.vactrol_state = 0.0;
         self.gain = 1.0;
         self.frequency = 0.5;
@@ -58,14 +90,15 @@ impl LpgEnvelope {
         let tail = 1.0 - self.vactrol_state;
         let tail_2 = tail * tail;
         let vactrol_coefficient = if vactrol_error > 0.0 {
-            0.6
+            self.attack_coefficient
         } else {
             short_decay + (1.0 - vactrol_state_4) * decay_tail
         };
         self.vactrol_state += vactrol_coefficient * vactrol_error;
 
         self.gain = self.vactrol_state;
-        self.frequency = 0.003 + 0.3 * vactrol_state_4 + hf * 0.04;
+        self.frequency =
+            ((0.003 + 0.3 * vactrol_state_4 + hf * 0.04) * self.frequency_scale).min(0.45);
         self.hf_bleed = (tail_2 + (1.0 - tail_2) * hf) * hf * hf;
     }
 

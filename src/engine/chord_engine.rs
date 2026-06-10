@@ -20,7 +20,7 @@ use crate::chords::chord_bank::{ChordBank, CHORD_NUM_VOICES};
 use crate::oscillator::string_synth_oscillator::StringSynthOscillator;
 use crate::oscillator::wavetable_oscillator::WavetableOscillator;
 use crate::resources::waves::WAV_INTEGRATED_WAVES;
-use crate::utils::one_pole;
+use crate::utils::{one_pole, scaled_smoothing_coefficient, REFERENCE_SAMPLE_RATE};
 
 pub const CHORD_NUM_HARMONICS: usize = 3;
 
@@ -34,6 +34,10 @@ pub struct ChordEngine<'a> {
     timbre_lp: f32,
 
     wavetable: [&'a [i16]; 15],
+
+    // Sample rate dependent constants
+    smoothing_coefficient: f32,
+    sr_ratio: f32,
 }
 
 impl ChordEngine<'_> {
@@ -50,6 +54,8 @@ impl Default for ChordEngine<'_> {
             chords: ChordBank::new(),
             morph_lp: 0.0,
             timbre_lp: 0.0,
+            smoothing_coefficient: 0.1,
+            sr_ratio: 1.0,
             wavetable: [
                 &WAV_INTEGRATED_WAVES[wt_index(2, 6, 1)..],
                 &WAV_INTEGRATED_WAVES[wt_index(2, 6, 6)..],
@@ -72,7 +78,7 @@ impl Default for ChordEngine<'_> {
 }
 
 impl Engine for ChordEngine<'_> {
-    fn init(&mut self, _sample_rate_hz: f32) {
+    fn init(&mut self, sample_rate_hz: f32) {
         for i in 0..CHORD_NUM_VOICES {
             self.divide_down_voice[i].init();
             self.wavetable_voice[i].init();
@@ -82,6 +88,12 @@ impl Engine for ChordEngine<'_> {
 
         self.morph_lp = 0.0;
         self.timbre_lp = 0.0;
+
+        // The parameters are smoothed once per block; keep the smoothing time
+        // constant in seconds when the block rate changes with the sample rate.
+        self.smoothing_coefficient =
+            scaled_smoothing_coefficient(0.1, REFERENCE_SAMPLE_RATE / sample_rate_hz);
+        self.sr_ratio = sample_rate_hz / REFERENCE_SAMPLE_RATE;
 
         self.reset();
     }
@@ -98,8 +110,16 @@ impl Engine for ChordEngine<'_> {
         aux: &mut [f32],
         _already_enveloped: &mut bool,
     ) {
-        one_pole(&mut self.morph_lp, parameters.morph, 0.1);
-        one_pole(&mut self.timbre_lp, parameters.timbre, 0.1);
+        one_pole(
+            &mut self.morph_lp,
+            parameters.morph,
+            self.smoothing_coefficient,
+        );
+        one_pole(
+            &mut self.timbre_lp,
+            parameters.timbre,
+            self.smoothing_coefficient,
+        );
 
         self.chords.set_chord(parameters.harmonics);
 
@@ -129,7 +149,9 @@ impl Engine for ChordEngine<'_> {
             let destination = ((1 << note) & aux_note_mask) != 0;
 
             let note_f0 = f0 * ratios[note];
-            let mut divide_down_gain = 4.0 - note_f0 * 32.0;
+            // The gain limit is defined in terms of the normalized frequency
+            // at the reference rate.
+            let mut divide_down_gain = 4.0 - note_f0 * self.sr_ratio * 32.0;
             divide_down_gain = divide_down_gain.clamp(0.0, 1.0);
             divide_down_amount *= divide_down_gain;
 

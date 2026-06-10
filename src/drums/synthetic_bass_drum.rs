@@ -11,7 +11,7 @@ use crate::utils::filter::{FilterMode, FrequencyApproximation, Svf};
 use crate::utils::parameter_interpolator::ParameterInterpolator;
 use crate::utils::random;
 use crate::utils::units::semitones_to_ratio;
-use crate::utils::{one_pole, slope};
+use crate::utils::{one_pole, scaled_smoothing_coefficient, slope, sqrt, REFERENCE_SAMPLE_RATE};
 
 #[derive(Debug, Default, Clone)]
 pub struct SyntheticBassDrum {
@@ -36,6 +36,12 @@ pub struct SyntheticBassDrum {
 
     body_env_pulse_width: i32,
     fm_pulse_width: i32,
+
+    // Sample rate dependent constants
+    sr_ratio: f32,
+    phase_noise_coefficient: f32,
+    phase_noise_gain: f32,
+    envelope_lp_coefficient: f32,
 }
 
 impl SyntheticBassDrum {
@@ -58,7 +64,16 @@ impl SyntheticBassDrum {
         self.sustain_gain = 0.0;
 
         self.click.init(sample_rate_hz);
-        self.noise.init();
+        self.noise.init(sample_rate_hz);
+
+        // Keep smoothing time constants in seconds at any sample rate.
+        let rate_ratio = REFERENCE_SAMPLE_RATE / sample_rate_hz;
+        self.sr_ratio = sample_rate_hz / REFERENCE_SAMPLE_RATE;
+        self.phase_noise_coefficient = scaled_smoothing_coefficient(0.002, rate_ratio);
+        // Compensate the white noise spectral density so the low-passed phase
+        // noise keeps the same variance at any sample rate.
+        self.phase_noise_gain = sqrt(sample_rate_hz / REFERENCE_SAMPLE_RATE);
+        self.envelope_lp_coefficient = scaled_smoothing_coefficient(0.1, rate_ratio);
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -81,7 +96,9 @@ impl SyntheticBassDrum {
 
         let mut f0_mod = ParameterInterpolator::new(&mut self.f0, f0, out.len());
 
-        dirtiness *= f32::max(1.0 - 8.0 * f0, 0.0);
+        // The dirtiness limit is defined in terms of the normalized
+        // frequency at the reference rate.
+        dirtiness *= f32::max(1.0 - 8.0 * f0 * self.sr_ratio, 0.0);
 
         let fm_decay = 1.0 - 1.0 / (0.008 * (1.0 + fm_envelope_decay * 4.0) * self.sample_rate_hz);
 
@@ -103,7 +120,11 @@ impl SyntheticBassDrum {
             ParameterInterpolator::new(&mut self.sustain_gain, accent * decay, out.len());
 
         for out_sample in out.iter_mut() {
-            one_pole(&mut self.phase_noise, random::get_float() - 0.5, 0.002);
+            one_pole(
+                &mut self.phase_noise,
+                (random::get_float() - 0.5) * self.phase_noise_gain,
+                self.phase_noise_coefficient,
+            );
 
             let mut mix = 0.0;
 
@@ -134,7 +155,7 @@ impl SyntheticBassDrum {
                     self.transient_env *= transient_env_decay;
                 }
 
-                let envelope_lp_f = 0.1;
+                let envelope_lp_f = self.envelope_lp_coefficient;
                 one_pole(&mut self.body_env_lp, self.body_env, envelope_lp_f);
                 one_pole(
                     &mut self.transient_env_lp,
@@ -186,6 +207,11 @@ pub struct SyntheticBassDrumClick {
     lp: f32,
     hp: f32,
     filter: Svf,
+
+    // Sample rate dependent constants
+    slope_up: f32,
+    slope_down: f32,
+    hp_coefficient: f32,
 }
 
 impl SyntheticBassDrumClick {
@@ -203,12 +229,18 @@ impl SyntheticBassDrumClick {
             2.0,
             FrequencyApproximation::Fast,
         );
+
+        // Keep the click attack/release times constant in seconds.
+        let rate_ratio = REFERENCE_SAMPLE_RATE / sample_rate_hz;
+        self.slope_up = (0.5 * rate_ratio).min(1.0);
+        self.slope_down = scaled_smoothing_coefficient(0.1, rate_ratio);
+        self.hp_coefficient = scaled_smoothing_coefficient(0.04, rate_ratio);
     }
 
     #[inline]
     pub fn process(&mut self, in_: f32) -> f32 {
-        slope(&mut self.lp, in_, 0.5, 0.1);
-        one_pole(&mut self.hp, self.lp, 0.04);
+        slope(&mut self.lp, in_, self.slope_up, self.slope_down);
+        one_pole(&mut self.hp, self.lp, self.hp_coefficient);
 
         self.filter.process(self.lp - self.hp, FilterMode::LowPass)
     }
@@ -218,23 +250,41 @@ impl SyntheticBassDrumClick {
 pub struct SyntheticBassDrumAttackNoise {
     lp: f32,
     hp: f32,
+
+    // Sample rate dependent constants
+    lp_coefficient: f32,
+    hp_coefficient: f32,
+    noise_gain: f32,
 }
 
 impl SyntheticBassDrumAttackNoise {
     pub fn new() -> Self {
-        Self::default()
+        Self {
+            lp: 0.0,
+            hp: 0.0,
+            lp_coefficient: 0.05,
+            hp_coefficient: 0.005,
+            noise_gain: 1.0,
+        }
     }
 
-    pub fn init(&mut self) {
+    pub fn init(&mut self, sample_rate_hz: f32) {
         self.lp = 0.0;
         self.hp = 0.0;
+
+        // Keep the noise band constant in Hz, and compensate the white noise
+        // spectral density so the level stays the same at any sample rate.
+        let rate_ratio = REFERENCE_SAMPLE_RATE / sample_rate_hz;
+        self.lp_coefficient = scaled_smoothing_coefficient(0.05, rate_ratio);
+        self.hp_coefficient = scaled_smoothing_coefficient(0.005, rate_ratio);
+        self.noise_gain = sqrt(sample_rate_hz / REFERENCE_SAMPLE_RATE);
     }
 
     #[inline]
     pub fn render(&mut self) -> f32 {
-        let sample = random::get_float();
-        one_pole(&mut self.lp, sample, 0.05);
-        one_pole(&mut self.hp, self.lp, 0.005);
+        let sample = random::get_float() * self.noise_gain;
+        one_pole(&mut self.lp, sample, self.lp_coefficient);
+        one_pole(&mut self.hp, self.lp, self.hp_coefficient);
 
         self.lp - self.hp
     }

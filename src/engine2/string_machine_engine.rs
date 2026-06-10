@@ -19,8 +19,8 @@ use crate::engine::{note_to_frequency, Engine, EngineParameters};
 use crate::fx::ensemble::Ensemble;
 use crate::oscillator::string_synth_oscillator::StringSynthOscillator;
 use crate::utils::filter::{FilterMode, FrequencyApproximation, NaiveSvf};
-use crate::utils::one_pole;
 use crate::utils::units::semitones_to_ratio;
+use crate::utils::{one_pole, scaled_smoothing_coefficient, REFERENCE_SAMPLE_RATE};
 
 #[derive(Debug, Default, Clone)]
 pub struct StringMachineEngine {
@@ -32,6 +32,10 @@ pub struct StringMachineEngine {
 
     morph_lp: f32,
     timbre_lp: f32,
+
+    // Sample rate dependent constants
+    smoothing_coefficient: f32,
+    sr_ratio: f32,
 }
 
 impl StringMachineEngine {
@@ -45,12 +49,15 @@ impl StringMachineEngine {
 
             morph_lp: 0.0,
             timbre_lp: 0.0,
+
+            smoothing_coefficient: 0.1,
+            sr_ratio: 1.0,
         }
     }
 }
 
 impl Engine for StringMachineEngine {
-    fn init(&mut self, _sample_rate_hz: f32) {
+    fn init(&mut self, sample_rate_hz: f32) {
         for divide_down_voice in self.divide_down_voice.iter_mut() {
             divide_down_voice.init();
         }
@@ -60,7 +67,13 @@ impl Engine for StringMachineEngine {
         self.timbre_lp = 0.0;
         self.svf[0].init();
         self.svf[1].init();
-        self.ensemble.init();
+        self.ensemble.init(sample_rate_hz);
+
+        // The parameters are smoothed once per block; keep the smoothing time
+        // constant in seconds when the block rate changes with the sample rate.
+        self.smoothing_coefficient =
+            scaled_smoothing_coefficient(0.1, REFERENCE_SAMPLE_RATE / sample_rate_hz);
+        self.sr_ratio = sample_rate_hz / REFERENCE_SAMPLE_RATE;
     }
 
     fn reset(&mut self) {
@@ -75,8 +88,16 @@ impl Engine for StringMachineEngine {
         aux: &mut [f32],
         _already_enveloped: &mut bool,
     ) {
-        one_pole(&mut self.morph_lp, parameters.morph, 0.1);
-        one_pole(&mut self.timbre_lp, parameters.timbre, 0.1);
+        one_pole(
+            &mut self.morph_lp,
+            parameters.morph,
+            self.smoothing_coefficient,
+        );
+        one_pole(
+            &mut self.timbre_lp,
+            parameters.timbre,
+            self.smoothing_coefficient,
+        );
 
         self.chords.set_chord(parameters.harmonics);
 
@@ -92,7 +113,9 @@ impl Engine for StringMachineEngine {
         let f0 = note_to_frequency(parameters.note, parameters.a0_normalized) * 0.998;
         for note in 0..CHORD_NUM_NOTES {
             let note_f0 = f0 * self.chords.ratio(note as i32);
-            let divide_down_gain = (4.0 - note_f0 * 32.0).clamp(0.0, 1.0);
+            // The gain limit is defined in terms of the normalized frequency
+            // at the reference rate.
+            let divide_down_gain = (4.0 - note_f0 * self.sr_ratio * 32.0).clamp(0.0, 1.0);
             self.divide_down_voice[note].render(
                 note_f0,
                 &harmonics,

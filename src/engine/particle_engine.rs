@@ -23,6 +23,7 @@ use crate::fx::diffuser::Diffuser;
 use crate::noise::particle::Particle;
 use crate::utils::filter::{FilterMode, FrequencyApproximation, Svf};
 use crate::utils::units::semitones_to_ratio;
+use crate::utils::REFERENCE_SAMPLE_RATE;
 
 const NUM_PARTICLES: usize = 6;
 
@@ -33,6 +34,9 @@ pub struct ParticleEngine {
     post_filter: Svf,
 
     temp_buffer: Box<[f32]>,
+
+    // Sample rate dependent constants
+    sr_ratio: f32,
 }
 
 impl ParticleEngine {
@@ -42,6 +46,7 @@ impl ParticleEngine {
             diffuser: Diffuser::new(),
             post_filter: Svf::new(),
             temp_buffer: vec![0.0; block_size].into_boxed_slice(),
+            sr_ratio: 1.0,
         }
     }
 }
@@ -53,6 +58,7 @@ impl Engine for ParticleEngine {
         }
         self.diffuser.init(sample_rate_hz);
         self.post_filter.init();
+        self.sr_ratio = sample_rate_hz / REFERENCE_SAMPLE_RATE;
         self.reset();
     }
 
@@ -73,8 +79,13 @@ impl Engine for ParticleEngine {
             60.0 + parameters.timbre * parameters.timbre * 72.0,
             parameters.a0_normalized,
         );
-        let density = density_sqrt * density_sqrt * (1.0 / NUM_PARTICLES as f32);
-        let gain = 1.0 / density;
+        // `density_sqrt` is a normalized frequency, so the squared probability
+        // scales with 1/sr_ratio²; multiplying by sr_ratio keeps the impulse
+        // rate constant in Hz. The extra sr_ratio factor in the gain scales
+        // each impulse amplitude by sr_ratio, which keeps the impulse energy
+        // constant in absolute time.
+        let density = density_sqrt * density_sqrt * (1.0 / NUM_PARTICLES as f32) * self.sr_ratio;
+        let gain = self.sr_ratio / density;
         let q_sqrt = semitones_to_ratio(if parameters.morph >= 0.5 {
             (parameters.morph - 0.5) * 120.0
         } else {
@@ -95,7 +106,7 @@ impl Engine for ParticleEngine {
         aux.fill(0.0);
 
         for particle in &mut self.particle {
-            particle.render(sync, density, gain, f0, spread, q, out, aux);
+            particle.render(sync, density, gain, f0, spread, q, self.sr_ratio, out, aux);
         }
 
         self.post_filter

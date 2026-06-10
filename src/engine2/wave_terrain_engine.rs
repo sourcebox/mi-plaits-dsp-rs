@@ -24,12 +24,14 @@ use crate::oscillator::sine_oscillator::{sine, FastSineOscillator};
 use crate::oscillator::wavetable_oscillator::interpolate_wave;
 use crate::resources::waves::WAV_INTEGRATED_WAVES;
 use crate::utils::parameter_interpolator::SimpleParameterInterpolator;
+use crate::utils::REFERENCE_SAMPLE_RATE;
 
 #[derive(Debug, Clone)]
 pub struct WaveTerrainEngine<'a> {
     path: FastSineOscillator,
     offset: f32,
     terrain_idx: f32,
+    sr_ratio: f32,
 
     temp_buffer_1: Box<[f32]>,
     temp_buffer_2: Box<[f32]>,
@@ -43,6 +45,7 @@ impl<'a> WaveTerrainEngine<'a> {
             path: FastSineOscillator::new(),
             offset: 0.0,
             terrain_idx: 0.0,
+            sr_ratio: 1.0,
             temp_buffer_1: vec![0.0; block_size * 2].into_boxed_slice(),
             temp_buffer_2: vec![0.0; block_size * 2].into_boxed_slice(),
             user_terrain: None,
@@ -91,6 +94,7 @@ impl Engine for WaveTerrainEngine<'_> {
         self.path.init();
         self.offset = 0.0;
         self.terrain_idx = 0.0;
+        self.sr_ratio = _sample_rate_hz / REFERENCE_SAMPLE_RATE;
         self.user_terrain = None;
     }
 
@@ -105,7 +109,9 @@ impl Engine for WaveTerrainEngine<'_> {
         const SCALE: f32 = 1.0 / OVERSAMPLING as f32;
 
         let f0 = note_to_frequency(parameters.note, parameters.a0_normalized);
-        let attenuation = f32::max(1.0 - 8.0 * f0, 0.0);
+        // The radius limit is defined in terms of the normalized frequency
+        // at the reference rate.
+        let attenuation = f32::max(1.0 - 8.0 * f0 * self.sr_ratio, 0.0);
         let radius = 0.1 + 0.9 * parameters.timbre * attenuation * (2.0 - attenuation);
 
         // Use the "magic sine" algorithm to generate sin and cos functions for the

@@ -11,7 +11,9 @@ use crate::utils::filter::{DcBlocker, FilterMode, FrequencyApproximation, Svf};
 use crate::utils::parameter_interpolator::ParameterInterpolator;
 use crate::utils::random;
 use crate::utils::units::semitones_to_ratio;
-use crate::utils::{crossfade, interpolate, one_pole};
+use crate::utils::{
+    crossfade, interpolate, one_pole, scaled_smoothing_coefficient, REFERENCE_SAMPLE_RATE,
+};
 
 pub const DELAY_LINE_SIZE: usize = 1024;
 
@@ -64,8 +66,11 @@ impl String {
 
     pub fn init(&mut self, sample_rate_hz: f32) {
         self.sample_rate_hz = sample_rate_hz;
-        self.string.reset();
-        self.stretch.reset();
+        // Scale the delay lines so that the lowest playable note stays the
+        // same at any sample rate.
+        let scale = sample_rate_hz / REFERENCE_SAMPLE_RATE;
+        self.string.set_scale(scale);
+        self.stretch.set_scale(scale);
         self.iir_damping_filter.init();
         self.dc_blocker.init(1.0 - 20.0 / sample_rate_hz);
         self.dispersion_noise = 0.0;
@@ -130,7 +135,7 @@ impl String {
         out: &mut [f32],
         non_linearity: StringNonLinearity,
     ) {
-        let delay = (1.0 / f0).clamp(4.0, DELAY_LINE_SIZE as f32 - 4.0);
+        let delay = (1.0 / f0).clamp(4.0, self.string.max_delay() as f32 - 4.0);
 
         // If there is not enough delay time in the delay line, we play at the
         // lowest possible note and we upsample on the fly with a shitty linear
@@ -174,7 +179,10 @@ impl String {
             0.0
         };
         let noise_amount = noise_amount_sqrt * noise_amount_sqrt * 0.1;
-        let noise_filter = 0.06 + 0.94 * brightness * brightness;
+        let noise_filter = scaled_smoothing_coefficient(
+            0.06 + 0.94 * brightness * brightness,
+            REFERENCE_SAMPLE_RATE / self.sample_rate_hz,
+        );
 
         let bridge_curving_sqrt = non_linearity_amount;
         let bridge_curving = bridge_curving_sqrt * bridge_curving_sqrt * 0.01;

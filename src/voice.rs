@@ -276,10 +276,16 @@ impl Voice<'_> {
         }
 
         self.engine_quantizer.init(NUM_ENGINES as i32, 0.05, true);
-        self.out_post_processor.init();
-        self.aux_post_processor.init();
+        self.out_post_processor.init(sample_rate_hz);
+        self.aux_post_processor.init(sample_rate_hz);
         self.decay_envelope.init();
-        self.lpg_envelope.init();
+        self.lpg_envelope.init(sample_rate_hz);
+
+        // Keep the trigger delay constant in absolute time: the delay line is
+        // written to once per block, and the block rate scales with the
+        // sample rate.
+        self.trigger_delay
+            .set_scale(sample_rate_hz / crate::utils::REFERENCE_SAMPLE_RATE);
     }
 
     #[inline]
@@ -300,7 +306,9 @@ impl Voice<'_> {
         // Delay trigger by 1ms to deal with sequencers or MIDI interfaces whose
         // CV out lags behind the GATE out.
         self.trigger_delay.write(modulations.trigger);
-        let trigger_value = self.trigger_delay.read_with_delay(MAX_TRIGGER_DELAY);
+        let trigger_value = self
+            .trigger_delay
+            .read_with_delay(self.trigger_delay.max_delay());
 
         let previous_trigger_state = self.trigger_state;
 
@@ -500,7 +508,7 @@ impl Voice<'_> {
                     .process_ping(attack, short_decay, decay_tail, hf);
             }
         } else {
-            self.lpg_envelope.init();
+            self.lpg_envelope.reset();
         }
 
         self.out_post_processor.process(
@@ -572,13 +580,13 @@ impl ChannelPostProcessor {
         }
     }
 
-    pub fn init(&mut self) {
+    pub fn init(&mut self, sample_rate_hz: f32) {
         self.lpg.init();
-        self.reset();
+        self.limiter.init(sample_rate_hz);
     }
 
     pub fn reset(&mut self) {
-        self.limiter.init();
+        self.limiter.reset();
     }
 
     #[inline]
