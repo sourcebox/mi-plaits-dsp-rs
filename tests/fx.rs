@@ -1,11 +1,10 @@
 //! Tests for the effects
 
-mod modulation;
-mod wav_writer;
+mod common;
 
-use mi_plaits_dsp::oscillator::sine_oscillator::SineOscillator;
-
+use common::*;
 use mi_plaits_dsp::fx::*;
+use mi_plaits_dsp::oscillator::sine_oscillator::SineOscillator;
 
 const SAMPLE_RATE: f32 = 48000.0;
 const BLOCK_SIZE: usize = 24;
@@ -32,7 +31,7 @@ fn diffuser() {
         wav_data.extend_from_slice(&in_out);
     }
 
-    wav_writer::write("fx/diffuser/diffuser.wav", &wav_data).ok();
+    write_wav("fx/diffuser/diffuser.wav", &wav_data).ok();
 }
 
 #[test]
@@ -61,8 +60,8 @@ fn ensemble() {
         wav_data_right.extend_from_slice(&right);
     }
 
-    wav_writer::write("fx/ensemble/ensemble_left.wav", &wav_data_left).ok();
-    wav_writer::write("fx/ensemble/ensemble_right.wav", &wav_data_right).ok();
+    write_wav("fx/ensemble/ensemble_left.wav", &wav_data_left).ok();
+    write_wav("fx/ensemble/ensemble_right.wav", &wav_data_right).ok();
 }
 
 #[test]
@@ -82,12 +81,12 @@ fn sample_rate_reducer() {
 
     for n in 0..blocks {
         osc.render(f, &mut in_out);
-        let fx_f = modulation::ramp_up(n, blocks) * 0.1;
+        let fx_f = mod_ramp_up(n, blocks) * 0.1;
         fx.process(fx_f, &mut in_out, true);
         wav_data.extend_from_slice(&in_out);
     }
 
-    wav_writer::write("fx/sample_rate_reducer/sample_rate_reducer.wav", &wav_data).ok();
+    write_wav("fx/sample_rate_reducer/sample_rate_reducer.wav", &wav_data).ok();
 }
 
 #[test]
@@ -107,10 +106,10 @@ fn overdrive() {
 
     for n in 0..blocks {
         osc.render(f, &mut in_out);
-        let drive = modulation::ramp_up(n, blocks);
+        let drive = mod_ramp_up(n, blocks);
         fx.process(drive, &mut in_out);
         wav_data.extend_from_slice(&in_out);
     }
 
-    wav_writer::write("fx/overdrive/overdrive.wav", &wav_data).ok();
+    write_wav("fx/overdrive/overdrive.wav", &wav_data).ok();
 }

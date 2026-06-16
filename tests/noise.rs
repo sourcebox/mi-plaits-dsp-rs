@@ -1,7 +1,8 @@
 //! Tests for the noise generators
 
-mod wav_writer;
+mod common;
 
+use common::*;
 use mi_plaits_dsp::noise::*;
 
 const SAMPLE_RATE: f32 = 48000.0;
@@ -25,7 +26,7 @@ fn clocked_noise() {
         wav_data.extend_from_slice(&out);
     }
 
-    wav_writer::write("noises/clocked/clocked.wav", &wav_data).ok();
+    write_wav("noises/clocked/clocked.wav", &wav_data).ok();
 }
 
 #[test]
@@ -43,7 +44,7 @@ fn dust() {
         wav_data.push(out);
     }
 
-    wav_writer::write("noises/dust/dust.wav", &wav_data).ok();
+    write_wav("noises/dust/dust.wav", &wav_data).ok();
 }
 
 #[test]
@@ -74,8 +75,8 @@ fn particle() {
         wav_data_aux.extend_from_slice(&aux);
     }
 
-    wav_writer::write("noises/particle/particle.wav", &wav_data).ok();
-    wav_writer::write("noises/particle/particle_aux.wav", &wav_data_aux).ok();
+    write_wav("noises/particle/particle.wav", &wav_data).ok();
+    write_wav("noises/particle/particle_aux.wav", &wav_data_aux).ok();
 }
 
 #[test]
@@ -95,7 +96,7 @@ fn smooth_random_generator() {
         wav_data.push(out);
     }
 
-    wav_writer::write(
+    write_wav(
         "noises/smooth_random_generator/smooth_random_generator.wav",
         &wav_data,
     )

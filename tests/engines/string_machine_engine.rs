@@ -5,8 +5,7 @@ use mi_plaits_dsp::engine2::*;
 const SAMPLE_RATE: f32 = 48000.0;
 const A0_NORMALIZED: f32 = 55.0 / SAMPLE_RATE;
 
-use crate::modulation;
-use crate::wav_writer;
+use crate::common::*;
 
 const BLOCK_SIZE: usize = 24;
 
@@ -34,7 +33,7 @@ fn string_machine_engine_harmonics() {
             note: 48.0,
             timbre: 0.5,
             morph: 0.5,
-            harmonics: modulation::ramp_up(n, blocks),
+            harmonics: mod_ramp_up(n, blocks),
             accent: 1.0,
             a0_normalized: A0_NORMALIZED,
         };
@@ -44,12 +43,12 @@ fn string_machine_engine_harmonics() {
         wav_data_aux.extend_from_slice(&aux);
     }
 
-    wav_writer::write(
+    write_wav(
         "engines/string_machine/string_machine_harmonics.wav",
         &wav_data,
     )
     .ok();
-    wav_writer::write(
+    write_wav(
         "engines/string_machine/string_machine_harmonics_aux.wav",
         &wav_data_aux,
     )
@@ -78,7 +77,7 @@ fn string_machine_engine_timbre() {
                 TriggerState::Low
             },
             note: 48.0,
-            timbre: modulation::ramp_up(n, blocks),
+            timbre: mod_ramp_up(n, blocks),
             morph: 0.5,
             harmonics: 0.5,
             accent: 1.0,
@@ -90,12 +89,12 @@ fn string_machine_engine_timbre() {
         wav_data_aux.extend_from_slice(&aux);
     }
 
-    wav_writer::write(
+    write_wav(
         "engines/string_machine/string_machine_timbre.wav",
         &wav_data,
     )
     .ok();
-    wav_writer::write(
+    write_wav(
         "engines/string_machine/string_machine_timbre_aux.wav",
         &wav_data_aux,
     )
@@ -125,7 +124,7 @@ fn string_machine_engine_morph() {
             },
             note: 48.0,
             timbre: 0.5,
-            morph: modulation::ramp_up(n, blocks),
+            morph: mod_ramp_up(n, blocks),
             harmonics: 0.5,
             accent: 1.0,
             a0_normalized: A0_NORMALIZED,
@@ -136,8 +135,8 @@ fn string_machine_engine_morph() {
         wav_data_aux.extend_from_slice(&aux);
     }
 
-    wav_writer::write("engines/string_machine/string_machine_morph.wav", &wav_data).ok();
-    wav_writer::write(
+    write_wav("engines/string_machine/string_machine_morph.wav", &wav_data).ok();
+    write_wav(
         "engines/string_machine/string_machine_morph_aux.wav",
         &wav_data_aux,
     )

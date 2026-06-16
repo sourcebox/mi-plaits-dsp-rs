@@ -1,7 +1,8 @@
 //! Tests for the drums
 
-mod wav_writer;
+mod common;
 
+use common::*;
 use mi_plaits_dsp::drums::*;
 
 const SAMPLE_RATE: f32 = 48000.0;
@@ -41,7 +42,7 @@ fn analog_bass_drum() {
         wav_data.extend_from_slice(&out);
     }
 
-    wav_writer::write("drums/analog_bass_drum/analog_bass_drum.wav", &wav_data).ok();
+    write_wav("drums/analog_bass_drum/analog_bass_drum.wav", &wav_data).ok();
 }
 
 #[test]
@@ -67,7 +68,7 @@ fn analog_snare_drum() {
         wav_data.extend_from_slice(&out);
     }
 
-    wav_writer::write("drums/analog_snare_drum/analog_snare_drum.wav", &wav_data).ok();
+    write_wav("drums/analog_snare_drum/analog_snare_drum.wav", &wav_data).ok();
 }
 
 #[test]
@@ -110,7 +111,7 @@ fn hihat() {
         wav_data.extend_from_slice(&out);
     }
 
-    wav_writer::write("drums/hihat/hihat.wav", &wav_data).ok();
+    write_wav("drums/hihat/hihat.wav", &wav_data).ok();
 }
 
 #[test]
@@ -149,7 +150,7 @@ fn synthetic_bass_drum() {
         wav_data.extend_from_slice(&out);
     }
 
-    wav_writer::write(
+    write_wav(
         "drums/synthetic_bass_drum/synthetic_bass_drum.wav",
         &wav_data,
     )
@@ -181,7 +182,7 @@ fn synthetic_snare_drum() {
         wav_data.extend_from_slice(&out);
     }
 
-    wav_writer::write(
+    write_wav(
         "drums/synthetic_snare_drum/synthetic_snare_drum.wav",
         &wav_data,
     )

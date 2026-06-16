@@ -1,5 +1,4 @@
 //! Tests for the engines
 
+mod common;
 mod engines;
-mod modulation;
-mod wav_writer;

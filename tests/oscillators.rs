@@ -1,8 +1,8 @@
 //! Tests for the oscillators
 
-mod modulation;
-mod wav_writer;
+mod common;
 
+use common::*;
 use mi_plaits_dsp::oscillator::*;
 
 const SAMPLE_RATE: f32 = 48000.0;
@@ -25,12 +25,12 @@ fn formant_oscillator() {
     let f_formant = formant_frequency / SAMPLE_RATE;
 
     for n in 0..blocks {
-        let modulation = modulation::ramp_up(n, blocks);
+        let modulation = mod_ramp_up(n, blocks);
         osc.render(f_carrier, f_formant * modulation, phase_shift, &mut out);
         wav_data.extend_from_slice(&out);
     }
 
-    wav_writer::write("oscillators/formant/formant.wav", &wav_data).ok();
+    write_wav("oscillators/formant/formant.wav", &wav_data).ok();
 }
 
 #[test]
@@ -50,12 +50,12 @@ fn grainlet_oscillator() {
     let f_formant = formant_frequency / SAMPLE_RATE;
 
     for n in 0..blocks {
-        let modulation = modulation::ramp_up(n, blocks);
+        let modulation = mod_ramp_up(n, blocks);
         osc.render(f_carrier, f_formant, modulation, carrier_bleed, &mut out);
         wav_data.extend_from_slice(&out);
     }
 
-    wav_writer::write("oscillators/grainlet/grainlet.wav", &wav_data).ok();
+    write_wav("oscillators/grainlet/grainlet.wav", &wav_data).ok();
 }
 
 #[test]
@@ -74,14 +74,14 @@ fn harmonic_oscillator() {
     amplitudes[1] = 0.1;
 
     for n in 0..blocks {
-        let modulation = modulation::ramp_up(n, blocks);
+        let modulation = mod_ramp_up(n, blocks);
         amplitudes[0] = 0.5;
         amplitudes[5] = modulation;
         osc.render(f0, &amplitudes, &mut out, 1);
         wav_data.extend_from_slice(&out);
     }
 
-    wav_writer::write("oscillators/harmonic/harmonic.wav", &wav_data).ok();
+    write_wav("oscillators/harmonic/harmonic.wav", &wav_data).ok();
 }
 
 #[test]
@@ -102,7 +102,7 @@ fn nes_triangle_oscillator() {
         wav_data.extend_from_slice(&out);
     }
 
-    wav_writer::write("oscillators/nes_triangle/nes_triangle.wav", &wav_data).ok();
+    write_wav("oscillators/nes_triangle/nes_triangle.wav", &wav_data).ok();
 }
 
 #[test]
@@ -119,7 +119,7 @@ fn oscillator_impulse_train() {
     let f = frequency / SAMPLE_RATE;
 
     for n in 0..blocks {
-        let modulation = modulation::ramp_up(n, blocks);
+        let modulation = mod_ramp_up(n, blocks);
         let pw = modulation;
         osc.render(
             f,
@@ -132,7 +132,7 @@ fn oscillator_impulse_train() {
         wav_data.extend_from_slice(&out);
     }
 
-    wav_writer::write(
+    write_wav(
         "oscillators/oscillator/oscillator_impulse_train.wav",
         &wav_data,
     )
@@ -153,7 +153,7 @@ fn oscillator_saw() {
     let f = frequency / SAMPLE_RATE;
 
     for n in 0..blocks {
-        let modulation = modulation::ramp_up(n, blocks);
+        let modulation = mod_ramp_up(n, blocks);
         let pw = modulation;
         osc.render(
             f,
@@ -166,7 +166,7 @@ fn oscillator_saw() {
         wav_data.extend_from_slice(&out);
     }
 
-    wav_writer::write("oscillators/oscillator/oscillator_saw.wav", &wav_data).ok();
+    write_wav("oscillators/oscillator/oscillator_saw.wav", &wav_data).ok();
 }
 
 #[test]
@@ -183,7 +183,7 @@ fn oscillator_triangle() {
     let f = frequency / SAMPLE_RATE;
 
     for n in 0..blocks {
-        let modulation = modulation::ramp_up(n, blocks);
+        let modulation = mod_ramp_up(n, blocks);
         let pw = modulation;
         osc.render(
             f,
@@ -196,7 +196,7 @@ fn oscillator_triangle() {
         wav_data.extend_from_slice(&out);
     }
 
-    wav_writer::write("oscillators/oscillator/oscillator_triangle.wav", &wav_data).ok();
+    write_wav("oscillators/oscillator/oscillator_triangle.wav", &wav_data).ok();
 }
 
 #[test]
@@ -213,7 +213,7 @@ fn oscillator_slope() {
     let f = frequency / SAMPLE_RATE;
 
     for n in 0..blocks {
-        let modulation = modulation::ramp_up(n, blocks);
+        let modulation = mod_ramp_up(n, blocks);
         let pw = modulation;
         osc.render(
             f,
@@ -226,7 +226,7 @@ fn oscillator_slope() {
         wav_data.extend_from_slice(&out);
     }
 
-    wav_writer::write("oscillators/oscillator/oscillator_slope.wav", &wav_data).ok();
+    write_wav("oscillators/oscillator/oscillator_slope.wav", &wav_data).ok();
 }
 
 #[test]
@@ -243,7 +243,7 @@ fn oscillator_square() {
     let f = frequency / SAMPLE_RATE;
 
     for n in 0..blocks {
-        let modulation = modulation::ramp_up(n, blocks);
+        let modulation = mod_ramp_up(n, blocks);
         let pw = modulation;
         osc.render(
             f,
@@ -256,7 +256,7 @@ fn oscillator_square() {
         wav_data.extend_from_slice(&out);
     }
 
-    wav_writer::write("oscillators/oscillator/oscillator_square.wav", &wav_data).ok();
+    write_wav("oscillators/oscillator/oscillator_square.wav", &wav_data).ok();
 }
 
 #[test]
@@ -273,7 +273,7 @@ fn oscillator_square_bright() {
     let f = frequency / SAMPLE_RATE;
 
     for n in 0..blocks {
-        let modulation = modulation::ramp_up(n, blocks);
+        let modulation = mod_ramp_up(n, blocks);
         let pw = modulation;
         osc.render(
             f,
@@ -286,7 +286,7 @@ fn oscillator_square_bright() {
         wav_data.extend_from_slice(&out);
     }
 
-    wav_writer::write(
+    write_wav(
         "oscillators/oscillator/oscillator_square_bright.wav",
         &wav_data,
     )
@@ -307,7 +307,7 @@ fn oscillator_square_dark() {
     let f = frequency / SAMPLE_RATE;
 
     for n in 0..blocks {
-        let modulation = modulation::ramp_up(n, blocks);
+        let modulation = mod_ramp_up(n, blocks);
         let pw = modulation;
         osc.render(
             f,
@@ -320,7 +320,7 @@ fn oscillator_square_dark() {
         wav_data.extend_from_slice(&out);
     }
 
-    wav_writer::write(
+    write_wav(
         "oscillators/oscillator/oscillator_square_dark.wav",
         &wav_data,
     )
@@ -341,7 +341,7 @@ fn oscillator_square_triangle() {
     let f = frequency / SAMPLE_RATE;
 
     for n in 0..blocks {
-        let modulation = modulation::ramp_up(n, blocks);
+        let modulation = mod_ramp_up(n, blocks);
         let pw = modulation;
         osc.render(
             f,
@@ -354,7 +354,7 @@ fn oscillator_square_triangle() {
         wav_data.extend_from_slice(&out);
     }
 
-    wav_writer::write(
+    write_wav(
         "oscillators/oscillator/oscillator_square_triangle.wav",
         &wav_data,
     )
@@ -379,7 +379,7 @@ fn sine_oscillator() {
         wav_data.extend_from_slice(&out);
     }
 
-    wav_writer::write("oscillators/sine/sine.wav", &wav_data).ok();
+    write_wav("oscillators/sine/sine.wav", &wav_data).ok();
 }
 
 #[test]
@@ -400,7 +400,7 @@ fn fast_sine_oscillator() {
         wav_data.extend_from_slice(&out);
     }
 
-    wav_writer::write("oscillators/fast_sine/fast_sine.wav", &wav_data).ok();
+    write_wav("oscillators/fast_sine/fast_sine.wav", &wav_data).ok();
 }
 
 #[test]
@@ -423,7 +423,7 @@ fn string_synth_oscillator() {
         wav_data.extend_from_slice(&out);
     }
 
-    wav_writer::write("oscillators/string_synth/string_synth.wav", &wav_data).ok();
+    write_wav("oscillators/string_synth/string_synth.wav", &wav_data).ok();
 }
 
 #[test]
@@ -440,13 +440,13 @@ fn super_square_oscillator() {
     let f0 = frequency / SAMPLE_RATE;
 
     for n in 0..blocks {
-        let modulation = modulation::ramp_up(n, blocks);
+        let modulation = mod_ramp_up(n, blocks);
         let shape = modulation;
         osc.render(f0, shape, &mut out);
         wav_data.extend_from_slice(&out);
     }
 
-    wav_writer::write("oscillators/super_square/super_square.wav", &wav_data).ok();
+    write_wav("oscillators/super_square/super_square.wav", &wav_data).ok();
 }
 
 #[test]
@@ -464,13 +464,13 @@ fn variable_saw_oscillator() {
     let f = frequency / SAMPLE_RATE;
 
     for n in 0..blocks {
-        let modulation = modulation::ramp_up(n, blocks);
+        let modulation = mod_ramp_up(n, blocks);
         let pw = modulation;
         osc.render(f, pw, waveshape, &mut out);
         wav_data.extend_from_slice(&out);
     }
 
-    wav_writer::write("oscillators/variable_saw/variable_saw.wav", &wav_data).ok();
+    write_wav("oscillators/variable_saw/variable_saw.wav", &wav_data).ok();
 }
 
 #[test]
@@ -490,13 +490,13 @@ fn variable_shape_oscillator() {
     let f = frequency / SAMPLE_RATE;
 
     for n in 0..blocks {
-        let modulation = modulation::ramp_up(n, blocks);
+        let modulation = mod_ramp_up(n, blocks);
         let pw = modulation;
         osc.render(master_f, f, pw, waveshape, 0.0, &mut out, true, false);
         wav_data.extend_from_slice(&out);
     }
 
-    wav_writer::write("oscillators/variable_shape/variable_shape.wav", &wav_data).ok();
+    write_wav("oscillators/variable_shape/variable_shape.wav", &wav_data).ok();
 }
 
 #[test]
@@ -517,7 +517,7 @@ fn vosim_oscillator() {
     let formant_f_2 = formant_frequency_2 / SAMPLE_RATE;
 
     for n in 0..blocks {
-        let modulation = modulation::triangle(n, blocks, 1.0 / 8.0);
+        let modulation = mod_triangle(n, blocks, 1.0 / 8.0);
         osc.render(
             carrier_f,
             formant_f_1 * (1.0 + modulation),
@@ -528,7 +528,7 @@ fn vosim_oscillator() {
         wav_data.extend_from_slice(&out);
     }
 
-    wav_writer::write("oscillators/vosim/vosim.wav", &wav_data).ok();
+    write_wav("oscillators/vosim/vosim.wav", &wav_data).ok();
 }
 
 #[test]
@@ -554,14 +554,14 @@ fn wavetable_oscillator() {
     let f = frequency / SAMPLE_RATE;
 
     for n in 0..blocks {
-        let modulation = modulation::ramp_up(n, blocks);
+        let modulation = mod_ramp_up(n, blocks);
         let waveform = modulation;
         out.fill(0.0);
         osc.render(f, 1.0, waveform, &wavetable, &mut out, 128, 96, true, true);
         wav_data.extend_from_slice(&out);
     }
 
-    wav_writer::write("oscillators/wavetable/wavetable.wav", &wav_data).ok();
+    write_wav("oscillators/wavetable/wavetable.wav", &wav_data).ok();
 }
 
 #[test]
@@ -581,8 +581,8 @@ fn z_oscillator() {
     let formant_f = formant_frequency / SAMPLE_RATE;
 
     for n in 0..blocks {
-        let modulation = modulation::ramp_up(n, blocks);
-        let modulation_2 = modulation::ramp_up(n, blocks);
+        let modulation = mod_ramp_up(n, blocks);
+        let modulation_2 = mod_ramp_up(n, blocks);
         osc.render(
             carrier_f,
             formant_f * (1.0 + modulation * 8.0),
@@ -593,5 +593,5 @@ fn z_oscillator() {
         wav_data.extend_from_slice(&out);
     }
 
-    wav_writer::write("oscillators/z/z.wav", &wav_data).ok();
+    write_wav("oscillators/z/z.wav", &wav_data).ok();
 }

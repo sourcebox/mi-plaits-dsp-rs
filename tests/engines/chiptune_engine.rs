@@ -5,8 +5,7 @@ use mi_plaits_dsp::engine2::*;
 const SAMPLE_RATE: f32 = 48000.0;
 const A0_NORMALIZED: f32 = 55.0 / SAMPLE_RATE;
 
-use crate::modulation;
-use crate::wav_writer;
+use crate::common::*;
 
 const BLOCK_SIZE: usize = 24;
 
@@ -34,7 +33,7 @@ fn chiptune_engine_harmonics() {
             note: 48.0,
             timbre: 0.5,
             morph: 0.5,
-            harmonics: modulation::ramp_up(n, blocks),
+            harmonics: mod_ramp_up(n, blocks),
             accent: 1.0,
             a0_normalized: A0_NORMALIZED,
         };
@@ -44,8 +43,8 @@ fn chiptune_engine_harmonics() {
         wav_data_aux.extend_from_slice(&aux);
     }
 
-    wav_writer::write("engines/chiptune/chiptune_harmonics.wav", &wav_data).ok();
-    wav_writer::write("engines/chiptune/chiptune_harmonics_aux.wav", &wav_data_aux).ok();
+    write_wav("engines/chiptune/chiptune_harmonics.wav", &wav_data).ok();
+    write_wav("engines/chiptune/chiptune_harmonics_aux.wav", &wav_data_aux).ok();
 }
 
 #[test]
@@ -70,7 +69,7 @@ fn chiptune_engine_timbre() {
                 TriggerState::Low
             },
             note: 48.0,
-            timbre: modulation::ramp_up(n, blocks),
+            timbre: mod_ramp_up(n, blocks),
             morph: 0.5,
             harmonics: 0.5,
             accent: 1.0,
@@ -82,8 +81,8 @@ fn chiptune_engine_timbre() {
         wav_data_aux.extend_from_slice(&aux);
     }
 
-    wav_writer::write("engines/chiptune/chiptune_timbre.wav", &wav_data).ok();
-    wav_writer::write("engines/chiptune/chiptune_timbre_aux.wav", &wav_data_aux).ok();
+    write_wav("engines/chiptune/chiptune_timbre.wav", &wav_data).ok();
+    write_wav("engines/chiptune/chiptune_timbre_aux.wav", &wav_data_aux).ok();
 }
 
 #[test]
@@ -109,7 +108,7 @@ fn chiptune_engine_morph() {
             },
             note: 48.0,
             timbre: 0.5,
-            morph: modulation::ramp_up(n, blocks),
+            morph: mod_ramp_up(n, blocks),
             harmonics: 0.5,
             accent: 1.0,
             a0_normalized: A0_NORMALIZED,
@@ -120,6 +119,6 @@ fn chiptune_engine_morph() {
         wav_data_aux.extend_from_slice(&aux);
     }
 
-    wav_writer::write("engines/chiptune/chiptune_morph.wav", &wav_data).ok();
-    wav_writer::write("engines/chiptune/chiptune_morph_aux.wav", &wav_data_aux).ok();
+    write_wav("engines/chiptune/chiptune_morph.wav", &wav_data).ok();
+    write_wav("engines/chiptune/chiptune_morph_aux.wav", &wav_data_aux).ok();
 }
