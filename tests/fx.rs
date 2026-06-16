@@ -32,7 +32,7 @@ fn diffuser() {
         wav_data.extend_from_slice(&in_out);
     }
 
-    wav_writer::write("fx/diffuser.wav", &wav_data).ok();
+    wav_writer::write("fx/diffuser/diffuser.wav", &wav_data).ok();
 }
 
 #[test]
@@ -61,8 +61,8 @@ fn ensemble() {
         wav_data_right.extend_from_slice(&right);
     }
 
-    wav_writer::write("fx/ensemble_left.wav", &wav_data_left).ok();
-    wav_writer::write("fx/ensemble_right.wav", &wav_data_right).ok();
+    wav_writer::write("fx/ensemble/ensemble_left.wav", &wav_data_left).ok();
+    wav_writer::write("fx/ensemble/ensemble_right.wav", &wav_data_right).ok();
 }
 
 #[test]
@@ -87,7 +87,7 @@ fn sample_rate_reducer() {
         wav_data.extend_from_slice(&in_out);
     }
 
-    wav_writer::write("fx/sample_rate_reducer.wav", &wav_data).ok();
+    wav_writer::write("fx/sample_rate_reducer/sample_rate_reducer.wav", &wav_data).ok();
 }
 
 #[test]
@@ -112,5 +112,5 @@ fn overdrive() {
         wav_data.extend_from_slice(&in_out);
     }
 
-    wav_writer::write("fx/overdrive.wav", &wav_data).ok();
+    wav_writer::write("fx/overdrive/overdrive.wav", &wav_data).ok();
 }

@@ -59,8 +59,8 @@ fn all_engines() {
         }
     }
 
-    wav_writer::write("voice/all_engines.wav", &wav_data).ok();
-    wav_writer::write("voice/all_engines_aux.wav", &wav_data_aux).ok();
+    wav_writer::write("voice/all_engines/all_engines.wav", &wav_data).ok();
+    wav_writer::write("voice/all_engines/all_engines_aux.wav", &wav_data_aux).ok();
 }
 
 #[test]
@@ -116,6 +116,14 @@ fn all_engines_trigger() {
         }
     }
 
-    wav_writer::write("voice/all_engines_trigger.wav", &wav_data).ok();
-    wav_writer::write("voice/all_engines_trigger_aux.wav", &wav_data_aux).ok();
+    wav_writer::write(
+        "voice/all_engines_trigger/all_engines_trigger.wav",
+        &wav_data,
+    )
+    .ok();
+    wav_writer::write(
+        "voice/all_engines_trigger/all_engines_trigger_aux.wav",
+        &wav_data_aux,
+    )
+    .ok();
 }

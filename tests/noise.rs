@@ -25,7 +25,7 @@ fn clocked_noise() {
         wav_data.extend_from_slice(&out);
     }
 
-    wav_writer::write("noise/clocked.wav", &wav_data).ok();
+    wav_writer::write("noises/clocked/clocked.wav", &wav_data).ok();
 }
 
 #[test]
@@ -43,7 +43,7 @@ fn dust() {
         wav_data.push(out);
     }
 
-    wav_writer::write("noise/dust.wav", &wav_data).ok();
+    wav_writer::write("noises/dust/dust.wav", &wav_data).ok();
 }
 
 #[test]
@@ -74,8 +74,8 @@ fn particle() {
         wav_data_aux.extend_from_slice(&aux);
     }
 
-    wav_writer::write("noise/particle.wav", &wav_data).ok();
-    wav_writer::write("noise/particle_aux.wav", &wav_data_aux).ok();
+    wav_writer::write("noises/particle/particle.wav", &wav_data).ok();
+    wav_writer::write("noises/particle/particle_aux.wav", &wav_data_aux).ok();
 }
 
 #[test]
@@ -95,5 +95,9 @@ fn smooth_random_generator() {
         wav_data.push(out);
     }
 
-    wav_writer::write("noise/smooth_random_generator.wav", &wav_data).ok();
+    wav_writer::write(
+        "noises/smooth_random_generator/smooth_random_generator.wav",
+        &wav_data,
+    )
+    .ok();
 }

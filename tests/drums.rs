@@ -41,7 +41,7 @@ fn analog_bass_drum() {
         wav_data.extend_from_slice(&out);
     }
 
-    wav_writer::write("drums/analog_bass_drum.wav", &wav_data).ok();
+    wav_writer::write("drums/analog_bass_drum/analog_bass_drum.wav", &wav_data).ok();
 }
 
 #[test]
@@ -67,7 +67,7 @@ fn analog_snare_drum() {
         wav_data.extend_from_slice(&out);
     }
 
-    wav_writer::write("drums/analog_snare_drum.wav", &wav_data).ok();
+    wav_writer::write("drums/analog_snare_drum/analog_snare_drum.wav", &wav_data).ok();
 }
 
 #[test]
@@ -110,7 +110,7 @@ fn hihat() {
         wav_data.extend_from_slice(&out);
     }
 
-    wav_writer::write("drums/hihat.wav", &wav_data).ok();
+    wav_writer::write("drums/hihat/hihat.wav", &wav_data).ok();
 }
 
 #[test]
@@ -149,7 +149,11 @@ fn synthetic_bass_drum() {
         wav_data.extend_from_slice(&out);
     }
 
-    wav_writer::write("drums/synthetic_bass_drum.wav", &wav_data).ok();
+    wav_writer::write(
+        "drums/synthetic_bass_drum/synthetic_bass_drum.wav",
+        &wav_data,
+    )
+    .ok();
 }
 
 #[test]
@@ -177,5 +181,9 @@ fn synthetic_snare_drum() {
         wav_data.extend_from_slice(&out);
     }
 
-    wav_writer::write("drums/synthetic_snare_drum.wav", &wav_data).ok();
+    wav_writer::write(
+        "drums/synthetic_snare_drum/synthetic_snare_drum.wav",
+        &wav_data,
+    )
+    .ok();
 }

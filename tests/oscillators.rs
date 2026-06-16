@@ -30,7 +30,7 @@ fn formant_oscillator() {
         wav_data.extend_from_slice(&out);
     }
 
-    wav_writer::write("oscillator/formant.wav", &wav_data).ok();
+    wav_writer::write("oscillators/formant/formant.wav", &wav_data).ok();
 }
 
 #[test]
@@ -55,7 +55,7 @@ fn grainlet_oscillator() {
         wav_data.extend_from_slice(&out);
     }
 
-    wav_writer::write("oscillator/grainlet.wav", &wav_data).ok();
+    wav_writer::write("oscillators/grainlet/grainlet.wav", &wav_data).ok();
 }
 
 #[test]
@@ -81,7 +81,7 @@ fn harmonic_oscillator() {
         wav_data.extend_from_slice(&out);
     }
 
-    wav_writer::write("oscillator/harmonic.wav", &wav_data).ok();
+    wav_writer::write("oscillators/harmonic/harmonic.wav", &wav_data).ok();
 }
 
 #[test]
@@ -102,7 +102,7 @@ fn nes_triangle_oscillator() {
         wav_data.extend_from_slice(&out);
     }
 
-    wav_writer::write("oscillator/nes_triangle.wav", &wav_data).ok();
+    wav_writer::write("oscillators/nes_triangle/nes_triangle.wav", &wav_data).ok();
 }
 
 #[test]
@@ -132,7 +132,11 @@ fn oscillator_impulse_train() {
         wav_data.extend_from_slice(&out);
     }
 
-    wav_writer::write("oscillator/oscillator_impulse_train.wav", &wav_data).ok();
+    wav_writer::write(
+        "oscillators/oscillator/oscillator_impulse_train.wav",
+        &wav_data,
+    )
+    .ok();
 }
 
 #[test]
@@ -162,7 +166,7 @@ fn oscillator_saw() {
         wav_data.extend_from_slice(&out);
     }
 
-    wav_writer::write("oscillator/oscillator_saw.wav", &wav_data).ok();
+    wav_writer::write("oscillators/oscillator/oscillator_saw.wav", &wav_data).ok();
 }
 
 #[test]
@@ -192,7 +196,7 @@ fn oscillator_triangle() {
         wav_data.extend_from_slice(&out);
     }
 
-    wav_writer::write("oscillator/oscillator_triangle.wav", &wav_data).ok();
+    wav_writer::write("oscillators/oscillator/oscillator_triangle.wav", &wav_data).ok();
 }
 
 #[test]
@@ -222,7 +226,7 @@ fn oscillator_slope() {
         wav_data.extend_from_slice(&out);
     }
 
-    wav_writer::write("oscillator/oscillator_slope.wav", &wav_data).ok();
+    wav_writer::write("oscillators/oscillator/oscillator_slope.wav", &wav_data).ok();
 }
 
 #[test]
@@ -252,7 +256,7 @@ fn oscillator_square() {
         wav_data.extend_from_slice(&out);
     }
 
-    wav_writer::write("oscillator/oscillator_square.wav", &wav_data).ok();
+    wav_writer::write("oscillators/oscillator/oscillator_square.wav", &wav_data).ok();
 }
 
 #[test]
@@ -282,7 +286,11 @@ fn oscillator_square_bright() {
         wav_data.extend_from_slice(&out);
     }
 
-    wav_writer::write("oscillator/oscillator_square_bright.wav", &wav_data).ok();
+    wav_writer::write(
+        "oscillators/oscillator/oscillator_square_bright.wav",
+        &wav_data,
+    )
+    .ok();
 }
 
 #[test]
@@ -312,7 +320,11 @@ fn oscillator_square_dark() {
         wav_data.extend_from_slice(&out);
     }
 
-    wav_writer::write("oscillator/oscillator_square_dark.wav", &wav_data).ok();
+    wav_writer::write(
+        "oscillators/oscillator/oscillator_square_dark.wav",
+        &wav_data,
+    )
+    .ok();
 }
 
 #[test]
@@ -342,7 +354,11 @@ fn oscillator_square_triangle() {
         wav_data.extend_from_slice(&out);
     }
 
-    wav_writer::write("oscillator/oscillator_square_triangle.wav", &wav_data).ok();
+    wav_writer::write(
+        "oscillators/oscillator/oscillator_square_triangle.wav",
+        &wav_data,
+    )
+    .ok();
 }
 
 #[test]
@@ -363,7 +379,7 @@ fn sine_oscillator() {
         wav_data.extend_from_slice(&out);
     }
 
-    wav_writer::write("oscillator/sine.wav", &wav_data).ok();
+    wav_writer::write("oscillators/sine/sine.wav", &wav_data).ok();
 }
 
 #[test]
@@ -384,7 +400,7 @@ fn fast_sine_oscillator() {
         wav_data.extend_from_slice(&out);
     }
 
-    wav_writer::write("oscillator/fastsine.wav", &wav_data).ok();
+    wav_writer::write("oscillators/fast_sine/fast_sine.wav", &wav_data).ok();
 }
 
 #[test]
@@ -407,7 +423,7 @@ fn string_synth_oscillator() {
         wav_data.extend_from_slice(&out);
     }
 
-    wav_writer::write("oscillator/string_synth.wav", &wav_data).ok();
+    wav_writer::write("oscillators/string_synth/string_synth.wav", &wav_data).ok();
 }
 
 #[test]
@@ -430,7 +446,7 @@ fn super_square_oscillator() {
         wav_data.extend_from_slice(&out);
     }
 
-    wav_writer::write("oscillator/super_square.wav", &wav_data).ok();
+    wav_writer::write("oscillators/super_square/super_square.wav", &wav_data).ok();
 }
 
 #[test]
@@ -454,7 +470,7 @@ fn variable_saw_oscillator() {
         wav_data.extend_from_slice(&out);
     }
 
-    wav_writer::write("oscillator/variable_saw.wav", &wav_data).ok();
+    wav_writer::write("oscillators/variable_saw/variable_saw.wav", &wav_data).ok();
 }
 
 #[test]
@@ -480,7 +496,7 @@ fn variable_shape_oscillator() {
         wav_data.extend_from_slice(&out);
     }
 
-    wav_writer::write("oscillator/variable_shape.wav", &wav_data).ok();
+    wav_writer::write("oscillators/variable_shape/variable_shape.wav", &wav_data).ok();
 }
 
 #[test]
@@ -512,7 +528,7 @@ fn vosim_oscillator() {
         wav_data.extend_from_slice(&out);
     }
 
-    wav_writer::write("oscillator/vosim.wav", &wav_data).ok();
+    wav_writer::write("oscillators/vosim/vosim.wav", &wav_data).ok();
 }
 
 #[test]
@@ -545,7 +561,7 @@ fn wavetable_oscillator() {
         wav_data.extend_from_slice(&out);
     }
 
-    wav_writer::write("oscillator/wavetable.wav", &wav_data).ok();
+    wav_writer::write("oscillators/wavetable/wavetable.wav", &wav_data).ok();
 }
 
 #[test]
@@ -577,5 +593,5 @@ fn z_oscillator() {
         wav_data.extend_from_slice(&out);
     }
 
-    wav_writer::write("oscillator/z.wav", &wav_data).ok();
+    wav_writer::write("oscillators/z/z.wav", &wav_data).ok();
 }

@@ -51,8 +51,12 @@ fn modal_voice() {
         wav_data_aux.extend_from_slice(&aux);
     }
 
-    wav_writer::write("physical_modelling/modal_voice.wav", &wav_data).ok();
-    wav_writer::write("physical_modelling/modal_voice_aux.wav", &wav_data_aux).ok();
+    wav_writer::write("physical_modelling/modal_voice/modal_voice.wav", &wav_data).ok();
+    wav_writer::write(
+        "physical_modelling/modal_voice/modal_voice_aux.wav",
+        &wav_data_aux,
+    )
+    .ok();
 }
 
 #[test]
@@ -83,7 +87,7 @@ fn resonator() {
         wav_data.extend_from_slice(&out);
     }
 
-    wav_writer::write("physical_modelling/resonator.wav", &wav_data).ok();
+    wav_writer::write("physical_modelling/resonator/resonator.wav", &wav_data).ok();
 }
 
 #[test]
@@ -119,7 +123,7 @@ fn string() {
         wav_data.extend_from_slice(&out);
     }
 
-    wav_writer::write("physical_modelling/string.wav", &wav_data).ok();
+    wav_writer::write("physical_modelling/string/string.wav", &wav_data).ok();
 }
 
 #[test]
@@ -166,6 +170,14 @@ fn string_voice() {
         wav_data_aux.extend_from_slice(&aux);
     }
 
-    wav_writer::write("physical_modelling/string_voice.wav", &wav_data).ok();
-    wav_writer::write("physical_modelling/string_voice_aux.wav", &wav_data_aux).ok();
+    wav_writer::write(
+        "physical_modelling/string_voice/string_voice.wav",
+        &wav_data,
+    )
+    .ok();
+    wav_writer::write(
+        "physical_modelling/string_voice/string_voice_aux.wav",
+        &wav_data_aux,
+    )
+    .ok();
 }
