@@ -41,8 +41,18 @@ fn six_op_engine_harmonics() {
         wav_data_aux.extend_from_slice(&aux);
     }
 
-    write_wav("engines/six_op/six_op_harmonics.wav", &wav_data).ok();
-    write_wav("engines/six_op/six_op_harmonics_aux.wav", &wav_data_aux).ok();
+    write_wav(
+        "engines/six_op/six_op_harmonics.wav",
+        &wav_data,
+        SAMPLE_RATE as u32,
+    )
+    .ok();
+    write_wav(
+        "engines/six_op/six_op_harmonics_aux.wav",
+        &wav_data_aux,
+        SAMPLE_RATE as u32,
+    )
+    .ok();
 }
 
 #[test]
@@ -76,8 +86,18 @@ fn six_op_engine_timbre() {
         wav_data_aux.extend_from_slice(&aux);
     }
 
-    write_wav("engines/six_op/six_op_timbre.wav", &wav_data).ok();
-    write_wav("engines/six_op/six_op_timbre_aux.wav", &wav_data_aux).ok();
+    write_wav(
+        "engines/six_op/six_op_timbre.wav",
+        &wav_data,
+        SAMPLE_RATE as u32,
+    )
+    .ok();
+    write_wav(
+        "engines/six_op/six_op_timbre_aux.wav",
+        &wav_data_aux,
+        SAMPLE_RATE as u32,
+    )
+    .ok();
 }
 
 #[test]
@@ -111,6 +131,16 @@ fn six_op_engine_morph() {
         wav_data_aux.extend_from_slice(&aux);
     }
 
-    write_wav("engines/six_op/six_op_morph.wav", &wav_data).ok();
-    write_wav("engines/six_op/six_op_morph_aux.wav", &wav_data_aux).ok();
+    write_wav(
+        "engines/six_op/six_op_morph.wav",
+        &wav_data,
+        SAMPLE_RATE as u32,
+    )
+    .ok();
+    write_wav(
+        "engines/six_op/six_op_morph_aux.wav",
+        &wav_data_aux,
+        SAMPLE_RATE as u32,
+    )
+    .ok();
 }

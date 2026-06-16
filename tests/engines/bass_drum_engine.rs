@@ -42,10 +42,16 @@ fn bass_drum_engine_harmonics() {
         wav_data_aux.extend_from_slice(&aux);
     }
 
-    write_wav("engines/bass_drum/bass_drum_harmonics.wav", &wav_data).ok();
+    write_wav(
+        "engines/bass_drum/bass_drum_harmonics.wav",
+        &wav_data,
+        SAMPLE_RATE as u32,
+    )
+    .ok();
     write_wav(
         "engines/bass_drum/bass_drum_harmonics_aux.wav",
         &wav_data_aux,
+        SAMPLE_RATE as u32,
     )
     .ok();
 }
@@ -84,8 +90,18 @@ fn bass_drum_engine_timbre() {
         wav_data_aux.extend_from_slice(&aux);
     }
 
-    write_wav("engines/bass_drum/bass_drum_timbre.wav", &wav_data).ok();
-    write_wav("engines/bass_drum/bass_drum_timbre_aux.wav", &wav_data_aux).ok();
+    write_wav(
+        "engines/bass_drum/bass_drum_timbre.wav",
+        &wav_data,
+        SAMPLE_RATE as u32,
+    )
+    .ok();
+    write_wav(
+        "engines/bass_drum/bass_drum_timbre_aux.wav",
+        &wav_data_aux,
+        SAMPLE_RATE as u32,
+    )
+    .ok();
 }
 
 #[test]
@@ -122,6 +138,16 @@ fn bass_drum_engine_morph() {
         wav_data_aux.extend_from_slice(&aux);
     }
 
-    write_wav("engines/bass_drum/bass_drum_morph.wav", &wav_data).ok();
-    write_wav("engines/bass_drum/bass_drum_morph_aux.wav", &wav_data_aux).ok();
+    write_wav(
+        "engines/bass_drum/bass_drum_morph.wav",
+        &wav_data,
+        SAMPLE_RATE as u32,
+    )
+    .ok();
+    write_wav(
+        "engines/bass_drum/bass_drum_morph_aux.wav",
+        &wav_data_aux,
+        SAMPLE_RATE as u32,
+    )
+    .ok();
 }

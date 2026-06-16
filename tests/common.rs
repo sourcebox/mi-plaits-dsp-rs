@@ -6,12 +6,11 @@ use std::path::Path;
 
 use hound::*;
 
-const SAMPLE_RATE: f32 = 48000.0;
-
 /// Writes sample data as WAV file in 32-bit float format.
 pub fn write_wav(
     filename: impl AsRef<std::path::Path> + core::fmt::Display,
     samples: &[f32],
+    sample_rate: u32,
 ) -> std::io::Result<()> {
     let path = format!("out/{filename}");
     let path = Path::new(path.as_str());
@@ -22,7 +21,7 @@ pub fn write_wav(
 
     let spec = WavSpec {
         channels: 2,
-        sample_rate: SAMPLE_RATE as u32,
+        sample_rate,
         bits_per_sample: 32,
         sample_format: SampleFormat::Float,
     };

@@ -42,8 +42,13 @@ fn fm_engine_harmonics() {
         wav_data_aux.extend_from_slice(&aux);
     }
 
-    write_wav("engines/fm/fm_harmonics.wav", &wav_data).ok();
-    write_wav("engines/fm/fm_harmonics_aux.wav", &wav_data_aux).ok();
+    write_wav("engines/fm/fm_harmonics.wav", &wav_data, SAMPLE_RATE as u32).ok();
+    write_wav(
+        "engines/fm/fm_harmonics_aux.wav",
+        &wav_data_aux,
+        SAMPLE_RATE as u32,
+    )
+    .ok();
 }
 
 #[test]
@@ -80,8 +85,13 @@ fn fm_engine_timbre() {
         wav_data_aux.extend_from_slice(&aux);
     }
 
-    write_wav("engines/fm/fm_timbre.wav", &wav_data).ok();
-    write_wav("engines/fm/fm_timbre_aux.wav", &wav_data_aux).ok();
+    write_wav("engines/fm/fm_timbre.wav", &wav_data, SAMPLE_RATE as u32).ok();
+    write_wav(
+        "engines/fm/fm_timbre_aux.wav",
+        &wav_data_aux,
+        SAMPLE_RATE as u32,
+    )
+    .ok();
 }
 
 #[test]
@@ -118,6 +128,11 @@ fn fm_engine_morph() {
         wav_data_aux.extend_from_slice(&aux);
     }
 
-    write_wav("engines/fm/fm_morph.wav", &wav_data).ok();
-    write_wav("engines/fm/fm_morph_aux.wav", &wav_data_aux).ok();
+    write_wav("engines/fm/fm_morph.wav", &wav_data, SAMPLE_RATE as u32).ok();
+    write_wav(
+        "engines/fm/fm_morph_aux.wav",
+        &wav_data_aux,
+        SAMPLE_RATE as u32,
+    )
+    .ok();
 }

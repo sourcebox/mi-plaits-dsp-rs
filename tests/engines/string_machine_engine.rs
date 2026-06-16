@@ -46,11 +46,13 @@ fn string_machine_engine_harmonics() {
     write_wav(
         "engines/string_machine/string_machine_harmonics.wav",
         &wav_data,
+        SAMPLE_RATE as u32,
     )
     .ok();
     write_wav(
         "engines/string_machine/string_machine_harmonics_aux.wav",
         &wav_data_aux,
+        SAMPLE_RATE as u32,
     )
     .ok();
 }
@@ -92,11 +94,13 @@ fn string_machine_engine_timbre() {
     write_wav(
         "engines/string_machine/string_machine_timbre.wav",
         &wav_data,
+        SAMPLE_RATE as u32,
     )
     .ok();
     write_wav(
         "engines/string_machine/string_machine_timbre_aux.wav",
         &wav_data_aux,
+        SAMPLE_RATE as u32,
     )
     .ok();
 }
@@ -135,10 +139,16 @@ fn string_machine_engine_morph() {
         wav_data_aux.extend_from_slice(&aux);
     }
 
-    write_wav("engines/string_machine/string_machine_morph.wav", &wav_data).ok();
+    write_wav(
+        "engines/string_machine/string_machine_morph.wav",
+        &wav_data,
+        SAMPLE_RATE as u32,
+    )
+    .ok();
     write_wav(
         "engines/string_machine/string_machine_morph_aux.wav",
         &wav_data_aux,
+        SAMPLE_RATE as u32,
     )
     .ok();
 }

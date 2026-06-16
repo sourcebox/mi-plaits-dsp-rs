@@ -46,11 +46,13 @@ fn virtual_analog_vcf_engine_harmonics() {
     write_wav(
         "engines/virtual_analog_vcf/virtual_analog_vcf_harmonics.wav",
         &wav_data,
+        SAMPLE_RATE as u32,
     )
     .ok();
     write_wav(
         "engines/virtual_analog_vcf/virtual_analog_vcf_harmonics_aux.wav",
         &wav_data_aux,
+        SAMPLE_RATE as u32,
     )
     .ok();
 }
@@ -92,11 +94,13 @@ fn virtual_analog_vcf_engine_timbre() {
     write_wav(
         "engines/virtual_analog_vcf/virtual_analog_vcf_timbre.wav",
         &wav_data,
+        SAMPLE_RATE as u32,
     )
     .ok();
     write_wav(
         "engines/virtual_analog_vcf/virtual_analog_vcf_timbre_aux.wav",
         &wav_data_aux,
+        SAMPLE_RATE as u32,
     )
     .ok();
 }
@@ -138,11 +142,13 @@ fn virtual_analog_vcf_engine_morph() {
     write_wav(
         "engines/virtual_analog_vcf/virtual_analog_vcf_morph.wav",
         &wav_data,
+        SAMPLE_RATE as u32,
     )
     .ok();
     write_wav(
         "engines/virtual_analog_vcf/virtual_analog_vcf_morph_aux.wav",
         &wav_data_aux,
+        SAMPLE_RATE as u32,
     )
     .ok();
 }

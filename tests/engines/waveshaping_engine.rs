@@ -42,10 +42,16 @@ fn waveshaping_engine_harmonics() {
         wav_data_aux.extend_from_slice(&aux);
     }
 
-    write_wav("engines/waveshaping/waveshaping_harmonics.wav", &wav_data).ok();
+    write_wav(
+        "engines/waveshaping/waveshaping_harmonics.wav",
+        &wav_data,
+        SAMPLE_RATE as u32,
+    )
+    .ok();
     write_wav(
         "engines/waveshaping/waveshaping_harmonics_aux.wav",
         &wav_data_aux,
+        SAMPLE_RATE as u32,
     )
     .ok();
 }
@@ -84,10 +90,16 @@ fn waveshaping_engine_timbre() {
         wav_data_aux.extend_from_slice(&aux);
     }
 
-    write_wav("engines/waveshaping/waveshaping_timbre.wav", &wav_data).ok();
+    write_wav(
+        "engines/waveshaping/waveshaping_timbre.wav",
+        &wav_data,
+        SAMPLE_RATE as u32,
+    )
+    .ok();
     write_wav(
         "engines/waveshaping/waveshaping_timbre_aux.wav",
         &wav_data_aux,
+        SAMPLE_RATE as u32,
     )
     .ok();
 }
@@ -126,10 +138,16 @@ fn waveshaping_engine_morph() {
         wav_data_aux.extend_from_slice(&aux);
     }
 
-    write_wav("engines/waveshaping/waveshaping_morph.wav", &wav_data).ok();
+    write_wav(
+        "engines/waveshaping/waveshaping_morph.wav",
+        &wav_data,
+        SAMPLE_RATE as u32,
+    )
+    .ok();
     write_wav(
         "engines/waveshaping/waveshaping_morph_aux.wav",
         &wav_data_aux,
+        SAMPLE_RATE as u32,
     )
     .ok();
 }

@@ -52,10 +52,16 @@ fn modal_voice() {
         wav_data_aux.extend_from_slice(&aux);
     }
 
-    write_wav("physical_modelling/modal_voice/modal_voice.wav", &wav_data).ok();
+    write_wav(
+        "physical_modelling/modal_voice/modal_voice.wav",
+        &wav_data,
+        SAMPLE_RATE as u32,
+    )
+    .ok();
     write_wav(
         "physical_modelling/modal_voice/modal_voice_aux.wav",
         &wav_data_aux,
+        SAMPLE_RATE as u32,
     )
     .ok();
 }
@@ -88,7 +94,12 @@ fn resonator() {
         wav_data.extend_from_slice(&out);
     }
 
-    write_wav("physical_modelling/resonator/resonator.wav", &wav_data).ok();
+    write_wav(
+        "physical_modelling/resonator/resonator.wav",
+        &wav_data,
+        SAMPLE_RATE as u32,
+    )
+    .ok();
 }
 
 #[test]
@@ -124,7 +135,12 @@ fn string() {
         wav_data.extend_from_slice(&out);
     }
 
-    write_wav("physical_modelling/string/string.wav", &wav_data).ok();
+    write_wav(
+        "physical_modelling/string/string.wav",
+        &wav_data,
+        SAMPLE_RATE as u32,
+    )
+    .ok();
 }
 
 #[test]
@@ -174,11 +190,13 @@ fn string_voice() {
     write_wav(
         "physical_modelling/string_voice/string_voice.wav",
         &wav_data,
+        SAMPLE_RATE as u32,
     )
     .ok();
     write_wav(
         "physical_modelling/string_voice/string_voice_aux.wav",
         &wav_data_aux,
+        SAMPLE_RATE as u32,
     )
     .ok();
 }

@@ -43,10 +43,16 @@ fn wave_terrain_engine_harmonics() {
         wav_data_aux.extend_from_slice(&aux);
     }
 
-    write_wav("engines/wave_terrain/wave_terrain_harmonics.wav", &wav_data).ok();
+    write_wav(
+        "engines/wave_terrain/wave_terrain_harmonics.wav",
+        &wav_data,
+        SAMPLE_RATE as u32,
+    )
+    .ok();
     write_wav(
         "engines/wave_terrain/wave_terrain_harmonics_aux.wav",
         &wav_data_aux,
+        SAMPLE_RATE as u32,
     )
     .ok();
 }
@@ -85,10 +91,16 @@ fn wave_terrain_engine_timbre() {
         wav_data_aux.extend_from_slice(&aux);
     }
 
-    write_wav("engines/wave_terrain/wave_terrain_timbre.wav", &wav_data).ok();
+    write_wav(
+        "engines/wave_terrain/wave_terrain_timbre.wav",
+        &wav_data,
+        SAMPLE_RATE as u32,
+    )
+    .ok();
     write_wav(
         "engines/wave_terrain/wave_terrain_timbre_aux.wav",
         &wav_data_aux,
+        SAMPLE_RATE as u32,
     )
     .ok();
 }
@@ -127,10 +139,16 @@ fn wave_terrain_engine_morph() {
         wav_data_aux.extend_from_slice(&aux);
     }
 
-    write_wav("engines/wave_terrain/wave_terrain_morph.wav", &wav_data).ok();
+    write_wav(
+        "engines/wave_terrain/wave_terrain_morph.wav",
+        &wav_data,
+        SAMPLE_RATE as u32,
+    )
+    .ok();
     write_wav(
         "engines/wave_terrain/wave_terrain_morph_aux.wav",
         &wav_data_aux,
+        SAMPLE_RATE as u32,
     )
     .ok();
 }

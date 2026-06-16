@@ -30,7 +30,12 @@ fn formant_oscillator() {
         wav_data.extend_from_slice(&out);
     }
 
-    write_wav("oscillators/formant/formant.wav", &wav_data).ok();
+    write_wav(
+        "oscillators/formant/formant.wav",
+        &wav_data,
+        SAMPLE_RATE as u32,
+    )
+    .ok();
 }
 
 #[test]
@@ -55,7 +60,12 @@ fn grainlet_oscillator() {
         wav_data.extend_from_slice(&out);
     }
 
-    write_wav("oscillators/grainlet/grainlet.wav", &wav_data).ok();
+    write_wav(
+        "oscillators/grainlet/grainlet.wav",
+        &wav_data,
+        SAMPLE_RATE as u32,
+    )
+    .ok();
 }
 
 #[test]
@@ -81,7 +91,12 @@ fn harmonic_oscillator() {
         wav_data.extend_from_slice(&out);
     }
 
-    write_wav("oscillators/harmonic/harmonic.wav", &wav_data).ok();
+    write_wav(
+        "oscillators/harmonic/harmonic.wav",
+        &wav_data,
+        SAMPLE_RATE as u32,
+    )
+    .ok();
 }
 
 #[test]
@@ -102,7 +117,12 @@ fn nes_triangle_oscillator() {
         wav_data.extend_from_slice(&out);
     }
 
-    write_wav("oscillators/nes_triangle/nes_triangle.wav", &wav_data).ok();
+    write_wav(
+        "oscillators/nes_triangle/nes_triangle.wav",
+        &wav_data,
+        SAMPLE_RATE as u32,
+    )
+    .ok();
 }
 
 #[test]
@@ -135,6 +155,7 @@ fn oscillator_impulse_train() {
     write_wav(
         "oscillators/oscillator/oscillator_impulse_train.wav",
         &wav_data,
+        SAMPLE_RATE as u32,
     )
     .ok();
 }
@@ -166,7 +187,12 @@ fn oscillator_saw() {
         wav_data.extend_from_slice(&out);
     }
 
-    write_wav("oscillators/oscillator/oscillator_saw.wav", &wav_data).ok();
+    write_wav(
+        "oscillators/oscillator/oscillator_saw.wav",
+        &wav_data,
+        SAMPLE_RATE as u32,
+    )
+    .ok();
 }
 
 #[test]
@@ -196,7 +222,12 @@ fn oscillator_triangle() {
         wav_data.extend_from_slice(&out);
     }
 
-    write_wav("oscillators/oscillator/oscillator_triangle.wav", &wav_data).ok();
+    write_wav(
+        "oscillators/oscillator/oscillator_triangle.wav",
+        &wav_data,
+        SAMPLE_RATE as u32,
+    )
+    .ok();
 }
 
 #[test]
@@ -226,7 +257,12 @@ fn oscillator_slope() {
         wav_data.extend_from_slice(&out);
     }
 
-    write_wav("oscillators/oscillator/oscillator_slope.wav", &wav_data).ok();
+    write_wav(
+        "oscillators/oscillator/oscillator_slope.wav",
+        &wav_data,
+        SAMPLE_RATE as u32,
+    )
+    .ok();
 }
 
 #[test]
@@ -256,7 +292,12 @@ fn oscillator_square() {
         wav_data.extend_from_slice(&out);
     }
 
-    write_wav("oscillators/oscillator/oscillator_square.wav", &wav_data).ok();
+    write_wav(
+        "oscillators/oscillator/oscillator_square.wav",
+        &wav_data,
+        SAMPLE_RATE as u32,
+    )
+    .ok();
 }
 
 #[test]
@@ -289,6 +330,7 @@ fn oscillator_square_bright() {
     write_wav(
         "oscillators/oscillator/oscillator_square_bright.wav",
         &wav_data,
+        SAMPLE_RATE as u32,
     )
     .ok();
 }
@@ -323,6 +365,7 @@ fn oscillator_square_dark() {
     write_wav(
         "oscillators/oscillator/oscillator_square_dark.wav",
         &wav_data,
+        SAMPLE_RATE as u32,
     )
     .ok();
 }
@@ -357,6 +400,7 @@ fn oscillator_square_triangle() {
     write_wav(
         "oscillators/oscillator/oscillator_square_triangle.wav",
         &wav_data,
+        SAMPLE_RATE as u32,
     )
     .ok();
 }
@@ -379,7 +423,7 @@ fn sine_oscillator() {
         wav_data.extend_from_slice(&out);
     }
 
-    write_wav("oscillators/sine/sine.wav", &wav_data).ok();
+    write_wav("oscillators/sine/sine.wav", &wav_data, SAMPLE_RATE as u32).ok();
 }
 
 #[test]
@@ -400,7 +444,12 @@ fn fast_sine_oscillator() {
         wav_data.extend_from_slice(&out);
     }
 
-    write_wav("oscillators/fast_sine/fast_sine.wav", &wav_data).ok();
+    write_wav(
+        "oscillators/fast_sine/fast_sine.wav",
+        &wav_data,
+        SAMPLE_RATE as u32,
+    )
+    .ok();
 }
 
 #[test]
@@ -423,7 +472,12 @@ fn string_synth_oscillator() {
         wav_data.extend_from_slice(&out);
     }
 
-    write_wav("oscillators/string_synth/string_synth.wav", &wav_data).ok();
+    write_wav(
+        "oscillators/string_synth/string_synth.wav",
+        &wav_data,
+        SAMPLE_RATE as u32,
+    )
+    .ok();
 }
 
 #[test]
@@ -446,7 +500,12 @@ fn super_square_oscillator() {
         wav_data.extend_from_slice(&out);
     }
 
-    write_wav("oscillators/super_square/super_square.wav", &wav_data).ok();
+    write_wav(
+        "oscillators/super_square/super_square.wav",
+        &wav_data,
+        SAMPLE_RATE as u32,
+    )
+    .ok();
 }
 
 #[test]
@@ -470,7 +529,12 @@ fn variable_saw_oscillator() {
         wav_data.extend_from_slice(&out);
     }
 
-    write_wav("oscillators/variable_saw/variable_saw.wav", &wav_data).ok();
+    write_wav(
+        "oscillators/variable_saw/variable_saw.wav",
+        &wav_data,
+        SAMPLE_RATE as u32,
+    )
+    .ok();
 }
 
 #[test]
@@ -496,7 +560,12 @@ fn variable_shape_oscillator() {
         wav_data.extend_from_slice(&out);
     }
 
-    write_wav("oscillators/variable_shape/variable_shape.wav", &wav_data).ok();
+    write_wav(
+        "oscillators/variable_shape/variable_shape.wav",
+        &wav_data,
+        SAMPLE_RATE as u32,
+    )
+    .ok();
 }
 
 #[test]
@@ -528,7 +597,7 @@ fn vosim_oscillator() {
         wav_data.extend_from_slice(&out);
     }
 
-    write_wav("oscillators/vosim/vosim.wav", &wav_data).ok();
+    write_wav("oscillators/vosim/vosim.wav", &wav_data, SAMPLE_RATE as u32).ok();
 }
 
 #[test]
@@ -561,7 +630,12 @@ fn wavetable_oscillator() {
         wav_data.extend_from_slice(&out);
     }
 
-    write_wav("oscillators/wavetable/wavetable.wav", &wav_data).ok();
+    write_wav(
+        "oscillators/wavetable/wavetable.wav",
+        &wav_data,
+        SAMPLE_RATE as u32,
+    )
+    .ok();
 }
 
 #[test]
@@ -593,5 +667,5 @@ fn z_oscillator() {
         wav_data.extend_from_slice(&out);
     }
 
-    write_wav("oscillators/z/z.wav", &wav_data).ok();
+    write_wav("oscillators/z/z.wav", &wav_data, SAMPLE_RATE as u32).ok();
 }

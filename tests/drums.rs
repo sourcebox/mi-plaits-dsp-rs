@@ -42,7 +42,12 @@ fn analog_bass_drum() {
         wav_data.extend_from_slice(&out);
     }
 
-    write_wav("drums/analog_bass_drum/analog_bass_drum.wav", &wav_data).ok();
+    write_wav(
+        "drums/analog_bass_drum/analog_bass_drum.wav",
+        &wav_data,
+        SAMPLE_RATE as u32,
+    )
+    .ok();
 }
 
 #[test]
@@ -68,7 +73,12 @@ fn analog_snare_drum() {
         wav_data.extend_from_slice(&out);
     }
 
-    write_wav("drums/analog_snare_drum/analog_snare_drum.wav", &wav_data).ok();
+    write_wav(
+        "drums/analog_snare_drum/analog_snare_drum.wav",
+        &wav_data,
+        SAMPLE_RATE as u32,
+    )
+    .ok();
 }
 
 #[test]
@@ -111,7 +121,7 @@ fn hihat() {
         wav_data.extend_from_slice(&out);
     }
 
-    write_wav("drums/hihat/hihat.wav", &wav_data).ok();
+    write_wav("drums/hihat/hihat.wav", &wav_data, SAMPLE_RATE as u32).ok();
 }
 
 #[test]
@@ -153,6 +163,7 @@ fn synthetic_bass_drum() {
     write_wav(
         "drums/synthetic_bass_drum/synthetic_bass_drum.wav",
         &wav_data,
+        SAMPLE_RATE as u32,
     )
     .ok();
 }
@@ -185,6 +196,7 @@ fn synthetic_snare_drum() {
     write_wav(
         "drums/synthetic_snare_drum/synthetic_snare_drum.wav",
         &wav_data,
+        SAMPLE_RATE as u32,
     )
     .ok();
 }

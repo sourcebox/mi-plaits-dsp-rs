@@ -31,7 +31,7 @@ fn diffuser() {
         wav_data.extend_from_slice(&in_out);
     }
 
-    write_wav("fx/diffuser/diffuser.wav", &wav_data).ok();
+    write_wav("fx/diffuser/diffuser.wav", &wav_data, SAMPLE_RATE as u32).ok();
 }
 
 #[test]
@@ -60,8 +60,18 @@ fn ensemble() {
         wav_data_right.extend_from_slice(&right);
     }
 
-    write_wav("fx/ensemble/ensemble_left.wav", &wav_data_left).ok();
-    write_wav("fx/ensemble/ensemble_right.wav", &wav_data_right).ok();
+    write_wav(
+        "fx/ensemble/ensemble_left.wav",
+        &wav_data_left,
+        SAMPLE_RATE as u32,
+    )
+    .ok();
+    write_wav(
+        "fx/ensemble/ensemble_right.wav",
+        &wav_data_right,
+        SAMPLE_RATE as u32,
+    )
+    .ok();
 }
 
 #[test]
@@ -86,7 +96,12 @@ fn sample_rate_reducer() {
         wav_data.extend_from_slice(&in_out);
     }
 
-    write_wav("fx/sample_rate_reducer/sample_rate_reducer.wav", &wav_data).ok();
+    write_wav(
+        "fx/sample_rate_reducer/sample_rate_reducer.wav",
+        &wav_data,
+        SAMPLE_RATE as u32,
+    )
+    .ok();
 }
 
 #[test]
@@ -111,5 +126,5 @@ fn overdrive() {
         wav_data.extend_from_slice(&in_out);
     }
 
-    write_wav("fx/overdrive/overdrive.wav", &wav_data).ok();
+    write_wav("fx/overdrive/overdrive.wav", &wav_data, SAMPLE_RATE as u32).ok();
 }

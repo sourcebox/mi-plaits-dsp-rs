@@ -60,8 +60,18 @@ fn all_engines() {
         }
     }
 
-    write_wav("voice/all_engines/all_engines.wav", &wav_data).ok();
-    write_wav("voice/all_engines/all_engines_aux.wav", &wav_data_aux).ok();
+    write_wav(
+        "voice/all_engines/all_engines.wav",
+        &wav_data,
+        SAMPLE_RATE as u32,
+    )
+    .ok();
+    write_wav(
+        "voice/all_engines/all_engines_aux.wav",
+        &wav_data_aux,
+        SAMPLE_RATE as u32,
+    )
+    .ok();
 }
 
 #[test]
@@ -120,11 +130,13 @@ fn all_engines_trigger() {
     write_wav(
         "voice/all_engines_trigger/all_engines_trigger.wav",
         &wav_data,
+        SAMPLE_RATE as u32,
     )
     .ok();
     write_wav(
         "voice/all_engines_trigger/all_engines_trigger_aux.wav",
         &wav_data_aux,
+        SAMPLE_RATE as u32,
     )
     .ok();
 }
