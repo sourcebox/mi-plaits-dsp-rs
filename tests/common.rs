@@ -6,6 +6,9 @@ use std::path::Path;
 
 use hound::*;
 
+/// List of sample rates used for tests.
+pub const SAMPLE_RATES: [u32; 3] = [44100, 48000, 96000];
+
 /// Writes sample data as WAV file in 32-bit float format.
 pub fn write_wav(
     filename: impl AsRef<std::path::Path> + core::fmt::Display,
