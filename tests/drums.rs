@@ -5,7 +5,6 @@ mod common;
 use common::*;
 use mi_plaits_dsp::drums::*;
 
-const SAMPLE_RATE: f32 = 48000.0;
 const BLOCK_SIZE: usize = 24;
 
 #[test]
@@ -18,36 +17,34 @@ fn analog_bass_drum() {
     let self_fm_amount = 0.0;
     let duration = 0.5;
 
-    let mut drum = analog_bass_drum::AnalogBassDrum::new();
-    let mut out = [0.0; BLOCK_SIZE];
-    let mut wav_data = Vec::new();
-    drum.init(SAMPLE_RATE);
+    for sample_rate in SAMPLE_RATES {
+        let mut drum = analog_bass_drum::AnalogBassDrum::new();
+        let mut out = [0.0; BLOCK_SIZE];
+        let mut wav_data = Vec::new();
+        drum.init(sample_rate as f32);
 
-    let blocks = (duration * SAMPLE_RATE / (BLOCK_SIZE as f32)) as usize;
-    let f0 = frequency / SAMPLE_RATE;
+        let blocks = (duration * sample_rate as f32 / (BLOCK_SIZE as f32)) as usize;
+        let f0 = frequency / sample_rate as f32;
 
-    for n in 0..blocks {
-        let trigger = n == 0;
-        drum.render(
-            false,
-            trigger,
-            accent,
-            f0,
-            tone,
-            decay,
-            attack_fm_amount,
-            self_fm_amount,
-            &mut out,
-        );
-        wav_data.extend_from_slice(&out);
+        for n in 0..blocks {
+            let trigger = n == 0;
+            drum.render(
+                false,
+                trigger,
+                accent,
+                f0,
+                tone,
+                decay,
+                attack_fm_amount,
+                self_fm_amount,
+                &mut out,
+            );
+            wav_data.extend_from_slice(&out);
+        }
+
+        let filename = format!("drums/analog_bass_drum/analog_bass_drum_{sample_rate}.wav");
+        write_wav(filename, &wav_data, sample_rate).ok();
     }
-
-    write_wav(
-        "drums/analog_bass_drum/analog_bass_drum.wav",
-        &wav_data,
-        SAMPLE_RATE as u32,
-    )
-    .ok();
 }
 
 #[test]
@@ -59,26 +56,24 @@ fn analog_snare_drum() {
     let snappy = 0.2;
     let duration = 0.5;
 
-    let mut drum = analog_snare_drum::AnalogSnareDrum::new();
-    let mut out = [0.0; BLOCK_SIZE];
-    let mut wav_data = Vec::new();
-    drum.init(SAMPLE_RATE);
+    for sample_rate in SAMPLE_RATES {
+        let mut drum = analog_snare_drum::AnalogSnareDrum::new();
+        let mut out = [0.0; BLOCK_SIZE];
+        let mut wav_data = Vec::new();
+        drum.init(sample_rate as f32);
 
-    let blocks = (duration * SAMPLE_RATE / (BLOCK_SIZE as f32)) as usize;
-    let f0 = frequency / SAMPLE_RATE;
+        let blocks = (duration * sample_rate as f32 / (BLOCK_SIZE as f32)) as usize;
+        let f0 = frequency / sample_rate as f32;
 
-    for n in 0..blocks {
-        let trigger = n == 0;
-        drum.render(false, trigger, accent, f0, tone, decay, snappy, &mut out);
-        wav_data.extend_from_slice(&out);
+        for n in 0..blocks {
+            let trigger = n == 0;
+            drum.render(false, trigger, accent, f0, tone, decay, snappy, &mut out);
+            wav_data.extend_from_slice(&out);
+        }
+
+        let filename = format!("drums/analog_snare_drum/analog_snare_drum_{sample_rate}.wav");
+        write_wav(filename, &wav_data, sample_rate).ok();
     }
-
-    write_wav(
-        "drums/analog_snare_drum/analog_snare_drum.wav",
-        &wav_data,
-        SAMPLE_RATE as u32,
-    )
-    .ok();
 }
 
 #[test]
@@ -90,38 +85,41 @@ fn hihat() {
     let noisiness = 0.0;
     let duration = 0.5;
 
-    let mut drum = hihat::Hihat::new();
-    let mut out = [0.0; BLOCK_SIZE];
-    let mut temp_1 = [0.0; BLOCK_SIZE];
-    let mut temp_2 = [0.0; BLOCK_SIZE];
-    let mut wav_data = Vec::new();
-    drum.init(SAMPLE_RATE);
+    for sample_rate in SAMPLE_RATES {
+        let mut drum = hihat::Hihat::new();
+        let mut out = [0.0; BLOCK_SIZE];
+        let mut temp_1 = [0.0; BLOCK_SIZE];
+        let mut temp_2 = [0.0; BLOCK_SIZE];
+        let mut wav_data = Vec::new();
+        drum.init(sample_rate as f32);
 
-    let blocks = (duration * SAMPLE_RATE / (BLOCK_SIZE as f32)) as usize;
-    let f0 = frequency / SAMPLE_RATE;
+        let blocks = (duration * sample_rate as f32 / (BLOCK_SIZE as f32)) as usize;
+        let f0 = frequency / sample_rate as f32;
 
-    for n in 0..blocks {
-        let trigger = n == 0;
-        drum.render(
-            false,
-            trigger,
-            accent,
-            f0,
-            tone,
-            decay,
-            noisiness,
-            &mut out,
-            &mut temp_1,
-            &mut temp_2,
-            hihat::NoiseType::RingMod,
-            hihat::VcaType::Swing,
-            false,
-            false,
-        );
-        wav_data.extend_from_slice(&out);
+        for n in 0..blocks {
+            let trigger = n == 0;
+            drum.render(
+                false,
+                trigger,
+                accent,
+                f0,
+                tone,
+                decay,
+                noisiness,
+                &mut out,
+                &mut temp_1,
+                &mut temp_2,
+                hihat::NoiseType::RingMod,
+                hihat::VcaType::Swing,
+                false,
+                false,
+            );
+            wav_data.extend_from_slice(&out);
+        }
+
+        let filename = format!("drums/hihat/hihat_{sample_rate}.wav");
+        write_wav(filename, &wav_data, sample_rate).ok();
     }
-
-    write_wav("drums/hihat/hihat.wav", &wav_data, SAMPLE_RATE as u32).ok();
 }
 
 #[test]
@@ -135,37 +133,35 @@ fn synthetic_bass_drum() {
     let fm_envelope_decay = 0.5;
     let duration = 0.5;
 
-    let mut drum = synthetic_bass_drum::SyntheticBassDrum::new();
-    let mut out = [0.0; BLOCK_SIZE];
-    let mut wav_data = Vec::new();
-    drum.init(SAMPLE_RATE);
+    for sample_rate in SAMPLE_RATES {
+        let mut drum = synthetic_bass_drum::SyntheticBassDrum::new();
+        let mut out = [0.0; BLOCK_SIZE];
+        let mut wav_data = Vec::new();
+        drum.init(sample_rate as f32);
 
-    let blocks = (duration * SAMPLE_RATE / (BLOCK_SIZE as f32)) as usize;
-    let f0 = frequency / SAMPLE_RATE;
+        let blocks = (duration * sample_rate as f32 / (BLOCK_SIZE as f32)) as usize;
+        let f0 = frequency / sample_rate as f32;
 
-    for n in 0..blocks {
-        let trigger = n == 0;
-        drum.render(
-            false,
-            trigger,
-            accent,
-            f0,
-            tone,
-            decay,
-            dirtiness,
-            fm_envelope_amount,
-            fm_envelope_decay,
-            &mut out,
-        );
-        wav_data.extend_from_slice(&out);
+        for n in 0..blocks {
+            let trigger = n == 0;
+            drum.render(
+                false,
+                trigger,
+                accent,
+                f0,
+                tone,
+                decay,
+                dirtiness,
+                fm_envelope_amount,
+                fm_envelope_decay,
+                &mut out,
+            );
+            wav_data.extend_from_slice(&out);
+        }
+
+        let filename = format!("drums/synthetic_bass_drum/synthetic_bass_drum_{sample_rate}.wav");
+        write_wav(filename, &wav_data, sample_rate).ok();
     }
-
-    write_wav(
-        "drums/synthetic_bass_drum/synthetic_bass_drum.wav",
-        &wav_data,
-        SAMPLE_RATE as u32,
-    )
-    .ok();
 }
 
 #[test]
@@ -177,26 +173,24 @@ fn synthetic_snare_drum() {
     let snappy = 0.2;
     let duration = 0.5;
 
-    let mut drum = synthetic_snare_drum::SyntheticSnareDrum::new();
-    let mut out = [0.0; BLOCK_SIZE];
-    let mut wav_data = Vec::new();
-    drum.init(SAMPLE_RATE);
+    for sample_rate in SAMPLE_RATES {
+        let mut drum = synthetic_snare_drum::SyntheticSnareDrum::new();
+        let mut out = [0.0; BLOCK_SIZE];
+        let mut wav_data = Vec::new();
+        drum.init(sample_rate as f32);
 
-    let blocks = (duration * SAMPLE_RATE / (BLOCK_SIZE as f32)) as usize;
-    let f0 = frequency / SAMPLE_RATE;
+        let blocks = (duration * sample_rate as f32 / (BLOCK_SIZE as f32)) as usize;
+        let f0 = frequency / sample_rate as f32;
 
-    for n in 0..blocks {
-        let trigger = n == 0;
-        drum.render(
-            false, trigger, accent, f0, fm_amount, decay, snappy, &mut out,
-        );
-        wav_data.extend_from_slice(&out);
+        for n in 0..blocks {
+            let trigger = n == 0;
+            drum.render(
+                false, trigger, accent, f0, fm_amount, decay, snappy, &mut out,
+            );
+            wav_data.extend_from_slice(&out);
+        }
+
+        let filename = format!("drums/synthetic_snare_drum/synthetic_snare_drum_{sample_rate}.wav");
+        write_wav(filename, &wav_data, sample_rate).ok();
     }
-
-    write_wav(
-        "drums/synthetic_snare_drum/synthetic_snare_drum.wav",
-        &wav_data,
-        SAMPLE_RATE as u32,
-    )
-    .ok();
 }
