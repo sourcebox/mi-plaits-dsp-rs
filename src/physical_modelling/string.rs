@@ -11,7 +11,7 @@ use crate::utils::filter::{DcBlocker, FilterMode, FrequencyApproximation, Svf};
 use crate::utils::parameter_interpolator::ParameterInterpolator;
 use crate::utils::random;
 use crate::utils::units::semitones_to_ratio;
-use crate::utils::{crossfade, interpolate, one_pole};
+use crate::utils::{crossfade, one_pole};
 
 pub const DELAY_LINE_SIZE: usize = 1024;
 
@@ -158,7 +158,19 @@ impl String {
         self.iir_damping_filter
             .set_f_q(damping_f, 0.5, FrequencyApproximation::Fast);
 
-        let damping_compensation = interpolate(&LUT_SVF_SHIFT, damping_cutoff, 1.0);
+        // The original C++ `Interpolate(lut_svf_shift, damping_cutoff, 1.0f)`
+        // indexes the table with a RAW index (`damping_cutoff` ≈ 12..84). The
+        // shared `interpolate()` here clamps its index to [0, 1] first (correct
+        // for normalized-phase lookups, wrong here) — that pinned this to
+        // `LUT_SVF_SHIFT[1]` for every note, scaling the string delay by a
+        // constant and detuning it ~+4 semitones sharp. Index the table
+        // directly, matching the C++. (see sourcebox/mi-plaits-dsp-rs#6)
+        let damping_compensation = {
+            let idx = damping_cutoff.clamp(0.0, (LUT_SVF_SHIFT.len() - 2) as f32);
+            let i = idx as usize;
+            let frac = idx - i as f32;
+            LUT_SVF_SHIFT[i] + (LUT_SVF_SHIFT[i + 1] - LUT_SVF_SHIFT[i]) * frac
+        };
 
         // Linearly interpolate delay time.
         let mut delay_modulation =
