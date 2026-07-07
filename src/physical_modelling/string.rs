@@ -158,13 +158,8 @@ impl String {
         self.iir_damping_filter
             .set_f_q(damping_f, 0.5, FrequencyApproximation::Fast);
 
-        // The original C++ `Interpolate(lut_svf_shift, damping_cutoff, 1.0f)`
-        // indexes the table with a RAW index (`damping_cutoff` ≈ 12..84). The
-        // shared `interpolate()` here clamps its index to [0, 1] first (correct
-        // for normalized-phase lookups, wrong here) — that pinned this to
-        // `LUT_SVF_SHIFT[1]` for every note, scaling the string delay by a
-        // constant and detuning it ~+4 semitones sharp. Index the table
-        // directly, matching the C++. (see sourcebox/mi-plaits-dsp-rs#6)
+        // `damping_cutoff` is in range `12.0 - 84.0`, so the shared `interpolate`
+        // function can't be used as it expects an index in range `0.0 - 1.0`.
         let damping_compensation = {
             let idx = damping_cutoff.clamp(0.0, (LUT_SVF_SHIFT.len() - 2) as f32);
             let i = idx as usize;
