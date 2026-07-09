@@ -86,17 +86,15 @@ impl<const NUM_HARMONICS: usize> HarmonicOscillator<NUM_HARMONICS> {
 
             let mut sum = 0.0;
             for (i, am) in am.iter().enumerate().take(NUM_HARMONICS) {
-                {
-                    sum += am.update(&mut self.amplitude[i]) * current;
-                    let temp = current;
-                    current = two_x * current - previous;
-                    previous = temp;
-                }
-                if first_harmonic_index == 1 {
-                    *out_sample = sum;
-                } else {
-                    *out_sample += sum;
-                }
+                sum += am.update(&mut self.amplitude[i]) * current;
+                let temp = current;
+                current = two_x * current - previous;
+                previous = temp;
+            }
+            if first_harmonic_index == 1 {
+                *out_sample = sum;
+            } else {
+                *out_sample += sum;
             }
         }
     }
