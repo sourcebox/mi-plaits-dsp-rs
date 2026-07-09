@@ -125,7 +125,7 @@ fn oscillator_impulse_train() {
         let mut osc = oscillator::Oscillator::new();
         let mut out = [0.0; BLOCK_SIZE];
         let mut wav_data = Vec::new();
-        osc.init();
+        osc.init(sample_rate as f32);
 
         let blocks = (duration * sample_rate as f32 / (BLOCK_SIZE as f32)) as usize;
         let f = frequency / sample_rate as f32;
@@ -158,7 +158,7 @@ fn oscillator_saw() {
         let mut osc = oscillator::Oscillator::new();
         let mut out = [0.0; BLOCK_SIZE];
         let mut wav_data = Vec::new();
-        osc.init();
+        osc.init(sample_rate as f32);
 
         let blocks = (duration * sample_rate as f32 / (BLOCK_SIZE as f32)) as usize;
         let f = frequency / sample_rate as f32;
@@ -191,7 +191,7 @@ fn oscillator_triangle() {
         let mut osc = oscillator::Oscillator::new();
         let mut out = [0.0; BLOCK_SIZE];
         let mut wav_data = Vec::new();
-        osc.init();
+        osc.init(sample_rate as f32);
 
         let blocks = (duration * sample_rate as f32 / (BLOCK_SIZE as f32)) as usize;
         let f = frequency / sample_rate as f32;
@@ -224,7 +224,7 @@ fn oscillator_slope() {
         let mut osc = oscillator::Oscillator::new();
         let mut out = [0.0; BLOCK_SIZE];
         let mut wav_data = Vec::new();
-        osc.init();
+        osc.init(sample_rate as f32);
 
         let blocks = (duration * sample_rate as f32 / (BLOCK_SIZE as f32)) as usize;
         let f = frequency / sample_rate as f32;
@@ -257,7 +257,7 @@ fn oscillator_square() {
         let mut osc = oscillator::Oscillator::new();
         let mut out = [0.0; BLOCK_SIZE];
         let mut wav_data = Vec::new();
-        osc.init();
+        osc.init(sample_rate as f32);
 
         let blocks = (duration * sample_rate as f32 / (BLOCK_SIZE as f32)) as usize;
         let f = frequency / sample_rate as f32;
@@ -290,7 +290,7 @@ fn oscillator_square_bright() {
         let mut osc = oscillator::Oscillator::new();
         let mut out = [0.0; BLOCK_SIZE];
         let mut wav_data = Vec::new();
-        osc.init();
+        osc.init(sample_rate as f32);
 
         let blocks = (duration * sample_rate as f32 / (BLOCK_SIZE as f32)) as usize;
         let f = frequency / sample_rate as f32;
@@ -323,7 +323,7 @@ fn oscillator_square_dark() {
         let mut osc = oscillator::Oscillator::new();
         let mut out = [0.0; BLOCK_SIZE];
         let mut wav_data = Vec::new();
-        osc.init();
+        osc.init(sample_rate as f32);
 
         let blocks = (duration * sample_rate as f32 / (BLOCK_SIZE as f32)) as usize;
         let f = frequency / sample_rate as f32;
@@ -356,7 +356,7 @@ fn oscillator_square_triangle() {
         let mut osc = oscillator::Oscillator::new();
         let mut out = [0.0; BLOCK_SIZE];
         let mut wav_data = Vec::new();
-        osc.init();
+        osc.init(sample_rate as f32);
 
         let blocks = (duration * sample_rate as f32 / (BLOCK_SIZE as f32)) as usize;
         let f = frequency / sample_rate as f32;

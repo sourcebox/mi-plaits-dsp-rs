@@ -11,6 +11,7 @@ use crate::utils::parameter_interpolator::ParameterInterpolator;
 use crate::utils::polyblep::{
     next_blep_sample, next_integrated_blep_sample, this_blep_sample, this_integrated_blep_sample,
 };
+use crate::REF_SAMPLE_RATE;
 
 pub const MAX_FREQUENCY: f32 = 0.25;
 pub const MIN_FREQUENCY: f32 = 0.000001;
@@ -39,6 +40,10 @@ pub struct Oscillator {
     // For interpolation of parameters.
     frequency: f32,
     pw: f32,
+
+    // Sample rate dependent factors.
+    impulse_train_lp_coeff: f32,
+    impulse_train_gain: f32,
 }
 
 impl Oscillator {
@@ -46,7 +51,7 @@ impl Oscillator {
         Self::default()
     }
 
-    pub fn init(&mut self) {
+    pub fn init(&mut self, sample_rate: f32) {
         self.phase = 0.5;
         self.next_sample = 0.0;
         self.lp_state = 1.0;
@@ -55,6 +60,9 @@ impl Oscillator {
 
         self.frequency = 0.001;
         self.pw = 0.5;
+
+        self.impulse_train_lp_coeff = 0.25 * REF_SAMPLE_RATE / sample_rate;
+        self.impulse_train_gain = 1.0 / self.impulse_train_lp_coeff;
     }
 
     #[inline]
@@ -123,8 +131,9 @@ impl Oscillator {
                     if matches!(shape, OscillatorShape::Saw) {
                         *out_sample = 2.0 * this_sample - 1.0;
                     } else {
-                        self.lp_state += 0.25 * ((self.hp_state - this_sample) - self.lp_state);
-                        *out_sample = 4.0 * self.lp_state;
+                        self.lp_state += self.impulse_train_lp_coeff
+                            * ((self.hp_state - this_sample) - self.lp_state);
+                        *out_sample = self.impulse_train_gain * self.lp_state;
                         self.hp_state = this_sample;
                     }
                 }

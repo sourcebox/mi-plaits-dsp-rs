@@ -29,10 +29,11 @@ impl NaiveSpeechSynth {
         Self::default()
     }
 
-    pub fn init(&mut self, sample_rate_hz: f32) {
-        self.sample_rate_hz = sample_rate_hz;
-        self.a0_normalized = 27.5 / sample_rate_hz;
-        self.pulse.init();
+    pub fn init(&mut self, sample_rate: f32) {
+        self.sample_rate_hz = sample_rate;
+        self.a0_normalized = 27.5 / sample_rate;
+
+        self.pulse.init(sample_rate);
         self.frequency = 0.0;
         self.click_duration = 0;
 
@@ -41,7 +42,7 @@ impl NaiveSpeechSynth {
         }
         self.pulse_coloration.init();
         self.pulse_coloration
-            .set_f_q(800.0 / sample_rate_hz, 0.5, FrequencyApproximation::Dirty);
+            .set_f_q(800.0 / sample_rate, 0.5, FrequencyApproximation::Dirty);
     }
 
     #[allow(clippy::too_many_arguments)]

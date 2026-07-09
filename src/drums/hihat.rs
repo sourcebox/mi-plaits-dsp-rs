@@ -27,7 +27,8 @@ pub enum VcaType {
 
 #[derive(Debug, Default, Clone)]
 pub struct Hihat {
-    sample_rate_hz: f32,
+    sample_rate: f32,
+
     envelope: f32,
     noise_clock: f32,
     noise_sample: f32,
@@ -45,15 +46,16 @@ impl Hihat {
         Self::default()
     }
 
-    pub fn init(&mut self, sample_rate_hz: f32) {
-        self.sample_rate_hz = sample_rate_hz;
+    pub fn init(&mut self, sample_rate: f32) {
+        self.sample_rate = sample_rate;
+
         self.envelope = 0.0;
         self.noise_clock = 0.0;
         self.noise_sample = 0.0;
         self.sustain_gain = 0.0;
 
         self.square_noise.init();
-        self.ring_mod_noise.init(sample_rate_hz);
+        self.ring_mod_noise.init(sample_rate);
         self.noise_coloration_svf.init();
         self.hpf.init();
     }
@@ -95,8 +97,8 @@ impl Hihat {
         }
 
         // Apply BPF on the metallic noise.
-        let mut cutoff = 150.0 / self.sample_rate_hz * semitones_to_ratio(tone * 72.0);
-        cutoff = cutoff.clamp(0.0, 16000.0 / self.sample_rate_hz);
+        let mut cutoff = 150.0 / self.sample_rate * semitones_to_ratio(tone * 72.0);
+        cutoff = cutoff.clamp(0.0, 16000.0 / self.sample_rate);
         self.noise_coloration_svf.set_f_q(
             cutoff,
             if resonance { 3.0 + 3.0 * tone } else { 1.0 },
@@ -217,7 +219,7 @@ impl SquareNoise {
 
 #[derive(Debug, Default, Clone)]
 pub struct RingModNoise {
-    sample_rate_hz: f32,
+    sample_rate: f32,
     oscillator: [Oscillator; 6],
 }
 
@@ -226,22 +228,22 @@ impl RingModNoise {
         Self::default()
     }
 
-    pub fn init(&mut self, sample_rate_hz: f32) {
-        self.sample_rate_hz = sample_rate_hz;
+    pub fn init(&mut self, sample_rate: f32) {
+        self.sample_rate = sample_rate;
         for i in 0..6 {
-            self.oscillator[i].init();
+            self.oscillator[i].init(sample_rate);
         }
     }
 
     #[inline]
     pub fn render(&mut self, f0: f32, temp_1: &mut [f32], temp_2: &mut [f32], out: &mut [f32]) {
         let ratio = f0 / (0.01 + f0);
-        let f1a = 200.0 / self.sample_rate_hz * ratio;
-        let f1b = 7530.0 / self.sample_rate_hz * ratio;
-        let f2a = 510.0 / self.sample_rate_hz * ratio;
-        let f2b = 8075.0 / self.sample_rate_hz * ratio;
-        let f3a = 730.0 / self.sample_rate_hz * ratio;
-        let f3b = 10500.0 / self.sample_rate_hz * ratio;
+        let f1a = 200.0 / self.sample_rate * ratio;
+        let f1b = 7530.0 / self.sample_rate * ratio;
+        let f2a = 510.0 / self.sample_rate * ratio;
+        let f2b = 8075.0 / self.sample_rate * ratio;
+        let f3a = 730.0 / self.sample_rate * ratio;
+        let f3b = 10500.0 / self.sample_rate * ratio;
 
         out.fill(0.0);
 

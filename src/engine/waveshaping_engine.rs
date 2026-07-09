@@ -37,9 +37,9 @@ impl WaveshapingEngine {
 }
 
 impl Engine for WaveshapingEngine {
-    fn init(&mut self, _sample_rate_hz: f32) {
-        self.slope.init();
-        self.triangle.init();
+    fn init(&mut self, sample_rate: f32) {
+        self.slope.init(sample_rate);
+        self.triangle.init(sample_rate);
         self.previous_shape = 0.0;
         self.previous_wavefolder_gain = 0.0;
         self.previous_overtone_gain = 0.0;
