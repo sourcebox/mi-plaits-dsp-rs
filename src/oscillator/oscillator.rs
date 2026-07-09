@@ -196,24 +196,29 @@ impl Oscillator {
                     }
                     next_sample += if self.phase < pw { 0.0 } else { 1.0 };
 
-                    if matches!(shape, OscillatorShape::SquareTriangle) {
-                        let integrator_coefficient = frequency * 0.0625;
-                        this_sample = 128.0 * (this_sample - 0.5);
-                        self.lp_state += integrator_coefficient * (this_sample - self.lp_state);
-                        *out_sample = self.lp_state;
-                    } else if matches!(shape, OscillatorShape::SquareDark) {
-                        let integrator_coefficient = frequency * 2.0;
-                        this_sample = 4.0 * (this_sample - 0.5);
-                        self.lp_state += integrator_coefficient * (this_sample - self.lp_state);
-                        *out_sample = self.lp_state;
-                    } else if matches!(shape, OscillatorShape::SquareBright) {
-                        let integrator_coefficient = frequency * 2.0;
-                        this_sample = 2.0 * this_sample - 1.0;
-                        self.lp_state += integrator_coefficient * (this_sample - self.lp_state);
-                        *out_sample = (this_sample - self.lp_state) * 0.5;
-                    } else {
-                        this_sample = 2.0 * this_sample - 1.0;
-                        *out_sample = this_sample;
+                    match shape {
+                        OscillatorShape::SquareTriangle => {
+                            let integrator_coefficient = frequency * 0.0625;
+                            this_sample = 128.0 * (this_sample - 0.5);
+                            self.lp_state += integrator_coefficient * (this_sample - self.lp_state);
+                            *out_sample = self.lp_state;
+                        }
+                        OscillatorShape::SquareDark => {
+                            let integrator_coefficient = frequency * 2.0;
+                            this_sample = 4.0 * (this_sample - 0.5);
+                            self.lp_state += integrator_coefficient * (this_sample - self.lp_state);
+                            *out_sample = self.lp_state;
+                        }
+                        OscillatorShape::SquareBright => {
+                            let integrator_coefficient = frequency * 2.0;
+                            this_sample = 2.0 * this_sample - 1.0;
+                            self.lp_state += integrator_coefficient * (this_sample - self.lp_state);
+                            *out_sample = (this_sample - self.lp_state) * 0.5;
+                        }
+                        _ => {
+                            this_sample = 2.0 * this_sample - 1.0;
+                            *out_sample = this_sample;
+                        }
                     }
                 }
             }
