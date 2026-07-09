@@ -21,8 +21,8 @@
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-use super::{note_to_frequency, Engine, EngineParameters};
-use crate::oscillator::wavetable_oscillator::{interpolate_wave_hermite, Differentiator};
+use super::{Engine, EngineParameters, note_to_frequency};
+use crate::oscillator::wavetable_oscillator::{Differentiator, interpolate_wave_hermite};
 use crate::resources::waves::WAV_INTEGRATED_WAVES;
 use crate::utils::one_pole;
 use crate::utils::parameter_interpolator::SimpleParameterInterpolator;

@@ -16,7 +16,7 @@
 use alloc::boxed::Box;
 use alloc::vec;
 
-use super::{note_to_frequency, Engine, EngineParameters};
+use super::{Engine, EngineParameters, note_to_frequency};
 use crate::oscillator::variable_saw_oscillator::VariableSawOscillator;
 use crate::oscillator::variable_shape_oscillator::VariableShapeOscillator;
 use crate::utils::parameter_interpolator::ParameterInterpolator;

@@ -19,7 +19,7 @@
 
 // Based on MIT-licensed code (c) 2021 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-use super::operator::{render_operators, RenderFn};
+use super::operator::{RenderFn, render_operators};
 
 #[derive(Debug, Clone)]
 pub struct Algorithms<const NUM_OPERATORS: usize, const NUM_ALGORITHMS: usize> {

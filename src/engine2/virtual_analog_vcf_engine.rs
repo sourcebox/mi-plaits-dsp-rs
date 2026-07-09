@@ -10,7 +10,7 @@
 
 // Based on MIT-licensed code (c) 2021 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-use crate::engine::{note_to_frequency, Engine, EngineParameters};
+use crate::engine::{Engine, EngineParameters, note_to_frequency};
 use crate::oscillator::variable_shape_oscillator::VariableShapeOscillator;
 use crate::utils::filter::{FilterMode, FrequencyApproximation, Svf};
 use crate::utils::parameter_interpolator::ParameterInterpolator;

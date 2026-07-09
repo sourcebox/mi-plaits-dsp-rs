@@ -16,7 +16,7 @@
 use alloc::boxed::Box;
 use alloc::vec;
 
-use super::{note_to_frequency, Engine, EngineParameters, TriggerState};
+use super::{Engine, EngineParameters, TriggerState, note_to_frequency};
 use crate::physical_modelling::string_voice::StringVoice;
 use crate::utils::delay_line::DelayLine;
 

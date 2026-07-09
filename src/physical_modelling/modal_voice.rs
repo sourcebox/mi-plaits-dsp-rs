@@ -5,7 +5,7 @@
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-use super::resonator::{Resonator, ResonatorSvf, MAX_NUM_MODES};
+use super::resonator::{MAX_NUM_MODES, Resonator, ResonatorSvf};
 use crate::noise::dust::dust;
 use crate::utils::filter::FilterMode;
 use crate::utils::units::semitones_to_ratio;

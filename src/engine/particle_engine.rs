@@ -15,7 +15,7 @@
 use alloc::boxed::Box;
 use alloc::vec;
 
-use super::{note_to_frequency, Engine, EngineParameters, TriggerState};
+use super::{Engine, EngineParameters, TriggerState, note_to_frequency};
 use crate::fx::diffuser::Diffuser;
 use crate::noise::particle::Particle;
 use crate::utils::filter::{FilterMode, FrequencyApproximation, Svf};

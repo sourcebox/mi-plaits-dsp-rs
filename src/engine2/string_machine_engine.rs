@@ -10,9 +10,9 @@
 
 // Based on MIT-licensed code (c) 2021 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-use crate::chords::chord_bank::{ChordBank, CHORD_NUM_NOTES};
+use crate::chords::chord_bank::{CHORD_NUM_NOTES, ChordBank};
 use crate::engine::chord_engine::CHORD_NUM_HARMONICS;
-use crate::engine::{note_to_frequency, Engine, EngineParameters};
+use crate::engine::{Engine, EngineParameters, note_to_frequency};
 use crate::fx::ensemble::Ensemble;
 use crate::oscillator::string_synth_oscillator::StringSynthOscillator;
 use crate::utils::filter::{FilterMode, FrequencyApproximation, NaiveSvf};

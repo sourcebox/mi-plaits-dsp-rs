@@ -15,7 +15,7 @@
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-use super::{note_to_frequency, Engine, EngineParameters};
+use super::{Engine, EngineParameters, note_to_frequency};
 use crate::oscillator::grainlet_oscillator::GrainletOscillator;
 use crate::oscillator::z_oscillator::ZOscillator;
 use crate::utils::filter::{FilterMode, FrequencyApproximation, OnePole};

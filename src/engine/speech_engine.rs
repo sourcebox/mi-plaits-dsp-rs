@@ -22,7 +22,7 @@
 use alloc::boxed::Box;
 use alloc::vec;
 
-use super::{note_to_frequency, Engine, EngineParameters, TriggerState};
+use super::{Engine, EngineParameters, TriggerState, note_to_frequency};
 use crate::speech::lpc_speech_synth_controller::LpcSpeechSynthController;
 use crate::speech::lpc_speech_synth_words::NUM_WORD_BANKS;
 use crate::speech::naive_speech_synth::NaiveSpeechSynth;

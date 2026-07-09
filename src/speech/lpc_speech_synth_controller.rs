@@ -5,7 +5,7 @@
 use alloc::boxed::Box;
 use alloc::vec;
 
-use super::lpc_speech_synth::{LpcSpeechSynth, LpcSpeechSynthFrame, LPC_SPEECH_SYNTH_DEFAULT_F0};
+use super::lpc_speech_synth::{LPC_SPEECH_SYNTH_DEFAULT_F0, LpcSpeechSynth, LpcSpeechSynthFrame};
 use super::lpc_speech_synth_phonemes::PHONEMES;
 use super::lpc_speech_synth_words::{NUM_WORD_BANKS, WORD_BANKS};
 use crate::utils::parameter_interpolator::ParameterInterpolator;

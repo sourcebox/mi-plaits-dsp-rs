@@ -16,8 +16,8 @@ use alloc::vec;
 
 use num_traits::{FromPrimitive, Num, ToPrimitive};
 
-use crate::engine::{note_to_frequency, Engine, EngineParameters};
-use crate::oscillator::sine_oscillator::{sine, FastSineOscillator};
+use crate::engine::{Engine, EngineParameters, note_to_frequency};
+use crate::oscillator::sine_oscillator::{FastSineOscillator, sine};
 use crate::oscillator::wavetable_oscillator::interpolate_wave;
 use crate::resources::waves::WAV_INTEGRATED_WAVES;
 use crate::utils::parameter_interpolator::SimpleParameterInterpolator;

@@ -11,7 +11,7 @@
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-use super::{note_to_frequency, Engine, EngineParameters};
+use super::{Engine, EngineParameters, note_to_frequency};
 use crate::oscillator::oscillator::{Oscillator, OscillatorShape};
 use crate::oscillator::sine_oscillator::sine;
 use crate::resources::{fold::LUT_FOLD, fold::LUT_FOLD_2, waveshape::LOOKUP_TABLE_I16_TABLE};

@@ -17,7 +17,7 @@
 use alloc::boxed::Box;
 use alloc::vec;
 
-use super::{note_to_frequency, Engine, EngineParameters, TriggerState};
+use super::{Engine, EngineParameters, TriggerState, note_to_frequency};
 use crate::drums::hihat::{Hihat, NoiseType, VcaType};
 
 #[derive(Debug, Clone)]

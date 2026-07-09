@@ -12,7 +12,7 @@
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-use super::{note_to_frequency, Engine, EngineParameters};
+use super::{Engine, EngineParameters, note_to_frequency};
 use crate::downsampler::Downsampler;
 use crate::oscillator::sine_oscillator::sine_pm;
 use crate::resources::fm::LUT_FM_FREQUENCY_QUANTIZER;

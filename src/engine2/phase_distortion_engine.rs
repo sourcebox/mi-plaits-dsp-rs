@@ -13,7 +13,7 @@
 use alloc::boxed::Box;
 use alloc::vec;
 
-use crate::engine::{note_to_frequency, Engine, EngineParameters};
+use crate::engine::{Engine, EngineParameters, note_to_frequency};
 use crate::oscillator::sine_oscillator::sine;
 use crate::oscillator::variable_shape_oscillator::VariableShapeOscillator;
 use crate::resources::fm::LUT_FM_FREQUENCY_QUANTIZER;

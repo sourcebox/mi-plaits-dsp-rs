@@ -18,7 +18,7 @@ use super::engine::swarm_engine::SwarmEngine;
 use super::engine::virtual_analog_engine::VirtualAnalogEngine;
 use super::engine::waveshaping_engine::WaveshapingEngine;
 use super::engine::wavetable_engine::WavetableEngine;
-use super::engine::{note_to_frequency, Engine, EngineParameters, TriggerState};
+use super::engine::{Engine, EngineParameters, TriggerState, note_to_frequency};
 use super::engine2::chiptune_engine::{self, ChiptuneEngine};
 use super::engine2::phase_distortion_engine::PhaseDistortionEngine;
 use super::engine2::six_op_engine::SixOpEngine;

@@ -16,7 +16,7 @@
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-use super::{note_to_frequency, Engine, EngineParameters, TriggerState};
+use super::{Engine, EngineParameters, TriggerState, note_to_frequency};
 use crate::drums::analog_bass_drum::AnalogBassDrum;
 use crate::drums::synthetic_bass_drum::SyntheticBassDrum;
 use crate::fx::overdrive::Overdrive;

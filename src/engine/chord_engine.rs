@@ -15,8 +15,8 @@
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-use super::{note_to_frequency, Engine, EngineParameters};
-use crate::chords::chord_bank::{ChordBank, CHORD_NUM_VOICES};
+use super::{Engine, EngineParameters, note_to_frequency};
+use crate::chords::chord_bank::{CHORD_NUM_VOICES, ChordBank};
 use crate::oscillator::string_synth_oscillator::StringSynthOscillator;
 use crate::oscillator::wavetable_oscillator::WavetableOscillator;
 use crate::resources::waves::WAV_INTEGRATED_WAVES;

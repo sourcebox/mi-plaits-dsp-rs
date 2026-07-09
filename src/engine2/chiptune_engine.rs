@@ -14,8 +14,8 @@
 // Based on MIT-licensed code (c) 2021 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
 use super::arpeggiator::{Arpeggiator, ArpeggiatorMode};
-use crate::chords::chord_bank::{ChordBank, CHORD_NUM_VOICES};
-use crate::engine::{note_to_frequency, Engine, EngineParameters, TriggerState};
+use crate::chords::chord_bank::{CHORD_NUM_VOICES, ChordBank};
+use crate::engine::{Engine, EngineParameters, TriggerState, note_to_frequency};
 use crate::oscillator::nes_triangle_oscillator::NesTriangleOscillator;
 use crate::oscillator::super_square_oscillator::SuperSquareOscillator;
 use crate::utils::hysteresis_quantizer::HysteresisQuantizer2;

@@ -12,7 +12,7 @@
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-use super::{note_to_frequency, Engine, EngineParameters, TriggerState};
+use super::{Engine, EngineParameters, TriggerState, note_to_frequency};
 use crate::drums::analog_snare_drum::AnalogSnareDrum;
 use crate::drums::synthetic_snare_drum::SyntheticSnareDrum;
 

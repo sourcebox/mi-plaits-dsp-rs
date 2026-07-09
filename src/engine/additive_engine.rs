@@ -15,7 +15,7 @@
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-use super::{note_to_frequency, Engine, EngineParameters};
+use super::{Engine, EngineParameters, note_to_frequency};
 use crate::oscillator::harmonic_oscillator::HarmonicOscillator;
 use crate::oscillator::sine_oscillator::sine;
 use crate::utils::one_pole;

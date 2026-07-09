@@ -3,7 +3,7 @@
 mod common;
 
 use common::*;
-use mi_plaits_dsp::voice::{Modulations, Patch, Voice, NUM_ENGINES};
+use mi_plaits_dsp::voice::{Modulations, NUM_ENGINES, Patch, Voice};
 
 const SAMPLE_RATE: f32 = 48000.0;
 const BLOCK_SIZE: usize = 24;

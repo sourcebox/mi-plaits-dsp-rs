@@ -1,7 +1,7 @@
 [package]
 name = "mi-plaits-dsp"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 authors = ["Oliver Rockstedt <info@sourcebox.de>"]
 description = "Port of DSP code from Mutable Instruments Plaits module"
 repository = "https://github.com/sourcebox/mi-plaits-dsp-rs"
