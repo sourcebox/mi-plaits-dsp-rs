@@ -250,10 +250,10 @@ impl<'a> LpcSpeechSynthWordBank<'a> {
             return false;
         }
 
-        if let Some(loaded_bank) = self.loaded_bank {
-            if bank == loaded_bank {
-                return false;
-            }
+        if let Some(loaded_bank) = self.loaded_bank
+            && bank == loaded_bank
+        {
+            return false;
         }
 
         self.num_frames = 0;
