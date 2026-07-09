@@ -4,9 +4,6 @@
 
 use core::cell::RefCell;
 
-#[allow(unused_imports)]
-use num_traits::float::Float;
-
 use super::algorithms::Algorithms;
 use super::dx_units::{
     amp_mod_sensitivity, frequency_ratio, keyboard_scaling, normalize_velocity, operator_level,

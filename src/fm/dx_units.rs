@@ -4,9 +4,6 @@
 
 #![allow(clippy::excessive_precision)]
 
-#[allow(unused_imports)]
-use num_traits::float::Float;
-
 use super::patch::{KeyboardScaling, Operator};
 use crate::utils::interpolate;
 use crate::utils::units::semitones_to_ratio_safe;

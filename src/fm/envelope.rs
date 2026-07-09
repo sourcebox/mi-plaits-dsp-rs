@@ -16,9 +16,6 @@
 
 // Based on MIT-licensed code (c) 2021 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-#[allow(unused_imports)]
-use num_traits::float::Float;
-
 use super::dx_units::{
     operator_envelope_increment, operator_level, pitch_envelope_increment, pitch_envelope_level,
 };

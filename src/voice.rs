@@ -2,9 +2,6 @@
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-#[allow(unused_imports)]
-use num_traits::float::Float;
-
 use super::engine::additive_engine::AdditiveEngine;
 use super::engine::bass_drum_engine::BassDrumEngine;
 use super::engine::chord_engine::ChordEngine;

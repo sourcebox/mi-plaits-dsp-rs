@@ -2,9 +2,6 @@
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-#[allow(unused_imports)]
-use num_traits::float::Float;
-
 use crate::oscillator::sine_oscillator::SineOscillator;
 use crate::utils::filter::{FilterMode, FrequencyApproximation, Svf};
 use crate::utils::one_pole;

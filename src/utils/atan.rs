@@ -2,9 +2,6 @@
 
 // Based on MIT-licensed code (c) 2014 by Olivier Gillet (ol.gillet@gmail.com)
 
-#[allow(unused_imports)]
-use num_traits::float::FloatCore;
-
 #[inline]
 pub fn fast_atan2(y: f32, x: f32) -> u16 {
     const SIGN_MASK: u32 = 0x80000000;

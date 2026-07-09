@@ -4,9 +4,6 @@
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-#[allow(unused_imports)]
-use num_traits::float::Float;
-
 use crate::utils::parameter_interpolator::ParameterInterpolator;
 use crate::utils::polyblep::{
     next_blep_sample, next_integrated_blep_sample, this_blep_sample, this_integrated_blep_sample,

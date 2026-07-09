@@ -4,9 +4,6 @@
 
 use super::slope;
 
-#[allow(unused_imports)]
-use num_traits::float::FloatCore;
-
 #[derive(Debug, Default, Clone)]
 pub struct Limiter {
     peak: f32,

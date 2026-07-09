@@ -7,9 +7,6 @@
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-#[allow(unused_imports)]
-use num_traits::float::Float;
-
 use crate::utils::filter::{FilterMode, FrequencyApproximation, OnePole, Svf};
 use crate::utils::parameter_interpolator::ParameterInterpolator;
 use crate::utils::random;

@@ -14,9 +14,6 @@
 use alloc::boxed::Box;
 use alloc::vec;
 
-#[allow(unused_imports)]
-use num_traits::float::Float;
-
 use num_traits::{FromPrimitive, Num, ToPrimitive};
 
 use crate::engine::{note_to_frequency, Engine, EngineParameters};

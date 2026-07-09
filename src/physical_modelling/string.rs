@@ -2,9 +2,6 @@
 
 // Based on MIT-licensed code (c) 2016 by Emilie Gillet (emilie.o.gillet@gmail.com)
 
-#[allow(unused_imports)]
-use num_traits::float::Float;
-
 use crate::resources::svf::LUT_SVF_SHIFT;
 use crate::utils::delay_line::DelayLine;
 use crate::utils::filter::{DcBlocker, FilterMode, FrequencyApproximation, Svf};
