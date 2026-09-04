@@ -519,6 +519,245 @@ impl Voice<'_> {
         );
     }
 
+    #[inline]
+    pub fn render_i16(
+        &mut self,
+        patch: &Patch,
+        modulations: &Modulations,
+        out: &mut [f32],
+        aux: &mut [f32],
+        out_i16: &mut [i16],
+        aux_i16: &mut [i16],
+    ) {
+        // Trigger, LPG, internal envelope.
+
+        // Delay trigger by 1ms to deal with sequencers or MIDI interfaces whose
+        // CV out lags behind the GATE out.
+        self.trigger_delay.write(modulations.trigger);
+        let trigger_value = self.trigger_delay.read_with_delay(MAX_TRIGGER_DELAY);
+
+        let previous_trigger_state = self.trigger_state;
+
+        if !previous_trigger_state {
+            if trigger_value > 0.3 {
+                self.trigger_state = true;
+                if !modulations.level_patched {
+                    self.lpg_envelope.trigger();
+                }
+                self.decay_envelope.trigger();
+                self.engine_cv = modulations.engine;
+            }
+        } else if trigger_value < 0.1 {
+            self.trigger_state = false;
+        }
+
+        if !modulations.trigger_patched {
+            self.engine_cv = modulations.engine;
+        }
+
+        // Engine selection.
+        let mut engine_index =
+            self.engine_quantizer
+                .process_with_base(patch.engine as i32, self.engine_cv) as usize;
+        engine_index = engine_index.clamp(0, NUM_ENGINES);
+
+        if engine_index != self.previous_engine_index || self.reload_resources {
+            match engine_index {
+                2 => {
+                    self.six_op_engine.load_syx_bank(self.resources.syx_bank_a);
+                }
+                3 => {
+                    self.six_op_engine.load_syx_bank(self.resources.syx_bank_b);
+                }
+                4 => {
+                    self.six_op_engine.load_syx_bank(self.resources.syx_bank_c);
+                }
+                5 => {
+                    self.waveterrain_engine
+                        .set_user_terrain(self.resources.user_wave_terrain);
+                }
+                13 => {
+                    self.wavetable_engine
+                        .set_wavetables(self.resources.wavetables);
+                }
+                _ => {}
+            }
+
+            let engine = self.get_engine(engine_index).unwrap().0;
+            engine.reset();
+
+            self.out_post_processor.reset();
+            self.previous_engine_index = engine_index;
+            self.reload_resources = false;
+        }
+
+        let mut p = EngineParameters {
+            a0_normalized: self.a0_normalized,
+            ..Default::default()
+        };
+
+        let rising_edge = self.trigger_state && !previous_trigger_state;
+        let note = (modulations.note + self.previous_note) * 0.5;
+        self.previous_note = modulations.note;
+
+        if modulations.trigger_patched {
+            p.trigger = if rising_edge {
+                TriggerState::RisingEdge
+            } else if self.trigger_state {
+                TriggerState::High
+            } else {
+                TriggerState::Low
+            };
+        } else {
+            p.trigger = TriggerState::Unpatched;
+        }
+
+        let short_decay = (200.0 * out.len() as f32)
+            * self.inv_sr
+            * semitones_to_ratio(-96.0 * patch.decay.clamp(0.1, 1.0));
+
+        self.decay_envelope.process(short_decay * 2.0);
+
+        let compressed_level =
+            (1.3 * modulations.level / (0.3 + modulations.level.abs())).clamp(0.0, 1.0);
+        p.accent = if modulations.level_patched {
+            compressed_level
+        } else {
+            0.8
+        };
+
+        let use_internal_envelope = modulations.trigger_patched;
+
+        // Actual synthesis parameters.
+
+        p.harmonics = patch.harmonics + modulations.harmonics;
+        p.harmonics = p.harmonics.clamp(0.0, 1.0);
+
+        let mut internal_envelope_amplitude = 1.0;
+        let mut internal_envelope_amplitude_timbre = 1.0;
+
+        if engine_index == 15 {
+            internal_envelope_amplitude = 2.0 - p.harmonics * 6.0;
+            internal_envelope_amplitude = internal_envelope_amplitude.clamp(0.0, 1.0);
+            self.speech_engine.set_prosody_amount(
+                if !modulations.trigger_patched || modulations.frequency_patched {
+                    0.0
+                } else {
+                    patch.frequency_modulation_amount
+                },
+            );
+            self.speech_engine.set_speed(
+                if !modulations.trigger_patched || modulations.morph_patched {
+                    0.0
+                } else {
+                    patch.morph_modulation_amount
+                },
+            );
+        } else if engine_index == 7 {
+            if modulations.trigger_patched && !modulations.timbre_patched {
+                // Disable internal envelope on TIMBRE, and enable the envelope generator
+                // built into the chiptune engine.
+                internal_envelope_amplitude_timbre = 0.0;
+                // Envelope shape is determined by TIMBRE modulation amount. A minimum value
+                // is forced to prevent infinite decay time.
+                self.chiptune_engine
+                    .set_envelope_shape(patch.timbre_modulation_amount.max(0.05));
+            } else {
+                self.chiptune_engine
+                    .set_envelope_shape(chiptune_engine::NO_ENVELOPE);
+            }
+        }
+
+        p.note = apply_modulations(
+            patch.note + note,
+            patch.frequency_modulation_amount,
+            modulations.frequency_patched,
+            modulations.frequency,
+            use_internal_envelope,
+            internal_envelope_amplitude
+                * self.decay_envelope.value()
+                * self.decay_envelope.value()
+                * 48.0,
+            1.0,
+            -119.0,
+            120.0,
+        );
+
+        p.timbre = apply_modulations(
+            patch.timbre,
+            patch.timbre_modulation_amount,
+            modulations.timbre_patched,
+            modulations.timbre,
+            use_internal_envelope,
+            internal_envelope_amplitude_timbre * self.decay_envelope.value(),
+            0.0,
+            0.0,
+            1.0,
+        );
+
+        p.morph = apply_modulations(
+            patch.morph,
+            patch.morph_modulation_amount,
+            modulations.morph_patched,
+            modulations.morph,
+            use_internal_envelope,
+            internal_envelope_amplitude * self.decay_envelope.value(),
+            0.0,
+            0.0,
+            1.0,
+        );
+
+        let engine = self.get_engine(engine_index).unwrap();
+        let mut already_enveloped = engine.1;
+        let out_gain = engine.2;
+        let aux_gain = engine.3;
+
+        engine.0.render(&p, out, aux, &mut already_enveloped);
+
+        let lpg_bypass =
+            already_enveloped || (!modulations.level_patched && !modulations.trigger_patched);
+
+        // Compute LPG parameters.
+        if !lpg_bypass {
+            let hf = patch.lpg_colour;
+            let decay_tail = (20.0 * out.len() as f32)
+                * self.inv_sr
+                * semitones_to_ratio(-72.0 * patch.decay + 12.0 * hf)
+                - short_decay;
+
+            if modulations.level_patched {
+                self.lpg_envelope
+                    .process_lp(compressed_level, short_decay, decay_tail, hf);
+            } else {
+                let attack = note_to_frequency(p.note, self.a0_normalized) * out.len() as f32 * 2.0;
+                self.lpg_envelope
+                    .process_ping(attack, short_decay, decay_tail, hf);
+            }
+        } else {
+            self.lpg_envelope.init();
+        }
+
+        self.out_post_processor.process_to_i16(
+            out_gain,
+            lpg_bypass,
+            self.lpg_envelope.gain(),
+            self.lpg_envelope.frequency(),
+            self.lpg_envelope.hf_bleed(),
+            out,
+            out_i16,
+        );
+
+        self.aux_post_processor.process_to_i16(
+            aux_gain,
+            lpg_bypass,
+            self.lpg_envelope.gain(),
+            self.lpg_envelope.frequency(),
+            self.lpg_envelope.hf_bleed(),
+            aux,
+            aux_i16,
+        );
+    }
+
     pub fn active_engine(&self) -> usize {
         self.previous_engine_index
     }
