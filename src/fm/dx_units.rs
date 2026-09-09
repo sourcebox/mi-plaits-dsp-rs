@@ -14,18 +14,12 @@ use crate::utils::units::semitones_to_ratio_safe;
 /// approximation can be chosen.
 #[inline]
 pub fn pow_2_fast(mut x: f32, order: i32) -> f32 {
-    #[repr(C)]
-    union Result {
-        f: f32,
-        w: i32,
-    }
-
-    let mut r = Result { f: 0.0 };
+    let mut bits = 0_i32;
 
     if order == 1 {
-        r.w = ((1 << 23) as f32 * (127.0 + x)) as i32;
+        bits = ((1 << 23) as f32 * (127.0 + x)) as i32;
 
-        return unsafe { r.f };
+        return f32::from_bits(bits as u32);
     }
 
     let mut x_integral = x as i32;
@@ -37,18 +31,16 @@ pub fn pow_2_fast(mut x: f32, order: i32) -> f32 {
     x -= x_integral as f32;
 
     if order == 1 {
-        r.f = 1.0 + x;
+        bits = (1.0 + x).to_bits() as i32;
     } else if order == 2 {
-        r.f = 1.0 + x * (0.6565 + x * 0.3435);
+        bits = (1.0 + x * (0.6565 + x * 0.3435)).to_bits() as i32;
     } else if order == 3 {
-        r.f = 1.0 + x * (0.6958 + x * (0.2251 + x * 0.0791));
+        bits = (1.0 + x * (0.6958 + x * (0.2251 + x * 0.0791))).to_bits() as i32;
     }
 
-    unsafe {
-        r.w += x_integral << 23;
-    }
+    bits += x_integral << 23;
 
-    unsafe { r.f }
+    f32::from_bits(bits as u32)
 }
 
 /// Convert an operator (envelope) level from 0-99 to the complement of the "TL" value.
