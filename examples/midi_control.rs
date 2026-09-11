@@ -58,7 +58,7 @@ impl<'a> AudioGenerator for App<'a> {
     }
 
     fn process(&mut self, frames: &mut [[f32; 2]]) {
-        let mut mix = vec![0.0; CHUNK_SIZE];
+        let mut mix = [0.0; CHUNK_SIZE];
 
         for (n, voice) in self.voices.iter_mut().enumerate() {
             let mut out = vec![0.0; CHUNK_SIZE];
