@@ -57,7 +57,7 @@ fn ensemble() {
 
         for _ in 0..blocks {
             osc.render(f, &mut left);
-            let mut right = left.clone();
+            let mut right = left;
             fx.process(&mut left, &mut right);
             wav_data_left.extend_from_slice(&left);
             wav_data_right.extend_from_slice(&right);

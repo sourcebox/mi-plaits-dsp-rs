@@ -86,7 +86,7 @@ fn resonator() {
                 in_[0] = 1.0;
             }
             out.fill(0.0);
-            model.process(f0, structure, brightness, damping, &mut in_, &mut out);
+            model.process(f0, structure, brightness, damping, &in_, &mut out);
             wav_data.extend_from_slice(&out);
         }
 
@@ -123,7 +123,7 @@ fn string() {
                 non_linearity_amount,
                 brightness,
                 damping,
-                &mut in_,
+                &in_,
                 &mut out,
             );
             wav_data.extend_from_slice(&out);
