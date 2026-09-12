@@ -7,6 +7,58 @@ use mi_plaits_dsp::fx::*;
 use mi_plaits_dsp::oscillator::sine_oscillator::SineOscillator;
 
 const BLOCK_SIZE: usize = 24;
+const RESET_PROBE_BLOCKS: usize = 400;
+
+#[test]
+fn diffuser_reset_clears_delay_lines() {
+    let mut fx = diffuser::Diffuser::new();
+    fx.init(48_000.0);
+
+    let mut in_out = [1.0; BLOCK_SIZE];
+    fx.process(1.0, 0.5, &mut in_out);
+
+    // Clearing the delay lines must not clear the persistent LP or LFO state,
+    // so use a clone with an explicit clear.
+    let mut expected = fx.clone();
+    fx.reset();
+    expected.clear();
+
+    for block in 0..RESET_PROBE_BLOCKS {
+        in_out.fill(0.0);
+        let mut expected_out = in_out;
+        fx.process(1.0, 0.5, &mut in_out);
+        expected.process(1.0, 0.5, &mut expected_out);
+        assert_eq!(
+            in_out, expected_out,
+            "diffuser reset did not clear its delay lines in probe block {block}"
+        );
+    }
+}
+
+#[test]
+fn ensemble_reset_clears_delay_lines() {
+    let mut fx = ensemble::Ensemble::new();
+    fx.init();
+    fx.set_amount(1.0);
+    fx.set_depth(0.5);
+
+    let mut left = [1.0; BLOCK_SIZE];
+    let mut right = [1.0; BLOCK_SIZE];
+    fx.process(&mut left, &mut right);
+    fx.reset();
+
+    // A single block is not long enough for stale samples to emerge from the
+    // chorus lines, so observe several complete delay lengths.
+    for block in 0..RESET_PROBE_BLOCKS {
+        left.fill(0.0);
+        right.fill(0.0);
+        fx.process(&mut left, &mut right);
+        assert!(
+            left.iter().all(|sample| *sample == 0.0) && right.iter().all(|sample| *sample == 0.0),
+            "ensemble produced a stale sample after reset in probe block {block}"
+        );
+    }
+}
 
 #[test]
 fn diffuser() {
