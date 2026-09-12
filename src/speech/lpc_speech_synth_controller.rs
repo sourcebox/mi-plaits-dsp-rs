@@ -60,6 +60,13 @@ impl LpcSpeechSynthController<'_> {
 
     pub fn init(&mut self, sample_rate_hz: f32) {
         self.sample_rate_hz = sample_rate_hz;
+        self.clock_phase = 0.0;
+        self.playback_frame = -1;
+        self.last_playback_frame = -1;
+        self.remaining_frame_samples = 0;
+        self.sample.fill(0.0);
+        self.next_sample.fill(0.0);
+        self.gain = 0.0;
         self.synth.init();
     }
 
