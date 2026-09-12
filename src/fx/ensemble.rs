@@ -42,7 +42,7 @@ impl Ensemble {
     }
 
     pub fn reset(&mut self) {
-        self.engine.clear();
+        self.clear();
     }
 
     pub fn clear(&mut self) {
