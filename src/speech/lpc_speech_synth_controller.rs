@@ -452,3 +452,82 @@ const K7_LUT: [i8; 8] = [-64, -40, -16, 7, 31, 55, 79, 102];
 const K8_LUT: [i8; 8] = [-64, -44, -24, -4, 16, 37, 57, 77];
 
 const K9_LUT: [i8; 8] = [-51, -33, -15, 4, 22, 32, 59, 77];
+
+#[cfg(test)]
+mod tests {
+    use super::LpcSpeechSynthController;
+    use crate::utils::random;
+
+    const SAMPLE_RATE: f32 = 48_000.0;
+    const BLOCK_SIZE: usize = 24;
+    const SEED: u32 = 0x1234_5678;
+
+    fn render_word(
+        controller: &mut LpcSpeechSynthController,
+        trigger: bool,
+    ) -> ([f32; BLOCK_SIZE], [f32; BLOCK_SIZE]) {
+        let mut excitation = [0.0; BLOCK_SIZE];
+        let mut output = [0.0; BLOCK_SIZE];
+        controller.render(
+            false,
+            trigger,
+            0,
+            220.0 / SAMPLE_RATE,
+            0.0,
+            0.0,
+            0.25,
+            0.5,
+            1.0,
+            &mut excitation,
+            &mut output,
+        );
+        (excitation, output)
+    }
+
+    #[test]
+    fn init_restores_firmware_playback_state() {
+        let mut controller = LpcSpeechSynthController::new();
+        controller.clock_phase = 0.25;
+        controller.playback_frame = 7;
+        controller.last_playback_frame = 11;
+        controller.remaining_frame_samples = 99;
+        controller.sample = [0.25, -0.5];
+        controller.next_sample = [0.75, -1.0];
+        controller.gain = 0.75;
+
+        controller.init(44_100.0);
+
+        assert_eq!(controller.sample_rate_hz, 44_100.0);
+        assert_eq!(controller.clock_phase, 0.0);
+        assert_eq!(controller.playback_frame, -1);
+        assert_eq!(controller.last_playback_frame, -1);
+        assert_eq!(controller.remaining_frame_samples, 0);
+        assert_eq!(controller.sample, [0.0; 2]);
+        assert_eq!(controller.next_sample, [0.0; 2]);
+        assert_eq!(controller.gain, 0.0);
+    }
+
+    #[test]
+    fn reinitialized_controller_matches_fresh_output() {
+        let mut reinitialized = LpcSpeechSynthController::new();
+        reinitialized.init(SAMPLE_RATE);
+
+        random::seed(SEED);
+        for block in 0..8 {
+            let _ = render_word(&mut reinitialized, block == 0);
+        }
+        assert!(reinitialized.remaining_frame_samples > 0);
+
+        reinitialized.init(SAMPLE_RATE);
+
+        let mut fresh = LpcSpeechSynthController::new();
+        fresh.init(SAMPLE_RATE);
+
+        random::seed(SEED);
+        let actual = render_word(&mut reinitialized, false);
+        random::seed(SEED);
+        let expected = render_word(&mut fresh, false);
+
+        assert_eq!(actual, expected);
+    }
+}
