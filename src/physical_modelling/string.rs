@@ -66,6 +66,7 @@ impl String {
         self.stretch.reset();
         self.iir_damping_filter.init();
         self.dc_blocker.init(1.0 - 20.0 / sample_rate_hz);
+        self.delay = 100.0;
         self.dispersion_noise = 0.0;
         self.curved_bridge = 0.0;
         self.out_sample[0] = 0.0;
@@ -232,5 +233,20 @@ impl String {
             }
             *out_sample += crossfade(self.out_sample[1], self.out_sample[0], self.src_phase);
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::String;
+
+    #[test]
+    fn init_sets_initial_delay() {
+        let mut string = String::new();
+        string.delay = 12.0;
+
+        string.init(48_000.0);
+
+        assert_eq!(string.delay, 100.0);
     }
 }
