@@ -13,7 +13,7 @@ use crate::utils::polyblep::{
 pub const MAX_FREQUENCY: f32 = 0.25;
 pub const MIN_FREQUENCY: f32 = 0.000001;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum OscillatorShape {
     ImpulseTrain,
     Saw,

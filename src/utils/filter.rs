@@ -5,7 +5,7 @@
 #[allow(unused_imports)]
 use num_traits::float::Float;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum FilterMode {
     LowPass,
     BandPass,
@@ -13,7 +13,7 @@ pub enum FilterMode {
     HighPass,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum FrequencyApproximation {
     Exact,
     Accurate,

@@ -12,6 +12,7 @@ use crate::utils::{crossfade, one_pole};
 
 pub const DELAY_LINE_SIZE: usize = 1024;
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum StringNonLinearity {
     CurvedBridge,
     Dispersion,

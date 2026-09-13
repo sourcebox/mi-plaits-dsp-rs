@@ -4,7 +4,7 @@
 
 use crate::utils::random;
 
-#[derive(Debug, Default, PartialEq, Eq, Clone)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
 pub enum ArpeggiatorMode {
     #[default]
     Up,

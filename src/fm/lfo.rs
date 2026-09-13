@@ -7,7 +7,7 @@ use super::patch::ModulationParameters;
 use crate::oscillator::sine_oscillator::sine;
 use crate::utils::random;
 
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
 pub enum Waveform {
     #[default]
     Triangle,

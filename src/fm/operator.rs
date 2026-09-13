@@ -23,6 +23,7 @@ impl Operator {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ModulationSource {
     External = -2,
     None = -1,

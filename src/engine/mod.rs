@@ -68,7 +68,7 @@ pub struct EngineParameters {
     pub a0_normalized: f32,
 }
 
-#[derive(Debug, Default, PartialEq, Eq, Clone)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
 pub enum TriggerState {
     #[default]
     Low = 0,

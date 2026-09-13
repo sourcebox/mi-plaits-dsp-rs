@@ -12,11 +12,13 @@ use crate::utils::parameter_interpolator::ParameterInterpolator;
 use crate::utils::random;
 use crate::utils::units::semitones_to_ratio;
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum NoiseType {
     Square,
     RingMod,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum VcaType {
     Swing,
     Linear,

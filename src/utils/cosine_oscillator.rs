@@ -8,7 +8,7 @@
 #[allow(unused_imports)]
 use num_traits::float::Float;
 
-#[derive(Default)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
 pub enum CosineOscillatorMode {
     #[default]
     Approximate,
