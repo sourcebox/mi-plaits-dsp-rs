@@ -31,6 +31,9 @@ jobs:
       - name: Install pinned Rust toolchain
         run: rustup toolchain install --no-self-update
 
+      - name: Install target for ARM Cortex-M4F
+        run: rustup target add thumbv7em-none-eabihf
+
       - name: Install Linux system dependencies
         if: runner.os == 'Linux'
         run: |
@@ -42,6 +45,9 @@ jobs:
 
       - name: Build
         run: cargo build --all-targets
+
+      - name: Build for ARM Cortex-M4F
+        run: cargo build --target thumbv7em-none-eabihf
 
       - name: Test
         run: cargo test --all-targets
