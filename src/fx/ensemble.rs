@@ -112,3 +112,37 @@ impl Ensemble {
         self.depth = depth;
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::Ensemble;
+
+    const BLOCK_SIZE: usize = 24;
+    const RESET_PROBE_BLOCKS: usize = 400;
+
+    #[test]
+    fn reset_clears_delay_lines() {
+        let mut fx = Ensemble::new();
+        fx.init();
+        fx.set_amount(1.0);
+        fx.set_depth(0.5);
+
+        let mut left = [1.0; BLOCK_SIZE];
+        let mut right = [1.0; BLOCK_SIZE];
+        fx.process(&mut left, &mut right);
+        fx.reset();
+
+        // A single block is not long enough for stale samples to emerge from the
+        // chorus lines, so observe several complete delay lengths.
+        for block in 0..RESET_PROBE_BLOCKS {
+            left.fill(0.0);
+            right.fill(0.0);
+            fx.process(&mut left, &mut right);
+            assert!(
+                left.iter().all(|sample| *sample == 0.0)
+                    && right.iter().all(|sample| *sample == 0.0),
+                "ensemble produced a stale sample after reset in probe block {block}"
+            );
+        }
+    }
+}

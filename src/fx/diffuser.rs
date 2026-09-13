@@ -96,3 +96,37 @@ impl Diffuser {
         self.lp_decay = lp;
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::Diffuser;
+
+    const BLOCK_SIZE: usize = 24;
+    const RESET_PROBE_BLOCKS: usize = 400;
+
+    #[test]
+    fn reset_clears_delay_lines() {
+        let mut fx = Diffuser::new();
+        fx.init(48_000.0);
+
+        let mut in_out = [1.0; BLOCK_SIZE];
+        fx.process(1.0, 0.5, &mut in_out);
+
+        // Clearing the delay lines must not clear the persistent LP or LFO state,
+        // so use a clone with an explicit clear.
+        let mut expected = fx.clone();
+        fx.reset();
+        expected.clear();
+
+        for block in 0..RESET_PROBE_BLOCKS {
+            in_out.fill(0.0);
+            let mut expected_out = in_out;
+            fx.process(1.0, 0.5, &mut in_out);
+            expected.process(1.0, 0.5, &mut expected_out);
+            assert_eq!(
+                in_out, expected_out,
+                "diffuser reset did not clear its delay lines in probe block {block}"
+            );
+        }
+    }
+}
