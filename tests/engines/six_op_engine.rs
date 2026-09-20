@@ -144,3 +144,67 @@ fn six_op_engine_morph() {
     )
     .ok();
 }
+
+/// Renders one block with bank 0's "CS 80" patch, which has delayed,
+/// non-key-synced LFO pitch modulation.
+fn render_cs80_block(
+    engine: &mut six_op_engine::SixOpEngine<'_>,
+    trigger: TriggerState,
+    out: &mut [f32; BLOCK_SIZE],
+) {
+    let parameters = EngineParameters {
+        trigger,
+        note: 48.0,
+        timbre: 0.5,
+        morph: 0.5,
+        harmonics: 0.5,
+        accent: 1.0,
+        a0_normalized: A0_NORMALIZED,
+    };
+    let mut aux = [0.0; BLOCK_SIZE];
+    let mut already_enveloped = false;
+
+    engine.render(&parameters, out, &mut aux, &mut already_enveloped);
+}
+
+/// An unloaded voice's LFO must remain idle so its first note does not inherit
+/// invalid phase and produce runaway pitch modulation after the LFO delay.
+#[test]
+fn six_op_engine_second_voice_starts_with_settled_lfo() {
+    const FIRST_NOTE_BLOCKS: usize = 2500;
+    const SECOND_NOTE_BLOCKS: usize = 3000;
+    const MEASURED_BLOCKS: usize = 1000;
+    const MAX_STEP: f32 = 0.25;
+
+    let mut engine = six_op_engine::SixOpEngine::new(BLOCK_SIZE);
+    let mut out = [0.0; BLOCK_SIZE];
+
+    engine.init(SAMPLE_RATE);
+    engine.load_syx_bank(&SYX_BANK_0);
+
+    // Hold the first note while the second voice remains unloaded.
+    render_cs80_block(&mut engine, TriggerState::RisingEdge, &mut out);
+    for _ in 1..FIRST_NOTE_BLOCKS {
+        render_cs80_block(&mut engine, TriggerState::High, &mut out);
+    }
+    render_cs80_block(&mut engine, TriggerState::Low, &mut out);
+
+    // Rotate to the second voice and render past its LFO delay.
+    render_cs80_block(&mut engine, TriggerState::RisingEdge, &mut out);
+    let mut previous = out[BLOCK_SIZE - 1];
+    let mut max_step: f32 = 0.0;
+    for block in 1..SECOND_NOTE_BLOCKS {
+        render_cs80_block(&mut engine, TriggerState::High, &mut out);
+        for sample in out {
+            if block >= SECOND_NOTE_BLOCKS - MEASURED_BLOCKS {
+                max_step = max_step.max((sample - previous).abs());
+            }
+            previous = sample;
+        }
+    }
+
+    assert!(
+        max_step < MAX_STEP,
+        "second voice output has a sample step of {max_step}, expected below {MAX_STEP}"
+    );
+}

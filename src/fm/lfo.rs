@@ -63,7 +63,9 @@ impl Lfo {
     #[inline]
     pub fn init(&mut self, sample_rate: f32) {
         self.phase = 0.0;
-        self.frequency = 0.1;
+        // An LFO has no valid rate until a patch is set. Keep its phase fixed so
+        // an unloaded voice cannot accumulate phase before its first note.
+        self.frequency = 0.0;
         self.delay_phase = 0.0;
         self.delay_increment[0] = 0.1;
         self.delay_increment[1] = 0.1;
@@ -193,5 +195,25 @@ impl Lfo {
     #[inline]
     pub fn amp_mod(&self) -> f32 {
         (1.0 - self.value) * self.delay_ramp() * self.amp_mod_depth
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn init_holds_phase_until_set() {
+        let mut lfo = Lfo::new();
+        lfo.init(48_000.0);
+
+        for _ in 0..10_000 {
+            lfo.step(24.0);
+        }
+        assert_eq!(lfo.phase, 0.0);
+
+        lfo.set(&ModulationParameters::default());
+        lfo.step(24.0);
+        assert!(lfo.phase > 0.0);
     }
 }
