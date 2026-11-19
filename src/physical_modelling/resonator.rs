@@ -31,12 +31,16 @@ impl Resonator {
         let mut amplitudes = CosineOscillator::new();
         amplitudes.init(position, CosineOscillatorMode::Approximate);
 
-        for i in 0..resolution {
-            self.mode_amplitude[i] = amplitudes.next() * 0.25;
+        for mode_amplitude in self.mode_amplitude.iter_mut().take(resolution) {
+            *mode_amplitude = amplitudes.next() * 0.25;
         }
 
-        for i in 0..(MAX_NUM_MODES / MODE_BATCH_SIZE) {
-            self.mode_filters[i].init();
+        for mode_filter in self
+            .mode_filters
+            .iter_mut()
+            .take(MAX_NUM_MODES / MODE_BATCH_SIZE)
+        {
+            mode_filter.init();
         }
     }
 

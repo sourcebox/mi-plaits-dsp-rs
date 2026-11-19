@@ -230,8 +230,8 @@ impl<'a, const NUM_OPERATORS: usize, const NUM_ALGORITHMS: usize>
         if let Some(ref patch) = self.patch {
             // Reset operator phase if a note on is detected & if the patch requires it.
             if note_on && patch.reset_phase != 0 {
-                for i in 0..NUM_OPERATORS {
-                    self.operator[i].phase = 0;
+                for op in self.operator.iter_mut().take(NUM_OPERATORS) {
+                    op.phase = 0;
                 }
             }
 

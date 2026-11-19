@@ -229,8 +229,8 @@ impl RingModNoise {
 
     pub fn init(&mut self, sample_rate: f32) {
         self.sample_rate = sample_rate;
-        for i in 0..6 {
-            self.oscillator[i].init(sample_rate);
+        for osc in &mut self.oscillator {
+            osc.init(sample_rate);
         }
     }
 
