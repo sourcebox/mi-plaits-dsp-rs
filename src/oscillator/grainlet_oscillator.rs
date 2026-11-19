@@ -8,7 +8,7 @@
 use crate::oscillator::oscillator::MAX_FREQUENCY;
 use crate::oscillator::sine_oscillator::sine;
 use crate::utils::parameter_interpolator::ParameterInterpolator;
-use crate::utils::polyblep::this_blep_sample;
+use crate::utils::polyblep::{next_blep_sample, this_blep_sample};
 
 #[derive(Debug, Default, Clone)]
 pub struct GrainletOscillator {
@@ -96,7 +96,7 @@ impl GrainletOscillator {
 
                 let discontinuity = after - before;
                 this_sample += discontinuity * this_blep_sample(reset_time);
-                next_sample += discontinuity * this_blep_sample(reset_time);
+                next_sample += discontinuity * next_blep_sample(reset_time);
                 self.formant_phase = reset_time * f1;
             } else {
                 self.formant_phase += f1;
@@ -146,7 +146,7 @@ fn carrier(mut phase: f32, mut shape: f32) -> f32 {
             phase = 0.75;
         }
     }
-    sine(phase) + 1.0 * 0.25
+    (sine(phase) + 1.0) * 0.25
 }
 
 #[inline]
